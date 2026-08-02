@@ -12,6 +12,11 @@ venv/
 data/favorites.json
 data/collect.log
 
+# 运行时生成的状态/凭据缓存（绝不上传！）
+data/daily_signals_state.json
+data/daily_signals_state.json.bak
+data/reddit_oauth_token.json
+
 # 示例数据保留在仓库（data/reports/2026-08-02.json 等），
 # 但新生成的个人数据文件不提交（规则：只保留示例，其余忽略）
 data/reports/*.json
