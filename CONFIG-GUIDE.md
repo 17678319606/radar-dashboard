@@ -11,6 +11,8 @@
 
 **作用**：把英文信号（App Store 美/日/韩、GitHub、Product Hunt 等）自动翻译成中文。没有它，英文内容显示原文。
 
+> 💡 **如果你已经装了 Hermes Agent**：跳过这一步，脚本会自动读取 `~/.hermes/.env` 里的 `DEEPSEEK_API_KEY`，无需重复配置。
+
 **申请步骤**：
 1. 打开 https://platform.deepseek.com/ → 注册/登录
 2. 左侧菜单 →「API Keys」→「创建 API Key」

@@ -136,6 +136,8 @@ crontab -e
 | `PH_TOKEN` | Product Hunt 每日新品 | https://www.producthunt.com/v2/oauth/applications | 🟢 可选 |
 | `REDDIT_*` | Reddit 信号（IP 被封时需 OAuth） | https://www.reddit.com/prefs/apps | 🟡 可选 |
 
+> 💡 **用了 Hermes 就不用重复配 DeepSeek Key**：采集脚本会自动读取 `~/.hermes/.env` 里的 `DEEPSEEK_API_KEY`（Hermes 自己的模型配置），无需在项目 `.env` 里再填一遍。只有不用 Hermes 时才需要手动配置。
+
 ## 🗂️ 目录结构
 
 ```

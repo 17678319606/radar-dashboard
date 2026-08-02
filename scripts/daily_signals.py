@@ -1002,13 +1002,20 @@ def fetch_appstore():
 # ============================================================
 
 def _get_deepseek_key():
-    """从环境变量或本地 .env 读取 DeepSeek API key"""
+    """从环境变量或本地 .env 读取 DeepSeek API key
+
+    读取优先级：
+    1. 环境变量 DEEPSEEK_API_KEY
+    2. 脚本目录 .env（项目自带）
+    3. ~/.hermes/.env（Hermes 用户已配置的 Key，复用无需重复配置）
+    4. 用户主目录 .env
+    """
     key = os.environ.get("DEEPSEEK_API_KEY", "")
     if key:
         return key
     try:
-        # 优先读脚本目录的 .env，其次用户主目录 .env
-        for env_file in [SCRIPT_DIR / '.env', Path.home() / '.env']:
+        # 优先读脚本目录的 .env，其次 Hermes 配置，最后用户主目录 .env
+        for env_file in [SCRIPT_DIR / '.env', Path.home() / '.hermes' / '.env', Path.home() / '.env']:
             if env_file.exists():
                 for line in env_file.read_text().splitlines():
                     if line.startswith("DEEPSEEK_API_KEY="):
