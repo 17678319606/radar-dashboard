@@ -86,6 +86,7 @@ bash start.sh
    「小程序机会」就是 `modules.miniProgram` 这个数组——面板专页直接读它，跨日期自动聚合。
 3. **怎么展示**：`app.py`（Flask 后端，只读 JSON 出 REST API）+ `templates/index.html`（单文件前端，hash 路由 `#/miniapp` 等）。后端无数据库，纯文件即数据，改 JSON 就能看到效果。
 4. **要自动化的 Agent**：读 `hermes-integration/HERMES-INTEGRATION.md`（配置 Hermes 全自动采集+生成+推送的完整步骤），skill 定义在 `hermes-integration/hn-daily-radar-SKILL.md`（含日报模板、cron prompt、JSON schema、故障排查）。
+5. **Key 约定**：脚本按 环境变量 → 项目 `.env` → `~/.hermes/.env`（Hermes 用户的 Key，自动复用）→ `~/.env` 的顺序读 `DEEPSEEK_API_KEY`；`TRUSTMRR_API_KEY` / `PH_TOKEN` / `REDDIT_*` 只从环境变量和项目 `.env` 读。给 Hermes 用户配置时，DeepSeek Key 不用重复填。
 
 **Agent 要做的日常操作**：加数据源（改 daily_signals.py + SOURCE_META）、改日报风格（改 skill 里的 prompt 模板）、修展示（改 index.html）、跑采集（`python3 scripts/daily_signals.py`）。
 
@@ -149,7 +150,9 @@ radar-dashboard/
 ├── scripts/
 │   ├── daily_signals.py    # 数据采集脚本（19 源）
 │   └── screenshot.py       # 生成 README 截图（Playwright）
-├── docs/screenshot-miniapp.png  # README 截图（小程序机会页）
+├── docs/
+│   ├── screenshot-miniapp.png  # README 截图（小程序机会页）
+│   └── wechat-qrcode.png       # 公众号二维码（README 底部）
 ├── data/
 │   ├── reports/            # 日报 JSON
 │   ├── raw_signals/        # 原始信号 JSON
@@ -170,7 +173,7 @@ radar-dashboard/
 如果你某天也采集/生成了 2026-08-02 的日报，会覆盖示例（正常，说明你开始有自己的数据了）。
 
 **没有 DeepSeek Key 会怎样？**
-App Store 美国/日本/韩国、GitHub、Product Hunt 等英文内容不翻译，显示原文。其他功能正常。
+App Store 美国/日本/韩国、GitHub、Product Hunt 等英文内容不翻译，显示原文。其他功能正常。如果你装了 Hermes 且已配置 Key，脚本会自动读取 `~/.hermes/.env`，无需手动填。
 
 **数据存在哪？**
 全部在本机 `data/` 目录，纯 JSON 文本，方便备份迁移。

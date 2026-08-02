@@ -55,19 +55,23 @@ deliver:  origin              # 或指定 Telegram 群
 
 ### 4. 配置 Key
 
-编辑 `~/.hermes/.env` 或对话里告诉 Hermes：
+**Hermes 用户通常什么都不用配**：如果你的 `~/.hermes/.env` 已有 `DEEPSEEK_API_KEY`（Hermes 主模型用的就是它），采集脚本会自动读取，无需重复配置。
+
+按需补充其他 Key（编辑 `~/.hermes/.env` 或对话里告诉 Hermes）：
 
 ```
-DEEPSEEK_API_KEY=你的Key      # 英文自动翻译中文（推荐）
-TRUSTMRR_API_KEY=你的Key      # 可选
+DEEPSEEK_API_KEY=你的Key      # 英文自动翻译中文（推荐，Hermes 已配则跳过）
+TRUSTMRR_API_KEY=你的Key      # 已验证收入创业公司数据（推荐）
 PH_TOKEN=你的Token            # 可选
-REDDIT_CLIENT_ID=...          # 可选（解锁 Reddit）
+REDDIT_CLIENT_ID=...          # 可不配（易风控，见下）
 REDDIT_CLIENT_SECRET=...
 REDDIT_USERNAME=...
 REDDIT_PASSWORD=...
 ```
 
-**Key 申请步骤见 `../CONFIG-GUIDE.md`**（手把手教学：DeepSeek / trustmrr / Product Hunt / Reddit 每个都写了去哪申请、怎么填）。也可以直接对 Hermes 说「帮我申请 DeepSeek API Key 需要做什么」，它会给你指引。
+> ⚠️ **Reddit 建议不配**：Reddit 对数据中心 IP 风控严格，容易 403/封 IP，配置后也未必稳定。不配不影响其他 18 个源，等真遇到需要再说。
+
+**Key 申请步骤见 `../CONFIG-GUIDE.md`**（手把手教学：DeepSeek / trustmrr / Product Hunt / Reddit 每个都写了去哪申请、怎么填，并标注了优先级）。也可以直接对 Hermes 说「帮我申请 DeepSeek API Key 需要做什么」，它会给你指引。
 
 ## ⚠️ 安全提醒
 
