@@ -1,0 +1,1791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>独立开发者雷达日报</title>
+<style>
+/* ─── Reset & Base ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0b0d12;
+  --surface: #13161e;
+  --card: #1a1e2a;
+  --card-hover: #1f2433;
+  --border: #2a2f45;
+  --text: #e4e7ed;
+  --text-secondary: #8b90a0;
+  --accent: #6c8cff;
+  --accent-glow: rgba(108,140,255,0.15);
+  --green: #4ade80;
+  --orange: #fb923c;
+  --red: #f87171;
+  --purple: #a78bfa;
+  --teal: #2dd4bf;
+  --pink: #f472b6;
+  --sidebar: 240px;
+  --radius: 12px;
+  --content-max: 1100px;
+  font-size: 15px;
+}
+html { scroll-behavior: smooth; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans SC', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+.layout {
+  display: flex;
+  width: 100%;
+  max-width: 1400px;
+}
+
+.module-color-opportunities { border-left: 3px solid var(--green); }
+.module-color-moneyCases { border-left: 3px solid var(--orange); }
+.module-color-productInspirations { border-left: 3px solid var(--purple); }
+.module-color-growthTips { border-left: 3px solid var(--teal); }
+.module-color-tools { border-left: 3px solid var(--pink); }
+.module-color-pitfalls { border-left: 3px solid var(--red); }
+.module-color-dataSignals { border-left: 3px solid var(--accent); }
+.module-color-dailyWisdom { border-left: 3px solid #facc15; }
+
+/* ─── Sidebar ─── */
+.sidebar {
+  width: var(--sidebar);
+  min-width: var(--sidebar);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.sidebar-header {
+  padding: 24px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-header h1 {
+  font-size: 1.05rem; font-weight: 700; color: var(--accent);
+  letter-spacing: -.02em;
+}
+.sidebar-header .sub { font-size: .7rem; color: var(--text-secondary); margin-top: 3px; opacity: .7; }
+.sidebar-nav { flex: 1; padding: 6px 10px; }
+.nav-section { margin-bottom: 4px; }
+.nav-section-title {
+  font-size: .65rem; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--text-secondary); padding: 8px 12px 4px; opacity: .6;
+}
+.nav-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 12px; border-radius: 8px;
+  font-size: .85rem; color: var(--text); cursor: pointer;
+  transition: all .15s; text-decoration: none;
+}
+.nav-item:hover { background: var(--card); }
+.nav-item.active { background: var(--accent-glow); color: var(--accent); }
+.nav-item .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.nav-item .badge {
+  margin-left: auto; font-size: .7rem; background: var(--card); padding: 1px 6px;
+  border-radius: 10px; color: var(--text-secondary);
+}
+.sidebar-footer {
+  padding: 12px 16px; border-top: 1px solid var(--border);
+  font-size: .75rem; color: var(--text-secondary);
+}
+
+/* ─── Main Content ─── */
+.main { flex: 1; min-width: 0; padding: 0; }
+.topbar {
+  display: flex; align-items: center; justify-content: center; padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--bg); z-index: 10;
+}
+.topbar-inner {
+  display: flex; align-items: center; gap: 12px;
+  width: 100%; max-width: var(--content-max);
+}
+.topbar h2 { font-size: 1rem; font-weight: 600; }
+.topbar .stats {
+  margin-left: auto; display: flex; gap: 16px; font-size: .75rem;
+}
+.topbar .stat-item { color: var(--text-secondary); }
+.topbar .stat-item strong { color: var(--text); }
+.content {
+  padding: 24px 24px 60px;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ─── Cards ─── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  transition: all .2s ease;
+  cursor: pointer;
+  position: relative;
+}
+.card:hover {
+  background: var(--card-hover);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(0,0,0,.25);
+}
+.card-title {
+  font-size: .9rem; font-weight: 600;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.card-meta {
+  font-size: .75rem; color: var(--text-secondary); margin-top: 6px;
+  display: flex; align-items: center; gap: 8px;
+}
+.card-desc {
+  font-size: .82rem; color: var(--text-secondary);
+  margin-top: 8px;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+
+/* ─── Timeline ─── */
+.timeline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 14px;
+}
+.timeline-card {
+  position: relative;
+}
+.timeline-card .date-badge {
+  position: absolute; top: -6px; right: 12px;
+  background: var(--accent); color: #fff; font-size: .68rem;
+  padding: 2px 10px; border-radius: 8px; font-weight: 600;
+  letter-spacing: .02em;
+}
+.timeline-card .module-chips {
+  display: flex; gap: 4px; flex-wrap: wrap; margin-top: 12px;
+}
+.timeline-card .chip {
+  font-size: .65rem; padding: 2px 8px; border-radius: 4px;
+  background: var(--surface); color: var(--text-secondary);
+}
+
+/* ─── Daily Detail ─── */
+.daily-header {
+  margin-bottom: 28px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.daily-header .date-large { font-size: 1.8rem; font-weight: 700; letter-spacing: -.02em; }
+.daily-header .source-stats {
+  display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap;
+}
+.daily-header .source-stat {
+  display: flex; align-items: center; gap: 4px;
+  font-size: .8rem; color: var(--text-secondary);
+  background: var(--surface); padding: 4px 10px; border-radius: 6px;
+}
+.module-section {
+  margin-bottom: 28px;
+}
+.module-header {
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.module-header h3 { font-size: 1rem; font-weight: 600; }
+.module-header .count {
+  font-size: .7rem; color: var(--text-secondary); margin-left: auto;
+  background: var(--card); padding: 2px 8px; border-radius: 10px;
+}
+.module-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  transition: border-color .15s;
+}
+.module-item:hover { border-color: rgba(108,140,255,.25); }
+.module-item h4 { font-size: .9rem; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+.module-item .label-row {
+  display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
+}
+.module-item .label {
+  font-size: .7rem; padding: 2px 8px; border-radius: 4px;
+  background: var(--card); color: var(--text-secondary);
+}
+.module-item .field {
+  font-size: .82rem; color: var(--text-secondary);
+  margin-top: 6px;
+}
+.module-item .field strong { color: var(--text); }
+.module-item .perspective {
+  margin-top: 8px; font-size: .82rem; color: var(--accent);
+  border-left: 2px solid var(--accent); padding-left: 10px;
+}
+.wisdom-card {
+  background: linear-gradient(135deg, rgba(250,204,21,.08), transparent);
+  border: 1px solid rgba(250,204,21,.2);
+}
+.wisdom-card .wisdom-steps {
+  margin-top: 8px; padding-left: 20px;
+}
+.wisdom-card .wisdom-steps li { font-size: .82rem; color: var(--text-secondary); margin-bottom: 4px; }
+
+/* ─── Module View (cross-day) ─── */
+.module-view-header {
+  margin-bottom: 20px;
+}
+.module-view-header h2 { font-size: 1.3rem; font-weight: 700; }
+.module-view-header .desc { font-size: .82rem; color: var(--text-secondary); margin-top: 4px; }
+.date-chip {
+  background: var(--card); border: 1px solid var(--border); color: var(--text-secondary);
+  border-radius: 16px; padding: 4px 14px; font-size: .78rem; cursor: pointer;
+  transition: all .15s; font-family: inherit;
+}
+.date-chip:hover { border-color: var(--accent); color: var(--text); }
+.date-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+/* ─── 信号流 · 热榜布局 ─── */
+.raw-layout {
+  display: flex; gap: 14px; align-items: flex-start;
+}
+.raw-sources {
+  width: 170px; min-width: 170px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 8px;
+  position: sticky; top: 70px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.raw-source-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 10px; border-radius: 7px; font-size: .8rem;
+  color: var(--text); cursor: pointer; transition: all .12s;
+  border: none; background: none; font-family: inherit; text-align: left; width: 100%;
+}
+.raw-source-item:hover { background: var(--card); }
+.raw-source-item.active { background: var(--accent-glow); color: var(--accent); font-weight: 600; }
+.raw-source-item .src-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.raw-source-item .src-count {
+  margin-left: auto; font-size: .65rem; color: var(--text-secondary);
+  background: var(--card); border-radius: 8px; padding: 1px 7px;
+}
+.raw-source-item.active .src-count { background: rgba(108,140,255,.15); color: var(--accent); }
+
+.raw-board {
+  flex: 1; min-width: 0;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; overflow: hidden;
+}
+.raw-board-header {
+  padding: 10px 16px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.raw-board-header h3 { font-size: .95rem; font-weight: 700; }
+.raw-board-header .board-meta {
+  margin-left: auto; font-size: .7rem; color: var(--text-secondary);
+}
+.raw-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 16px; border-bottom: 1px solid rgba(42,47,69,.5);
+  font-size: .82rem; transition: background .1s;
+}
+.raw-row:hover { background: var(--card); }
+.raw-row .rank {
+  width: 24px; text-align: center; font-weight: 700; color: var(--text-secondary);
+  flex-shrink: 0; font-size: .8rem;
+}
+.raw-row:nth-child(2) .rank, .raw-row:nth-child(3) .rank, .raw-row:nth-child(4) .rank { color: var(--accent); }
+.raw-row .row-title {
+  color: var(--text); text-decoration: none;
+  font-size: .85rem;
+}
+.raw-row .row-title:hover { color: var(--accent); }
+.raw-row .row-sub {
+  color: var(--text-secondary); font-size: .68rem; opacity: .7;
+  margin-left: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  vertical-align: middle;
+}
+.raw-row .row-cn-desc {
+  color: var(--text-secondary); font-size: .7rem; opacity: .8;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.raw-row .row-main { display: block; min-width: 0; }
+.raw-row .row-main .row-title, .raw-row .row-main .row-sub { display: inline-block; max-width: 100%; }
+.raw-row .row-points {
+  color: var(--orange); font-size: .72rem; flex-shrink: 0; font-weight: 600;
+}
+.raw-row .row-time {
+  color: var(--text-secondary); font-size: .68rem; flex-shrink: 0; width: 44px; text-align: right;
+}
+.raw-row .row-link {
+  flex-shrink: 0; font-size: .72rem; color: var(--text-secondary); text-decoration: none;
+  opacity: .6; transition: opacity .12s;
+}
+.raw-row:hover .row-link { opacity: 1; color: var(--accent); }
+.raw-empty-row { padding: 30px; text-align: center; color: var(--text-secondary); font-size: .8rem; }
+
+/* ─── 信息源管理页 ─── */
+.sources-summary {
+  display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;
+}
+.source-stat-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 18px; min-width: 130px;
+}
+.source-stat-card .num { font-size: 1.5rem; font-weight: 700; }
+.source-stat-card .lbl { font-size: .72rem; color: var(--text-secondary); margin-top: 2px; }
+.source-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 12px;
+}
+.source-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; transition: all .15s;
+}
+.source-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.source-card .src-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.source-card .src-emoji { font-size: 1.3rem; }
+.source-card .src-name { font-size: .95rem; font-weight: 700; flex: 1; }
+.source-card .src-badge {
+  font-size: .68rem; padding: 2px 10px; border-radius: 10px; font-weight: 600;
+}
+.src-badge.ok { background: rgba(74,222,128,.15); color: #4ade80; }
+.src-badge.error { background: rgba(239,68,68,.15); color: #ef4444; }
+.src-badge.config_required { background: rgba(250,204,21,.15); color: #eab308; }
+.src-badge.stale { background: rgba(148,163,184,.15); color: #94a3b8; }
+.src-badge.no_data { background: rgba(148,163,184,.12); color: #94a3b8; }
+.source-card .src-desc { font-size: .78rem; color: var(--text-secondary); margin-bottom: 10px; line-height: 1.5; }
+.source-card .src-meta { display: flex; gap: 14px; font-size: .72rem; color: var(--text-secondary); flex-wrap: wrap; }
+.source-card .src-meta b { color: var(--text); font-weight: 600; }
+.source-card .src-note { font-size: .7rem; color: #eab308; margin-top: 8px; }
+.source-group-title { font-size: .9rem; font-weight: 700; color: var(--text-secondary); margin: 20px 0 10px; display: flex; align-items: center; gap: 8px; }
+.source-group-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+/* ─── 小程序机会专页 ─── */
+.mp-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px;
+}
+.mp-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; transition: all .15s; display: flex; flex-direction: column; gap: 8px;
+}
+.mp-card:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.15); }
+.mp-head { display: flex; align-items: flex-start; gap: 8px; }
+.mp-title { font-size: .95rem; font-weight: 700; color: var(--text); flex: 1; line-height: 1.4; }
+.mp-date { font-size: .66rem; color: var(--text-secondary); background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 2px 8px; flex-shrink: 0; }
+.mp-kw { display: flex; flex-wrap: wrap; gap: 4px; }
+.mp-kw span {
+  font-size: .66rem; color: var(--green); background: rgba(34,197,94,.1);
+  border: 1px solid rgba(34,197,94,.25); border-radius: 8px; padding: 1px 8px;
+}
+.mp-line { font-size: .75rem; color: var(--text-secondary); line-height: 1.5; }
+.mp-line b { color: var(--text); font-weight: 600; }
+.mp-signal {
+  font-size: .68rem; color: var(--accent); opacity: .85; line-height: 1.4;
+  border-top: 1px dashed var(--border); padding-top: 6px;
+}
+.mp-filter {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 7px 14px; font-size: .8rem; width: 260px; font-family: inherit;
+  margin-bottom: 14px; outline: none;
+}
+.mp-filter:focus { border-color: var(--green); }
+.mp-empty { padding: 40px; text-align: center; color: var(--text-secondary); font-size: .85rem; }
+
+/* ─── 收藏按钮 ─── */
+.fav-btn {
+  background: none; border: none; cursor: pointer; padding: 2px 6px;
+  font-size: 1rem; color: var(--text-secondary); opacity: .5;
+  transition: all .15s; flex-shrink: 0; line-height: 1;
+}
+.fav-btn:hover { opacity: 1; transform: scale(1.15); }
+.fav-btn .fav-star { font-style: normal; }
+.fav-btn.is-fav { color: #fbbf24; opacity: 1; }
+.fav-btn.is-fav .fav-star { text-shadow: 0 0 8px rgba(251,191,36,.5); }
+.fav-btn-large { font-size: 1.3rem; padding: 4px 8px; }
+.raw-row .fav-btn { opacity: 0; }
+.raw-row:hover .fav-btn { opacity: .5; }
+.raw-row:hover .fav-btn:hover { opacity: 1; }
+
+/* ─── 收藏页 ─── */
+.fav-group-title { font-size: .9rem; font-weight: 700; color: var(--text-secondary); margin: 18px 0 10px; display: flex; align-items: center; gap: 8px; }
+.fav-group-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.fav-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  padding: 12px 14px; display: flex; gap: 10px; align-items: flex-start; transition: all .15s;
+}
+.fav-card:hover { border-color: #fbbf24; }
+.fav-card .fav-body { flex: 1; min-width: 0; }
+.fav-card .fav-title { font-size: .9rem; font-weight: 700; color: var(--text); text-decoration: none; }
+.fav-card .fav-title:hover { color: #fbbf24; }
+.fav-card .fav-meta { display: flex; gap: 10px; flex-wrap: wrap; font-size: .7rem; color: var(--text-secondary); margin-top: 5px; }
+.fav-card .fav-meta .chip {
+  background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 1px 8px;
+}
+.fav-card .fav-desc { font-size: .75rem; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+.fav-tag {
+  font-size: .66rem; padding: 2px 10px; border-radius: 10px; font-weight: 600; flex-shrink: 0;
+  align-self: flex-start;
+}
+.fav-tag.signal { background: rgba(96,165,250,.15); color: #60a5fa; }
+.fav-tag.report_item { background: rgba(251,191,36,.15); color: #fbbf24; }
+.fav-tag.miniapp { background: rgba(34,197,94,.15); color: #4ade80; }
+.cross-day-list { display: flex; flex-direction: column; gap: 8px; }
+.cross-day-item {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px 16px; transition: all .2s ease;
+}
+.cross-day-item:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 3px 14px rgba(0,0,0,.2); }
+.cross-day-item .date-col {
+  font-size: .75rem; color: var(--accent); white-space: nowrap;
+  min-width: 72px; padding-top: 3px; font-weight: 500;
+}
+.cross-day-item .content-col { flex: 1; min-width: 0; }
+.cross-day-item .content-col h4 { font-size: .85rem; font-weight: 600; }
+.cross-day-item .content-col p { font-size: .78rem; color: var(--text-secondary); margin-top: 4px; }
+
+.cross-day-item .detail-fields {
+  margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+  font-size: .78rem; color: var(--text-secondary);
+}
+.cross-day-item .detail-fields .field { margin-bottom: 4px; }
+.cross-day-item .detail-fields .field strong { color: var(--text); }
+.cross-day-item .detail-fields .perspective {
+  margin-top: 6px; color: var(--accent);
+  border-left: 2px solid var(--accent); padding-left: 8px; font-size: .78rem;
+}
+.cross-day-item .view-all-link {
+  text-align: right; margin-top: 8px;
+}
+.cross-day-item .view-all-link a {
+  font-size: .75rem; color: var(--text-secondary); text-decoration: none;
+  transition: color .15s; cursor: pointer;
+}
+.cross-day-item .view-all-link a:hover { color: var(--accent); }
+
+/* ─── Stats ─── */
+.stats-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 20px 16px; text-align: center;
+  transition: all .2s ease;
+}
+.stat-card:hover { border-color: var(--accent); transform: translateY(-1px); box-shadow: 0 4px 20px rgba(0,0,0,.2); }
+.stat-card .stat-value { font-size: 1.8rem; font-weight: 700; color: var(--accent); line-height: 1.2; }
+.stat-card .stat-label { font-size: .75rem; color: var(--text-secondary); margin-top: 4px; }
+.stat-card .stat-sub { font-size: .65rem; color: var(--text-secondary); margin-top: 2px; }
+
+.trends-section h3 { font-size: .9rem; margin-bottom: 10px; }
+.trend-item { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.trend-item .trend-tag { font-size: .82rem; min-width: 80px; }
+.trend-item .trend-bar {
+  flex: 1; height: 6px; border-radius: 3px; background: var(--surface);
+  overflow: hidden;
+}
+.trend-item .trend-fill {
+  height: 100%; border-radius: 3px; background: var(--accent);
+  transition: width .5s ease;
+}
+.trend-item .trend-count { font-size: .72rem; color: var(--text-secondary); min-width: 24px; text-align: right; }
+
+/* ─── Empty State ─── */
+.empty-state {
+  text-align: center; padding: 80px 20px; color: var(--text-secondary);
+}
+.empty-state .icon { font-size: 3rem; margin-bottom: 16px; opacity: .6; }
+.empty-state h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+.empty-state p { font-size: .82rem; max-width: 420px; margin: 0 auto; line-height: 1.6; }
+.empty-state .hint {
+  margin-top: 20px; font-size: .75rem; background: var(--card);
+  padding: 14px 20px; border-radius: 10px; display: inline-block;
+  line-height: 1.6; text-align: left;
+}
+
+/* ─── Loading ─── */
+.loading {
+  text-align: center; padding: 40px; color: var(--text-secondary);
+  font-size: .85rem;
+}
+.loading .spinner {
+  display: inline-block; width: 20px; height: 20px;
+  border: 2px solid var(--border); border-top-color: var(--accent);
+  border-radius: 50%; animation: spin .6s linear infinite;
+  margin-bottom: 8px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Back Button ─── */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: .8rem; color: var(--accent); cursor: pointer;
+  margin-bottom: 16px; background: none; border: none;
+  padding: 4px 0; transition: all .15s;
+}
+.back-btn:hover { opacity: .8; }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .sidebar { width: 56px; min-width: 56px; }
+  .sidebar-header { padding: 16px 12px 12px; }
+  .sidebar-header h1, .sidebar-header .sub,
+  .nav-section-title, .nav-item span, .badge, .sidebar-footer { display: none; }
+  .nav-item { justify-content: center; padding: 10px; border-radius: 6px; }
+  .nav-item .dot { width: 6px; height: 6px; }
+  .nav-section { margin-bottom: 2px; }
+  .content { padding: 16px; }
+  .timeline-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .topbar .stats { display: none; }
+  .topbar-inner { padding: 0 4px; }
+}
+
+/* ─── Expandable ─── */
+.expandable-content {
+  max-height: 0; overflow: hidden;
+  transition: max-height .3s ease, opacity .2s ease;
+  opacity: 0;
+}
+.expandable-content.open {
+  max-height: 2000px; opacity: 1;
+}
+.expand-toggle {
+  font-size: .75rem; color: var(--accent); cursor: pointer;
+  padding: 2px 0; border: none; background: none;
+}
+.expand-toggle:hover { text-decoration: underline; }
+
+/* ─── Notes ─── */
+.notes-section { margin-top: 8px; }
+.note-input {
+  width: 100%; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; color: var(--text); font-size: .78rem;
+  padding: 6px 10px; resize: vertical; min-height: 32px;
+  font-family: inherit;
+}
+.note-input:focus { outline: none; border-color: var(--accent); }
+.note-item { font-size: .75rem; color: var(--text-secondary); padding: 4px 0; border-bottom: 1px solid var(--border); }
+.note-item .date { font-size: .65rem; color: var(--text-secondary); }
+
+/* ─── Scrollbar ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #3a3f55; }
+</style>
+</head>
+<body>
+
+<!-- ═══ Sidebar ═══ -->
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <h1>📡 雷达日报</h1>
+    <div class="sub">独立开发者信号面板</div>
+  </div>
+  <nav class="sidebar-nav" id="nav">
+    <div class="nav-section">
+      <div class="nav-section-title">概览</div>
+      <a class="nav-item active" href="#/" data-route="home">
+        <span class="dot" style="background:var(--accent)"></span>
+        <span>日报时间线</span>
+      </a>
+      <a class="nav-item" href="#/miniapp" data-route="miniapp">
+        <span class="dot" style="background:var(--green)"></span>
+        <span>📱 小程序机会</span>
+      </a>
+      <a class="nav-item" href="#/stats" data-route="stats">
+        <span class="dot" style="background:var(--teal)"></span>
+        <span>统计趋势</span>
+      </a>
+      <a class="nav-item" href="#/raw" data-route="raw">
+        <span class="dot" style="background:var(--orange)"></span>
+        <span>信号流</span>
+      </a>
+      <a class="nav-item" href="#/sources" data-route="sources">
+        <span class="dot" style="background:#22c55e"></span>
+        <span>信息源管理</span>
+      </a>
+      <a class="nav-item" href="#/favorites" data-route="favorites">
+        <span class="dot" style="background:#fbbf24"></span>
+        <span>⭐ 我的收藏</span>
+      </a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">模块库</div>
+      <a class="nav-item" href="#/module/opportunities" data-route="module-opportunities">
+        <span class="dot" style="background:var(--green)"></span>
+        <span>机会库</span>
+        <span class="badge" data-badge="opportunities">0</span>
+      </a>
+      <a class="nav-item" href="#/module/money-cases" data-route="module-money-cases">
+        <span class="dot" style="background:var(--orange)"></span>
+        <span>赚钱案例库</span>
+        <span class="badge" data-badge="money-cases">0</span>
+      </a>
+      <a class="nav-item" href="#/module/inspirations" data-route="module-inspirations">
+        <span class="dot" style="background:var(--purple)"></span>
+        <span>产品灵感库</span>
+        <span class="badge" data-badge="inspirations">0</span>
+      </a>
+      <a class="nav-item" href="#/module/growth" data-route="module-growth">
+        <span class="dot" style="background:var(--teal)"></span>
+        <span>增长技巧库</span>
+        <span class="badge" data-badge="growth">0</span>
+      </a>
+      <a class="nav-item" href="#/module/signals" data-route="module-signals">
+        <span class="dot" style="background:var(--accent)"></span>
+        <span>数据信号库</span>
+        <span class="badge" data-badge="signals">0</span>
+      </a>
+      <a class="nav-item" href="#/module/mini-program" data-route="module-mini-program">
+        <span class="dot" style="background:var(--green)"></span>
+        <span>小程序机会库</span>
+        <span class="badge" data-badge="mini-program">0</span>
+      </a>
+      <a class="nav-item" href="#/module/wisdom" data-route="module-wisdom">
+        <span class="dot" style="background:#facc15"></span>
+        <span>心法库</span>
+        <span class="badge" data-badge="wisdom">0</span>
+      </a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <span id="reportCount">加载中...</span>
+  </div>
+</aside>
+
+<!-- ═══ Main ═══ -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <h2 id="pageTitle">日报时间线</h2>
+      <div class="stats" id="topStats">
+        <span class="stat-item">📡 <strong id="topTotal">-</strong> 份日报</span>
+        <span class="stat-item">📦 <strong id="topModules">-</strong> 模块</span>
+        <span class="stat-item">📊 <strong id="topTrend">-</strong> 趋势</span>
+      </div>
+    </div>
+  </div>
+  <div class="content" id="content">
+    <div class="loading"><div class="spinner"></div>加载中...</div>
+  </div>
+</main>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// 前端 SPA — 客户端路由 + API 调用 + 渲染
+// ═══════════════════════════════════════════════════════
+
+const API = '';
+let allReports = [];
+let moduleCounts = {};
+
+// ─── 路由 ───
+function getRoute() {
+  const hash = location.hash.slice(1) || '/';
+  const parts = hash.split('/').filter(Boolean);
+  return { hash, parts };
+}
+
+function navigate(path) {
+  history.pushState(null, '', '#' + path);
+  render();
+}
+
+// ─── API ───
+async function api(path) {
+  const r = await fetch(API + '/api' + path);
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// ─── 我的收藏页 ───
+const FAV_TYPE_LABELS = {
+  'signal': '📡 信号',
+  'report_item': '📋 日报模块',
+  'miniapp': '📱 小程序机会',
+};
+
+// 收藏页描述文本（按类型展示完整字段）
+function favDescText(f) {
+  const r = f.raw || {};
+  if (f.type === 'miniapp') {
+    const parts = [];
+    if (r.inspiration) parts.push(`💡 启发：${r.inspiration}`);
+    if (r.suggestion) parts.push(`🛠 建议：${r.suggestion}`);
+    if (r.keywords && r.keywords.length) parts.push(`🏷 关键词：${r.keywords.join(' / ')}`);
+    if (r.userNeed) parts.push(`👤 用户需求：${r.userNeed}`);
+    if (r.painPoint) parts.push(`⚠️ 痛点：${r.painPoint}`);
+    if (r.howToBuild) parts.push(`📝 怎么做：${r.howToBuild}`);
+    if (r.relatedSignal) parts.push(`📡 关联信号：${r.relatedSignal}`);
+    return parts.join('\n');
+  }
+  if (f.type === 'report_item') {
+    const parts = [];
+    const desc = f.desc_cn || f.desc || '';
+    if (desc) parts.push(desc);
+    const fields = [
+      ['📡 信号', r.signal],
+      ['✅ 为什么', r.whyNow],
+      ['💡 建议', r.suggestion],
+      ['💰 变现', r.monetization],
+      ['📈 流量', r.traffic],
+      ['💰 收入', r.revenue],
+      ['🧠 视角', r.perspective],
+      ['📊 判断', r.judgment],
+      ['👀 观察', r.observation],
+    ];
+    fields.forEach(([k, v]) => { if (v && v !== desc) parts.push(`${k}：${v}`); });
+    if (r.replicable === true) parts.push('🔄 可复制');
+    if (r.replicable === false) parts.push('🔄 难复制');
+    return parts.join('\n');
+  }
+  return f.desc_cn || f.desc || '';
+}
+
+async function renderFavorites(container) {
+  let favs;
+  try {
+    favs = await api('/favorites');
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>${escapeHtml(err.message)}</p></div>`;
+    return;
+  }
+
+  if (!favs.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">⭐</div>
+        <h3>还没有收藏</h3>
+        <p>在信号流、日报详情、小程序机会里点 ☆ 即可收藏单条信息</p>
+        <div class="hint">收藏的内容会聚合在这里，方便你快速找到和使用</div>
+      </div>`;
+    return;
+  }
+
+  // 统计
+  const byType = {};
+  favs.forEach(f => { byType[f.type] = (byType[f.type] || 0) + 1; });
+
+  let html = `
+    <div class="sources-summary">
+      <div class="source-stat-card"><div class="num" style="color:#fbbf24">${favs.length}</div><div class="lbl">总收藏</div></div>
+      ${Object.entries(FAV_TYPE_LABELS).map(([t, label]) =>
+        `<div class="source-stat-card"><div class="num" style="font-size:1.1rem">${byType[t] || 0}</div><div class="lbl">${label}</div></div>`
+      ).join('')}
+    </div>
+    <input class="mp-filter" id="favFilter" placeholder="🔍 按标题/内容筛选…" oninput="filterFavorites(this.value)">
+    <div id="favList">`;
+
+  // 按类型分组展示
+  const order = ['miniapp', 'signal', 'report_item'];
+  for (const t of order) {
+    const list = favs.filter(f => f.type === t);
+    if (!list.length) continue;
+    html += `<div class="fav-group-title">${FAV_TYPE_LABELS[t] || t}（${list.length}）</div>
+      <div style="display:flex;flex-direction:column;gap:8px" data-fav-group="${t}">`;
+    for (const f of list) {
+      const title = f.title_cn || f.name_cn || f.title || '(未命名)';
+      const metaParts = [];
+      if (f.source_label) metaParts.push(`<span class="chip">${escapeHtml(f.source_label)}</span>`);
+      if (f.date) metaParts.push(`<span class="chip">${escapeHtml(f.date)}</span>`);
+      if (f.module) metaParts.push(`<span class="chip">${escapeHtml(moduleLabel(f.module))}</span>`);
+      metaParts.push(`<span class="chip">${escapeHtml(f.created_at)}</span>`);
+      const desc = f.desc_cn || f.desc || '';
+      const searchText = [title, desc, f.source_label, f.date, f.module].join(' ').toLowerCase();
+      html += `
+        <div class="fav-card" data-search="${escapeHtml(searchText)}">
+          <span class="fav-tag ${f.type}">${FAV_TYPE_LABELS[f.type] || f.type}</span>
+          <div class="fav-body">
+            ${f.url
+              ? `<a class="fav-title" href="${escapeHtml(f.url)}" target="_blank" rel="noopener">${escapeHtml(title)} ↗</a>`
+              : `<span class="fav-title">${escapeHtml(title)}</span>`}
+            ${desc ? `<div class="fav-desc" style="white-space:pre-line">${escapeHtml(favDescText(f))}</div>` : ''}
+            <div class="fav-meta">${metaParts.join('')}</div>
+          </div>
+          <button class="fav-btn is-fav" onclick="removeFavorite('${f.id}', event)" title="取消收藏"><span class="fav-star">★</span></button>
+          ${copyBtnHtml({type: f.type, title: f.title || '', title_cn: f.title_cn || f.name_cn || '', url: f.url || '', source: f.source || '', source_label: f.source_label || '', date: f.date || '', desc: f.desc_cn || f.desc || '', raw: f.raw || {}})}
+        </div>`;
+    }
+    html += `</div>`;
+  }
+
+  html += `</div>`;
+  container.innerHTML = html;
+
+  window.filterFavorites = function(q) {
+    const kw = q.trim().toLowerCase();
+    document.querySelectorAll('.fav-card').forEach(card => {
+      const text = card.dataset.search || '';
+      card.style.display = (!kw || text.includes(kw)) ? '' : 'none';
+    });
+    // 隐藏空分组
+    document.querySelectorAll('[data-fav-group]').forEach(group => {
+      const visible = [...group.querySelectorAll('.fav-card')].some(c => c.style.display !== 'none');
+      group.style.display = visible ? '' : 'none';
+    });
+  };
+}
+
+// 收藏页取消收藏
+async function removeFavorite(id, event) {
+  event.preventDefault();
+  event.stopPropagation();
+  try {
+    await apiDelete('/favorites/' + id);
+    render(); // 刷新收藏页
+  } catch (err) {
+    console.error('取消收藏失败', err);
+  }
+}
+async function apiPost(path, body) {
+  const r = await fetch(API + '/api' + path, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(body),
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function apiDelete(path) {
+  const r = await fetch(API + '/api' + path, {method: 'DELETE'});
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+
+// 生成收藏 id（与后端 _fav_id 逻辑一致）
+function favId(obj) {
+  const key = `${obj.type || ''}|${obj.url || ''}|${obj.title || ''}`;
+  // 简单 hash（前端只需一致性，不要求与后端 md5 相同——后端会自己算）
+  return 'fav-' + Math.abs([...key].reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7)).toString(16);
+}
+
+// 收藏按钮 HTML：★ 已收藏 / ☆ 未收藏
+function favBtnHtml(obj, size = 'small') {
+  const id = favId(obj);
+  window.__favCache = window.__favCache || {};
+  window.__favCache[id] = {...obj, id: id};
+  return `<button class="fav-btn ${size === 'large' ? 'fav-btn-large' : ''}" data-fav-id="${id}"
+    onclick="toggleFavorite(event, '${id}')" title="收藏">
+    <span class="fav-star">☆</span></button>`;
+}
+
+// 复制按钮 HTML：📋 复制完整信息
+function copyBtnHtml(obj, size = 'small') {
+  const id = 'cpy-' + favId(obj);
+  window.__favCache = window.__favCache || {};
+  window.__favCache[id] = obj;
+  return `<button class="fav-btn copy-btn ${size === 'large' ? 'fav-btn-large' : ''}" data-copy-id="${id}"
+    onclick="copyInfo(event, '${id}')" title="复制信息（可发给 AI 分析）">
+    <span class="copy-ico">📋</span></button>`;
+}
+
+// 生成适合发给 AI 的结构化文本
+function buildCopyText(obj) {
+  const lines = [];
+  const raw = obj.raw || {};
+  lines.push(`【来源】${obj.source_label || obj.source || ''}${obj.date ? ' | ' + obj.date : ''}`);
+  lines.push(`【标题】${obj.title_cn || obj.name_cn || obj.title || ''}`);
+
+  if (obj.type === 'miniapp') {
+    // 小程序机会：全字段导出
+    const fields = [
+      ['启发', obj.inspiration || raw.inspiration],
+      ['建议', obj.suggestion || raw.suggestion],
+      ['关键词', (raw.keywords || []).join(' / ')],
+      ['用户需求', obj.userNeed || raw.userNeed],
+      ['痛点', obj.painPoint || raw.painPoint],
+      ['怎么做', obj.howToBuild || raw.howToBuild],
+      ['关联信号', raw.relatedSignal],
+    ];
+    fields.forEach(([k, v]) => { if (v) lines.push(`【${k}】${v}`); });
+  } else if (obj.type === 'report_item') {
+    // 日报模块：全字段导出（从 raw 完整 item 提取）
+    const r = raw;
+    const fields = [
+      ['信号', r.signal],
+      ['为什么现在能做', r.whyNow],
+      ['建议', r.suggestion],
+      ['变现路径', r.monetization],
+      ['获取流量', r.traffic],
+      ['收入', r.revenue],
+      ['判断', r.judgment],
+      ['观察', r.observation],
+      ['策略', r.strategy],
+      ['场景', r.scenario],
+      ['教训', r.lesson],
+      ['启发', r.inspiration],
+      ['做什么', r.what],
+      ['灵感', r.idea],
+      ['方法', r.method],
+      ['视角', r.perspective],
+      ['关键词', (r.keywords || []).join(' / ')],
+    ];
+    // 先加说明（如果有）
+    const desc = obj.desc_cn || obj.desc || '';
+    if (desc && desc !== obj.title) lines.push(`【说明】${desc}`);
+    fields.forEach(([k, v]) => { if (v && v !== desc) lines.push(`【${k}】${v}`); });
+    if (r.replicable === true) lines.push('【可复制】是');
+    if (r.replicable === false) lines.push('【可复制】难复制');
+  } else {
+    // 信号：通用字段
+    const desc = obj.desc_cn || obj.desc || obj.title_cn || '';
+    if (desc && desc !== obj.title) lines.push(`【说明】${desc}`);
+    const extras = [];
+    if (raw.revenue) extras.push(`收入: ${raw.revenue}`);
+    if (raw.category) extras.push(`分类: ${raw.category}`);
+    if (raw.artist) extras.push(`开发者: ${raw.artist}`);
+    if (raw.price) extras.push(`价格: ${raw.price}`);
+    if (raw.language) extras.push(`语言: ${raw.language}`);
+    if (raw.stars_total) extras.push(`Stars: ${raw.stars_total}`);
+    if (raw.stars_today) extras.push(`今日+${raw.stars_today}`);
+    if (raw.points) extras.push(`热度: ${raw.points}`);
+    if (extras.length) lines.push(`【详情】${extras.join(' | ')}`);
+  }
+
+  if (obj.url) lines.push(`【链接】${obj.url}`);
+  return lines.join('\n');
+}
+
+// 复制信息到剪贴板
+async function copyInfo(event, cacheId) {
+  event.preventDefault();
+  event.stopPropagation();
+  const obj = (window.__favCache || {})[cacheId];
+  if (!obj) return;
+  const btn = event.currentTarget;
+  const ico = btn.querySelector('.copy-ico');
+
+  try {
+    const text = buildCopyText(obj);
+    await navigator.clipboard.writeText(text);
+    // 反馈：短暂显示 ✓
+    ico.textContent = '✓';
+    btn.style.color = '#4ade80';
+    setTimeout(() => {
+      ico.textContent = '📋';
+      btn.style.color = '';
+    }, 1200);
+  } catch (err) {
+    console.error('复制失败', err);
+    ico.textContent = '✗';
+    setTimeout(() => { ico.textContent = '📋'; }, 1200);
+  }
+}
+
+// 切换收藏状态（点击按钮）
+async function toggleFavorite(event, favCacheId) {
+  event.preventDefault();
+  event.stopPropagation();
+  const obj = (window.__favCache || {})[favCacheId];
+  if (!obj) return;
+  const id = favId(obj);
+  const btn = event.currentTarget;
+  const star = btn.querySelector('.fav-star');
+
+  try {
+    const isFav = star.textContent === '★';
+    if (isFav) {
+      await apiDelete('/favorites/' + id);
+      star.textContent = '☆';
+      btn.classList.remove('is-fav');
+    } else {
+      await apiPost('/favorites', obj);
+      star.textContent = '★';
+      btn.classList.add('is-fav');
+    }
+    // 刷新收藏页（如果在收藏页）
+    if (location.hash.startsWith('#/favorites')) render();
+  } catch (err) {
+    console.error('收藏失败', err);
+  }
+}
+
+// 批量标记已收藏状态（页面渲染后调用）
+async function markFavorites(container) {
+  try {
+    const favs = await api('/favorites');
+    const ids = new Set(favs.map(f => f.id));
+    container.querySelectorAll('[data-fav-id]').forEach(btn => {
+      if (ids.has(btn.dataset.favId)) {
+        btn.classList.add('is-fav');
+        btn.querySelector('.fav-star').textContent = '★';
+      }
+    });
+  } catch (e) { /* 静默失败 */ }
+}
+
+// ─── 渲染引擎 ───
+async function render() {
+  const route = getRoute();
+  const { parts } = route;
+  const content = document.getElementById('content');
+  const title = document.getElementById('pageTitle');
+
+  // Update active nav
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  const navKey = parts[0] === 'module' ? `module-${parts[1]}` : (parts[0] || 'home');
+  const activeNav = document.querySelector(`[data-route="${navKey}"]`);
+  if (activeNav) activeNav.classList.add('active');
+
+  try {
+    if (parts.length === 0 || parts[0] === '') {
+      title.textContent = '📡 日报时间线';
+      await renderTimeline(content);
+    } else if (parts[0] === 'miniapp') {
+      title.textContent = '📱 小程序机会';
+      await renderMiniProgram(content);
+    } else if (parts[0] === 'stats') {
+      title.textContent = '📊 统计与趋势';
+      await renderStats(content);
+    } else if (parts[0] === 'raw') {
+      title.textContent = '📡 信号流';
+      await renderRaw(content, parts[1] || null, parts[2] || null);
+    } else if (parts[0] === 'sources') {
+      title.textContent = '🔌 信息源管理';
+      await renderSources(content);
+    } else if (parts[0] === 'favorites') {
+      title.textContent = '⭐ 我的收藏';
+      await renderFavorites(content);
+    } else if (parts[0] === 'daily' && parts[1]) {
+      title.textContent = `📋 ${parts[1]} 日报详情`;
+      await renderDaily(content, parts[1]);
+    } else if (parts[0] === 'module' && parts[1]) {
+      const labels = {
+        'opportunities': '📌 机会库',
+        'money-cases': '💰 赚钱案例库',
+        'inspirations': '💡 产品灵感库',
+        'growth': '📈 增长技巧库',
+        'tools': '🔧 工具库',
+        'pitfalls': '⚠️ 踩坑库',
+        'signals': '📊 数据信号库',
+        'mini-program': '📱 小程序机会库',
+        'wisdom': '🧠 心法库',
+      };
+      title.textContent = labels[parts[1]] || '模块视图';
+      await renderModule(content, parts[1]);
+    } else {
+      content.innerHTML = '<div class="empty-state"><div class="icon">🤷</div><h3>页面不存在</h3></div>';
+    }
+  } catch (err) {
+    content.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>${err.message}</p></div>`;
+  }
+
+  // Update topbar stats
+  updateTopStats();
+}
+
+// ─── 时间线视图 ───
+async function renderTimeline(container) {
+  const reports = await api('/reports');
+  allReports = reports;
+
+  if (!reports.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📡</div>
+        <h3>还没有雷达日报</h3>
+        <p>每天 08:45 自动采集生成，数据会展示在这里</p>
+        <div class="hint">⏳ 首次数据将在下一次 cron 运行后出现<br>也可以手动运行：<code>python3 ~/.hermes/scripts/daily_signals.py</code></div>
+      </div>`;
+    return;
+  }
+
+  let html = '<div class="timeline-grid">';
+  for (const r of reports) {
+    const moduleList = Object.keys(r.modules || {});
+    html += `
+      <div class="timeline-card card" onclick="navigate('/daily/${r.date}')">
+        <div class="date-badge">${r.date}</div>
+        <div class="card-title">${r.date} 雷达日报</div>
+        <div class="card-meta">${r.moduleCount} 个模块 · ${r.signalCount || '-'} 条精选</div>
+        ${moduleList.length ? '<div class="module-chips">' +
+          moduleList.map(m => `<span class="chip">${moduleLabel(m)}</span>`).join('') +
+        '</div>' : ''}
+      </div>`;
+  }
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+// ─── 日报详情视图 ───
+async function renderDaily(container, dateStr) {
+  const report = await api(`/reports/${dateStr}`);
+  if (!report || report.error) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>未找到该日报</h3></div>`;
+    return;
+  }
+
+  const mods = report.modules || {};
+  const sources = report.sources || {};
+
+  let html = `
+    <div class="daily-header">
+      <a class="back-btn" onclick="navigate('/')">← 返回时间线</a>
+      <div class="date-large">${report.date || dateStr}</div>
+      <div class="source-stats">
+        ${Object.entries(sources).map(([k, v]) =>
+          `<span class="source-stat">📡 ${k}: <strong>${v}</strong></span>`
+        ).join('')}
+      </div>
+    </div>`;
+
+  // Modules
+  const moduleOrder = [
+    { key: 'opportunities', emoji: '📌', label: '今日机会' },
+    { key: 'moneyCases', emoji: '💰', label: '今日赚钱案例' },
+    { key: 'productInspirations', emoji: '💡', label: '今日产品灵感' },
+    { key: 'growthTips', emoji: '📈', label: '今日增长技巧' },
+    { key: 'tools', emoji: '🔧', label: '今日工具' },
+    { key: 'pitfalls', emoji: '⚠️', label: '今日踩坑' },
+    { key: 'dataSignals', emoji: '📊', label: '今日数据信号' },
+    { key: 'miniProgram', emoji: '📱', label: '微信小程序机会' },
+    { key: 'dailyWisdom', emoji: '🧠', label: '今日心法' },
+  ];
+
+  for (const mod of moduleOrder) {
+    const data = mods[mod.key];
+    if (!data || (Array.isArray(data) && data.length === 0) || (typeof data === 'object' && !Array.isArray(data) && !data.method)) {
+      continue;
+    }
+
+    html += `<div class="module-section module-color-${mod.key}">
+      <div class="module-header">
+        <h3>${mod.emoji} ${mod.label}</h3>
+        <span class="count">${Array.isArray(data) ? data.length : 1} 条</span>
+      </div>`;
+
+    if (mod.key === 'dailyWisdom') {
+      const d = data;
+      html += `
+        <div class="module-item wisdom-card">
+          <h4>${d.method || '今日心法'}</h4>
+          ${d.scenario ? `<div class="field"><strong>实战场景：</strong>${escapeHtml(d.scenario)}</div>` : ''}
+          ${d.steps && d.steps.length ? `<ol class="wisdom-steps">${d.steps.map(s => `<li>${escapeHtml(s)}</li>`).join('')}</ol>` : ''}
+          ${d.derivation ? `<div class="field" style="margin-top:8px"><strong>推演：</strong>${escapeHtml(d.derivation)}</div>` : ''}
+        </div>`;
+    } else if (Array.isArray(data)) {
+      for (const item of data) {
+        html += renderModuleItem(mod.key, item);
+      }
+    }
+
+    html += `</div>`;
+  }
+
+  if (!Object.keys(mods).length) {
+    html += `<div class="empty-state"><div class="icon">📭</div><h3>暂无内容</h3></div>`;
+  }
+
+  container.innerHTML = html;
+  markFavorites(container);
+}
+
+function renderModuleItem(modKey, item) {
+  if (!item || typeof item !== 'object') return '';
+  let html = `<div class="module-item">`;
+
+  // Title
+  const title = item.title || item.what || item.idea || item.suggestion || item.strategy || item.tool || item.lesson || item.observation || '(未命名)';
+  const sourceUrl = item.url || item.sourceUrl || item.source_url || '';
+  const favObj = {type: 'report_item', title: String(title), url: sourceUrl,
+    source: modKey || '', source_label: moduleLabel(modKey || ''), date: item.date || '',
+    desc: (item.signal || item.suggestion || item.what || item.idea || ''), module: modKey || '', raw: item};
+  if (sourceUrl) {
+    html += `<h4><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--accent)">${escapeHtml(String(title))} ↗</a> ${favBtnHtml(favObj)} ${copyBtnHtml(favObj)}</h4>`;
+  } else {
+    html += `<h4>${escapeHtml(String(title))} ${favBtnHtml(favObj)} ${copyBtnHtml(favObj)}</h4>`;
+  }
+
+  // Labels
+  const labels = [];
+  if (item.revenue) labels.push(`💰 ${item.revenue}`);
+  if (item.signal) labels.push(`📡 信号: ${item.signal}`);
+  if (item.whyNow) labels.push(`✅ 为什么: ${item.whyNow}`);
+  if (item.replicable === true) labels.push('🔄 可复制');
+  if (item.replicable === false) labels.push('🔄 难复制');
+  if (item.score) labels.push(`▲${item.score}`);
+  if (item.growth) labels.push(`📈 ${item.growth}`);
+  if (item.relatedSignal) labels.push(`🔗 关联信号`);
+  if (labels.length) {
+    html += `<div class="label-row">${labels.map(l => `<span class="label">${escapeHtml(l)}</span>`).join('')}</div>`;
+  }
+
+  // Fields
+  const fields = [
+    { key: 'suggestion', label: '建议' },
+    { key: 'monetization', label: '变现路径' },
+    { key: 'what', label: '做什么' },
+    { key: 'traffic', label: '获取流量' },
+    { key: 'strategy', label: '策略' },
+    { key: 'lesson', label: '教训' },
+    { key: 'judgment', label: '判断' },
+    { key: 'observation', label: '观察' },
+    { key: 'idea', label: '灵感' },
+    { key: 'scenario', label: '场景' },
+    { key: 'tool', label: '工具' },
+    { key: 'signal', label: '信号来源' },
+    { key: 'whyNow', label: '为什么现在能做' },
+    { key: 'inspiration', label: '启发' },
+    { key: 'userNeed', label: '用户需求' },
+    { key: 'painPoint', label: '痛点' },
+    { key: 'howToBuild', label: '怎么做' },
+    { key: 'relatedSignal', label: '关联信号' },
+  ];
+  for (const f of fields) {
+    if (item[f.key] && String(item[f.key]) !== String(title)) {
+      html += `<div class="field"><strong>${f.label}：</strong>${escapeHtml(String(item[f.key]))}</div>`;
+    }
+  }
+
+  // Keywords array (miniProgram module)
+  if (item.keywords && Array.isArray(item.keywords) && item.keywords.length) {
+    html += `<div class="field"><strong>关键词：</strong>${item.keywords.map(k => `<span class="chip" style="display:inline-block;margin:2px 4px 2px 0">${escapeHtml(k)}</span>`).join('')}</div>`;
+  }
+
+  // Perspective
+  if (item.perspective) {
+    html += `<div class="perspective">🧠 ${escapeHtml(item.perspective)}</div>`;
+  }
+
+  html += `</div>`;
+  return html;
+}
+
+// ─── 模块跨日聚合视图 ───
+async function renderModule(container, moduleName) {
+  const items = await api(`/modules/${moduleName}`);
+
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="module-view-header">
+        <div class="empty-state">
+          <div class="icon">📦</div>
+          <h3>暂无数据</h3>
+          <p>等 cron 跑了日报就有内容了</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  let html = `
+    <div class="module-view-header">
+      <a class="back-btn" onclick="navigate('/')">← 返回时间线</a>
+      <h2>${moduleLabels[moduleName] || moduleName}</h2>
+      <div class="desc">共 ${items.length} 条记录，来自 ${new Set(items.map(i => i.date)).size} 天</div>
+    </div>
+    <div class="cross-day-list">`;
+
+  for (const item of items) {
+    // 心法库特殊渲染 — wisdom 数据结构不同: {method, scenario, steps[], derivation}
+    if (moduleName === 'wisdom') {
+      html += `
+      <div class="cross-day-item wisdom-card" style="border:1px solid rgba(250,204,21,.2);background:linear-gradient(135deg,rgba(250,204,21,.05),transparent)">
+        <div class="date-col">${item.date}</div>
+        <div class="content-col">
+          <h4>${escapeHtml(item.method || '今日心法')}</h4>
+          ${item.scenario ? `<div class="field" style="margin-top:6px"><strong>实战场景：</strong>${escapeHtml(item.scenario)}</div>` : ''}
+          ${item.steps && item.steps.length ? `<ol style="margin-top:8px;padding-left:20px">${item.steps.map(s => `<li style="font-size:.8rem;color:var(--text-secondary);margin-bottom:4px">${escapeHtml(s)}</li>`).join('')}</ol>` : ''}
+          ${item.derivation ? `<div class="field" style="margin-top:8px"><strong>推演：</strong>${escapeHtml(item.derivation)}</div>` : ''}
+          <div class="view-all-link">
+            <a onclick="navigate('/daily/${item.date}')">查看完整日报 →</a>
+          </div>
+        </div>
+      </div>`;
+      continue;
+    }
+
+    const title = item.title || item.what || item.idea || item.suggestion || item.strategy || item.lesson || item.observation || '(未命名)';
+    const desc = (item.suggestion !== title ? item.suggestion : '') || item.monetization || item.perspective || item.judgment || item.scenario || '';
+    const sourceUrl = item.url || item.sourceUrl || item.source_url || '';
+    const favObj = {type: 'report_item', title: String(title), url: sourceUrl,
+      source: moduleName || '', source_label: moduleLabel(moduleName || ''), date: item.date || '',
+      desc: String(desc), module: moduleName || '', raw: item};
+    // Key fields to show inline based on module type
+    const keyFields = [];
+    if (item.revenue) keyFields.push(['收入', item.revenue]);
+    if (item.what && item.what !== title) keyFields.push(['做什么', item.what]);
+    if (item.signal) keyFields.push(['信号', item.signal]);
+    if (item.suggestion && item.suggestion !== title) keyFields.push(['建议', item.suggestion]);
+    if (item.monetization) keyFields.push(['变现路径', item.monetization]);
+    if (item.whyNow) keyFields.push(['为什么现在能做', item.whyNow]);
+    if (item.traffic) keyFields.push(['获取流量', item.traffic]);
+    if (item.judgment) keyFields.push(['判断', item.judgment]);
+    if (item.observation) keyFields.push(['观察', item.observation]);
+    if (item.strategy) keyFields.push(['策略', item.strategy]);
+    if (item.idea && item.idea !== title) keyFields.push(['灵感', item.idea]);
+    if (item.scenario) keyFields.push(['场景', item.scenario]);
+    if (item.lesson) keyFields.push(['教训', item.lesson]);
+    if (item.inspiration) keyFields.push(['启发', item.inspiration]);
+    if (item.userNeed) keyFields.push(['用户需求', item.userNeed]);
+    if (item.painPoint) keyFields.push(['痛点', item.painPoint]);
+    if (item.howToBuild) keyFields.push(['怎么做', item.howToBuild]);
+    if (item.keywords && item.keywords.length) keyFields.push(['关键词', item.keywords.join(' / ')]);
+    if (item.replicable === true) keyFields.push(['', '🔄 可复制']);
+    if (item.replicable === false) keyFields.push(['', '🔄 难复制']);
+
+    html += `
+      <div class="cross-day-item">
+        <div class="date-col">${item.date}</div>
+        <div class="content-col">
+          ${sourceUrl
+            ? `<h4><a href="${escapeHtml(sourceUrl)}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--accent)">${escapeHtml(String(title))} ↗</a> ${favBtnHtml(favObj)} ${copyBtnHtml(favObj)}</h4>`
+            : `<h4>${escapeHtml(String(title))} ${favBtnHtml(favObj)} ${copyBtnHtml(favObj)}</h4>`}
+          ${desc ? `<p>${escapeHtml(String(desc))}</p>` : ''}
+          ${keyFields.length ? '<div class="detail-fields">' +
+            keyFields.map(f =>
+              `<div class="field">${f[0] ? `<strong>${f[0]}：</strong>` : ''}${escapeHtml(String(f[1]))}</div>`
+            ).join('') +
+          '</div>' : ''}
+          ${item.perspective ? `<div class="perspective">🧠 ${escapeHtml(item.perspective)}</div>` : ''}
+          <div class="view-all-link">
+            <a onclick="navigate('/daily/${item.date}')">查看完整日报 →</a>
+          </div>
+        </div>
+      </div>`;
+  }
+
+  html += '</div>';
+  container.innerHTML = html;
+  markFavorites(container);
+}
+
+// ─── 信号流视图（热榜布局：左平台导航 + 右榜单） ───
+const SOURCE_LABELS = {
+  'trustmrr': 'trustmrr',
+  'indiehackers': 'IndieHackers',
+  'reddit': 'Reddit',
+  'producthunt': 'Product Hunt',
+  'github': 'GitHub 总榜',
+  'github-js': 'GitHub JS榜',
+  'github-zh': 'GitHub 中文榜',
+  'v2ex': 'V2EX',
+  'kr36': '36氪',
+  'sspai': '少数派',
+  'oschina': '开源中国',
+  'jike-ai-explore': '即刻·AI探索站',
+  'jike-ai-discuss': '即刻·AI讨论',
+  'jike-engineer': '即刻·工程师',
+  'appstore-cn': 'App Store 中国',
+  'appstore-tw': 'App Store 台湾',
+  'appstore-us': 'App Store 美国',
+  'appstore-jp': 'App Store 日本',
+  'appstore-kr': 'App Store 韩国',
+};
+const SOURCE_COLORS = {
+  'trustmrr': '#4ade80', 'indiehackers': '#3b82f6', 'reddit': '#f97316',
+  'producthunt': '#a78bfa', 'github': '#94a3b8', 'github-js': '#eab308',
+  'github-zh': '#ef4444', 'v2ex': '#a16207',
+  'kr36': '#ef4444', 'sspai': '#eab308', 'oschina': '#f97316',
+  'jike-ai-explore': '#22d3ee', 'jike-ai-discuss': '#818cf8', 'jike-engineer': '#f472b6',
+  'appstore-cn': '#ef4444', 'appstore-tw': '#f97316', 'appstore-us': '#3b82f6',
+  'appstore-jp': '#f43f5e', 'appstore-kr': '#8b5cf6',
+};
+
+async function renderRaw(container, selectedDate, selectedSource) {
+  const dates = await api('/raw-dates');
+  if (!dates.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📡</div>
+        <h3>还没有信号数据</h3>
+        <p>运行采集脚本后，原始信号会按平台保存在这里</p>
+        <div class="hint">⏳ 手动运行：<code>python3 ~/.hermes/scripts/daily_signals.py</code></div>
+      </div>`;
+    return;
+  }
+
+  const date = selectedDate || dates[0];
+  const raw = await api(`/raw/${date}`);
+  const sources = raw.sources || {};
+
+  // 有数据的平台列表（按固定顺序）
+  const sourceOrder = ['appstore-cn', 'appstore-tw', 'appstore-us', 'appstore-jp', 'appstore-kr', 'github', 'github-js', 'github-zh', 'v2ex', 'kr36', 'oschina', 'sspai', 'jike-ai-explore', 'jike-ai-discuss', 'jike-engineer', 'trustmrr', 'producthunt', 'indiehackers', 'reddit'];
+  const availableSources = sourceOrder.filter(s => sources[s] && sources[s].length);
+  const activeSource = (selectedSource && sources[selectedSource]) ? selectedSource : (availableSources[0] || '');
+
+  // 日期选择 + 布局
+  let html = `
+    <div class="module-view-header">
+      <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+        ${dates.map(d =>
+          `<button class="date-chip ${d === date ? 'active' : ''}" onclick="navigate('/raw/${d}')">${d}</button>`
+        ).join('')}
+      </div>
+    </div>
+    <div class="raw-layout">
+      <div class="raw-sources">
+        ${availableSources.map(s => `
+          <button class="raw-source-item ${s === activeSource ? 'active' : ''}" onclick="navigate('/raw/${date}/${s}')">
+            <span class="src-dot" style="background:${SOURCE_COLORS[s] || '#8b90a0'}"></span>
+            <span>${SOURCE_LABELS[s] || s}</span>
+            <span class="src-count">${sources[s].length}</span>
+          </button>`).join('')}
+      </div>
+      <div class="raw-board">
+        <div class="raw-board-header">
+          <h3>${SOURCE_LABELS[activeSource] || activeSource}</h3>
+          <span class="board-meta">${raw.collected_at || ''} · ${sources[activeSource] ? sources[activeSource].length : 0} 条</span>
+        </div>`;
+
+  // 榜单行
+  if (!activeSource || !sources[activeSource] || !sources[activeSource].length) {
+    html += `<div class="raw-empty-row">该平台暂无数据</div>`;
+  } else {
+    const isGithub = activeSource === 'github' || activeSource === 'github-js' || activeSource === 'github-zh';
+    const isAppstore = activeSource.startsWith('appstore');
+    sources[activeSource].forEach((item, idx) => {
+      const title = item.title || '(无标题)';
+      const timeStr = item.timestamp
+        ? new Date(item.timestamp * 1000).toLocaleTimeString('zh-CN', {hour: '2-digit', minute: '2-digit'})
+        : '';
+      const points = item.points > 0 ? `▲${item.points}` : '';
+      // 清理标题里的 fire emoji 和多余空格（开源中国 RSS 带 :fire: 前缀）
+      const cleanTitle = title.replace(/^:fire:/, '').replace(/\s+/g, ' ').trim();
+
+      // 中文主标题 + 英文副标
+      let mainTitle, subTitle, cnDesc, icon;
+      if (isGithub) {
+        mainTitle = item.name_cn || item.title_cn || cleanTitle;
+        subTitle = cleanTitle;
+        cnDesc = item.desc_cn || '';
+      } else if (isAppstore) {
+        mainTitle = item.title_cn || cleanTitle;
+        subTitle = cleanTitle !== mainTitle ? cleanTitle : '';
+        const cat = item.category ? (item.category.length > 20 ? item.category.slice(0, 20) : item.category) : '';
+        const artist = item.artist || '';
+        cnDesc = item.desc_cn || (cat ? `${cat}${artist ? ' · ' + artist : ''}` : (artist || ''));
+        icon = item.icon || '';
+      } else {
+        mainTitle = item.title_cn || cleanTitle;
+        subTitle = cleanTitle !== mainTitle ? cleanTitle : '';
+        cnDesc = item.desc_cn || '';
+      }
+
+      const rowContent = `
+        <div class="raw-row">
+          <span class="rank">${idx + 1}</span>
+          <div class="row-main" style="flex:1;min-width:0">
+            ${icon ? `<img src="${escapeHtml(icon)}" style="width:22px;height:22px;border-radius:5px;vertical-align:-5px;margin-right:6px" loading="lazy">` : ''}
+            <a class="row-title" href="${item.url ? escapeHtml(item.url) : '#'}" ${item.url ? 'target="_blank" rel="noopener"' : ''} title="${escapeHtml(title)}">${escapeHtml(mainTitle)}</a>
+            ${subTitle ? `<span class="row-sub">${escapeHtml(subTitle)}</span>` : ''}
+            ${cnDesc ? `<div class="row-cn-desc">${escapeHtml(cnDesc)}</div>` : ''}
+          </div>
+          ${favBtnHtml({type: 'signal', title: mainTitle, url: item.url || '', source: activeSource, source_label: SOURCE_LABELS[activeSource] || activeSource, date, desc: cnDesc, raw: item})}
+          ${copyBtnHtml({type: 'signal', title: mainTitle, title_cn: mainTitle, url: item.url || '', source: activeSource, source_label: SOURCE_LABELS[activeSource] || activeSource, date, desc: cnDesc, raw: item})}
+          ${points ? `<span class="row-points">${points}</span>` : ''}
+          <span class="row-time">${timeStr}</span>
+          ${item.url ? `<a class="row-link" href="${escapeHtml(item.url)}" target="_blank" rel="noopener">↗</a>` : ''}
+        </div>`;
+      html += rowContent;
+    });
+  }
+
+  html += `</div></div>`;
+  container.innerHTML = html;
+  markFavorites(container);
+}
+
+// ─── 信息源管理视图 ───
+async function renderSources(container) {
+  let data;
+  try {
+    data = await api('/sources');
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>${escapeHtml(err.message)}</p></div>`;
+    return;
+  }
+
+  const { summary, sources } = data;
+  const statusText = {
+    'ok': '正常', 'error': '异常', 'config_required': '需配置',
+    'stale': '久未采集', 'no_data': '未采集',
+  };
+
+  // 汇总卡片
+  let html = `
+    <div class="sources-summary">
+      <div class="source-stat-card"><div class="num">${summary.total}</div><div class="lbl">信息源总数</div></div>
+      <div class="source-stat-card"><div class="num" style="color:#4ade80">${summary.ok}</div><div class="lbl">运行正常</div></div>
+      <div class="source-stat-card"><div class="num" style="color:#eab308">${summary.warn}</div><div class="lbl">需关注</div></div>
+      <div class="source-stat-card"><div class="num" style="font-size:1rem;padding-top:8px">${summary.last_run ? new Date(summary.last_run).toLocaleString('zh-CN', {month:'2-digit', day:'2-digit', hour:'2-digit', minute:'2-digit'}) : '—'}</div><div class="lbl">最近采集</div></div>
+    </div>`;
+
+  // 分组：海外 / 国内
+  const groups = [
+    { key: '海外', label: '🌍 海外数据源' },
+    { key: '国内', label: '🇨🇳 国内数据源' },
+  ];
+  for (const g of groups) {
+    const list = sources.filter(s => s.category === g.key);
+    if (!list.length) continue;
+    html += `<div class="source-group-title">${g.label}</div><div class="source-grid">`;
+    for (const s of list) {
+      html += `
+        <div class="source-card">
+          <div class="src-head">
+            <span class="src-emoji">${s.emoji}</span>
+            <span class="src-name">${escapeHtml(s.name)}</span>
+            <span class="src-badge ${s.status}">${statusText[s.status] || s.status_text}</span>
+          </div>
+          <div class="src-desc">${escapeHtml(s.desc)}</div>
+          <div class="src-meta">
+            <span>类型 <b>${s.type}</b></span>
+            <span>最近 <b>${s.last_seen_text}</b></span>
+            <span>今日 <b>${s.today_count}</b> 条</span>
+            <span>累计 <b>${s.seen_count}</b> 条</span>
+          </div>
+          ${s.note ? `<div class="src-note">⚠️ ${escapeHtml(s.note)}</div>` : ''}
+        </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // 提示
+  html += `
+    <div style="margin-top:24px;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:.75rem;color:var(--text-secondary);line-height:1.7">
+      💡 <b>提示</b>：此页仅展示信息源接入状态，方便你知晓雷达当前跟进哪些平台。<br>
+      · 想新增平台？直接告诉我平台名和入口（RSS/API/网页），我接入后这里会自动出现<br>
+      · 「需配置」的源（如 Reddit）需提供相应凭据后才能解锁
+    </div>`;
+
+  container.innerHTML = html;
+}
+
+// ─── 小程序机会专页（信息源式密集展示 + 关键词筛选） ───
+async function renderMiniProgram(container) {
+  const items = await api('/modules/mini-program');
+
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📱</div>
+        <h3>还没有小程序机会</h3>
+        <p>每天日报会生成 3-5 条小程序机会，聚合展示在这里</p>
+      </div>`;
+    return;
+  }
+
+  // 统计：总机会、覆盖天数、关键词云
+  const dates = new Set(items.map(i => i.date));
+  const kwCount = {};
+  items.forEach(i => (i.keywords || []).forEach(k => { kwCount[k] = (kwCount[k] || 0) + 1; }));
+  const topKws = Object.entries(kwCount).sort((a, b) => b[1] - a[1]).slice(0, 12);
+
+  let html = `
+    <div class="sources-summary">
+      <div class="source-stat-card"><div class="num" style="color:var(--green)">${items.length}</div><div class="lbl">小程序机会</div></div>
+      <div class="source-stat-card"><div class="num">${dates.size}</div><div class="lbl">覆盖天数</div></div>
+      <div class="source-stat-card" style="flex:1;min-width:280px"><div class="lbl" style="margin-bottom:6px">热门方向关键词</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">${topKws.map(([k, n]) => `<span class="mp-kw" style="font-size:.68rem;color:var(--green);background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.25);border-radius:8px;padding:1px 8px">${escapeHtml(k)} ×${n}</span>`).join('')}</div>
+      </div>
+    </div>
+    <input class="mp-filter" id="mpFilter" placeholder="🔍 按关键词/标题筛选…" oninput="filterMiniProgram(this.value)">
+    <div id="mpGrid" class="mp-grid">`;
+
+  for (const item of items) {
+    html += mpCardHtml(item);
+  }
+  html += `</div>`;
+  container.innerHTML = html;
+  markFavorites(container);
+
+  // 暴露过滤函数
+  window.filterMiniProgram = function(q) {
+    const grid = document.getElementById('mpGrid');
+    const kw = q.trim().toLowerCase();
+    grid.querySelectorAll('.mp-card').forEach(card => {
+      const text = card.dataset.search || '';
+      card.style.display = (!kw || text.includes(kw)) ? '' : 'none';
+    });
+  };
+}
+
+function mpCardHtml(item) {
+  const kws = (item.keywords || []).slice(0, 6);
+  const searchText = [item.title, item.inspiration, item.suggestion, item.userNeed,
+    item.painPoint, item.howToBuild, item.relatedSignal, (item.keywords || []).join(' ')]
+    .join(' ').toLowerCase();
+  const favObj = {type: 'miniapp', title: item.title || item.suggestion || '未命名机会',
+    url: '', source: 'miniapp', source_label: '📱 小程序机会', date: item.date || '',
+    desc: (item.userNeed || '') + ' | ' + (item.howToBuild || ''), raw: item};
+  return `
+    <div class="mp-card" data-search="${escapeHtml(searchText)}">
+      <div class="mp-head">
+        <span class="mp-title">📱 ${escapeHtml(item.title || item.suggestion || '未命名机会')}</span>
+        ${favBtnHtml(favObj, 'large')}
+        ${copyBtnHtml(favObj, 'large')}
+        <span class="mp-date">${item.date}</span>
+      </div>
+      ${kws.length ? `<div class="mp-kw">${kws.map(k => `<span>${escapeHtml(k)}</span>`).join('')}</div>` : ''}
+      <div class="mp-line"><b>用户需求：</b>${escapeHtml(item.userNeed || '—')}</div>
+      <div class="mp-line"><b>痛点：</b>${escapeHtml(item.painPoint || '—')}</div>
+      ${item.howToBuild ? `<div class="mp-line"><b>怎么做：</b>${escapeHtml(item.howToBuild)}</div>` : ''}
+      ${item.relatedSignal ? `<div class="mp-signal">📡 ${escapeHtml(item.relatedSignal)}</div>` : ''}
+    </div>`;
+}
+async function renderStats(container) {
+  const [stats, trends] = await Promise.all([api('/stats'), api('/trends')]);
+
+  const total = stats.totalReports || 0;
+  const totalMods = Object.values(stats.modules || {}).reduce((a, b) => a + b, 0);
+  const totalSources = Object.values(stats.sources || {}).reduce((a, b) => a + b, 0);
+
+  let html = `
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-value">${total}</div>
+        <div class="stat-label">总日报数</div>
+        <div class="stat-sub">持续积累中</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${totalMods}</div>
+        <div class="stat-label">模块产出</div>
+        <div class="stat-sub">累计模块篇数</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${totalSources}</div>
+        <div class="stat-label">源信号</div>
+        <div class="stat-sub">累计采集信号</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">${Object.keys(stats.monthly || {}).length}</div>
+        <div class="stat-label">覆盖月份</div>
+        <div class="stat-sub">${total ? '日均 '+ (totalMods / total).toFixed(1) + ' 模块' : ''}</div>
+      </div>
+    </div>`;
+
+  // Monthly distribution
+  if (stats.monthly && Object.keys(stats.monthly).length) {
+    const maxMonthly = Math.max(...Object.values(stats.monthly));
+    html += `<div class="trends-section"><h3>📅 月度趋势</h3>`;
+    for (const [month, count] of Object.entries(stats.monthly).reverse()) {
+      const pct = (count / maxMonthly * 100);
+      html += `<div class="trend-item">
+        <span class="trend-tag">${month}</span>
+        <div class="trend-bar"><div class="trend-fill" style="width:${pct}%"></div></div>
+        <span class="trend-count">${count}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Module distribution
+  if (Object.keys(stats.modules || {}).length) {
+    const maxMod = Math.max(...Object.values(stats.modules));
+    html += `<div class="trends-section" style="margin-top:24px"><h3>📦 模块热度</h3>`;
+    for (const [mod, count] of Object.entries(stats.modules).sort((a, b) => b[1] - a[1])) {
+      const pct = count / maxMod * 100;
+      html += `<div class="trend-item">
+        <span class="trend-tag">${moduleLabel(mod)}</span>
+        <div class="trend-bar"><div class="trend-fill" style="width:${pct}%;background:var(--teal)"></div></div>
+        <span class="trend-count">${count}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Source distribution
+  if (Object.keys(stats.sources || {}).length) {
+    html += `<div class="trends-section" style="margin-top:24px"><h3>📡 数据源分布</h3>`;
+    for (const [src, count] of Object.entries(stats.sources).sort((a, b) => b[1] - a[1])) {
+      html += `<div class="trend-item">
+        <span class="trend-tag">${src}</span>
+        <div class="trend-bar"><div class="trend-fill" style="width:100%;background:var(--purple)"></div></div>
+        <span class="trend-count">${count}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  // Trend keywords
+  if (trends.length) {
+    const maxTrend = trends[0]?.count || 1;
+    html += `<div class="trends-section" style="margin-top:24px"><h3>🔑 高频关键词</h3>`;
+    for (const t of trends.slice(0, 20)) {
+      const pct = t.count / maxTrend * 100;
+      html += `<div class="trend-item">
+        <span class="trend-tag">#${t.tag}</span>
+        <div class="trend-bar"><div class="trend-fill" style="width:${pct}%;background:var(--orange)"></div></div>
+        <span class="trend-count">${t.count}</span>
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ─── 辅助 ───
+function moduleLabel(key) {
+  const map = {
+    'opportunities': '机会', 'moneyCases': '赚钱案例', 'productInspirations': '产品灵感',
+    'growthTips': '增长技巧', 'tools': '工具', 'pitfalls': '踩坑',
+    'dataSignals': '数据信号', 'miniProgram': '小程序机会', 'dailyWisdom': '心法',
+  };
+  return map[key] || key;
+}
+
+const moduleLabels = {
+  'opportunities': '📌 今日机会 — 跨日聚合',
+  'money-cases': '💰 今日赚钱案例 — 跨日聚合',
+  'inspirations': '💡 今日产品灵感 — 跨日聚合',
+  'growth': '📈 今日增长技巧 — 跨日聚合',
+  'tools': '🔧 今日工具 — 跨日聚合',
+  'pitfalls': '⚠️ 今日踩坑 — 跨日聚合',
+  'signals': '📊 今日数据信号 — 跨日聚合',
+  'mini-program': '📱 微信小程序机会 — 跨日聚合',
+  'wisdom': '🧠 今日心法 — 跨日聚合',
+};
+
+async function updateTopStats() {
+  try {
+    const s = await api('/stats');
+    document.getElementById('topTotal').textContent = s.totalReports || 0;
+    document.getElementById('topModules').textContent = Object.keys(s.modules || {}).length;
+    // Update sidebar report count
+    document.getElementById('reportCount').textContent = `共 ${s.totalReports || 0} 份日报`;
+    // Update module badges
+    for (const [mod, count] of Object.entries(s.modules || {})) {
+      const badgeKey = {
+        'opportunities': 'opportunities', 'moneyCases': 'money-cases',
+        'productInspirations': 'inspirations', 'growthTips': 'growth',
+        'tools': 'tools', 'pitfalls': 'pitfalls',
+        'dataSignals': 'signals', 'miniProgram': 'mini-program',
+        'dailyWisdom': 'wisdom',
+      }[mod];
+      if (badgeKey) {
+        const el = document.querySelector(`[data-badge="${badgeKey}"]`);
+        if (el) el.textContent = count;
+      }
+    }
+  } catch {}
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+// ─── 启动 ───
+window.addEventListener('popstate', render);
+window.addEventListener('DOMContentLoaded', render);
+</script>
+</body>
+</html>
