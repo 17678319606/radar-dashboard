@@ -180,3 +180,15 @@ App Store 美国/日本/韩国、GitHub、Product Hunt 等英文内容不翻译�
 venv/bin/pip install playwright
 venv/bin/python scripts/screenshot.py docs/screenshot-miniapp.png
 ```
+
+---
+
+## 📱 联系作者
+
+我是独立开发者 susumr，这个雷达日报是我的日常工具，顺手开源分享。如果你也在做独立开发 / 小程序，欢迎关注我的公众号交流：
+
+<p align="center">
+  <img src="docs/wechat-qrcode.png" alt="公众号二维码" width="480">
+</p>
+
+> 🔍 微信搜索框输入公众号名称即可找到（搜一搜联合传播样式）。需要交流、合作或有问题反馈，扫码或搜索关注后留言即可。
