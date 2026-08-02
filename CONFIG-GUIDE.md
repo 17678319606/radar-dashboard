@@ -26,9 +26,9 @@ DEEPSEEK_API_KEY=sk-你的key
 
 ---
 
-## 🟢 优先级 P1：trustmrr Key（可选，2 分钟）
+## ⭐ 优先级 P0.5：trustmrr Key（推荐，2 分钟）
 
-**作用**：接入「已验证收入的创业公司」数据源（MRR、增长、技术栈）。
+**作用**：接入「已验证收入的创业公司」数据源（MRR、增长、技术栈）——这是海外独立开发赛道最有价值的信号源之一，**建议配置**（免费额度每日有限，够用）。
 
 **申请步骤**：
 1. 打开 https://trustmrr.com/ → 注册/登录
@@ -61,9 +61,11 @@ PH_TOKEN=你的token
 
 ---
 
-## 🟡 优先级 P2：Reddit OAuth（可选，5 分钟）
+## ⚪ 优先级 P2：Reddit OAuth（可不配，容易被风控）
 
-**作用**：解锁 Reddit 信号（r/SideProject、r/SaaS 等）。**只有当你发现 Reddit 源报错（IP 被封/403）时才需要**。
+**作用**：解锁 Reddit 信号（r/SideProject、r/SaaS 等）。
+
+> ⚠️ **建议不配**：Reddit 对数据中心 IP（云服务器、部分代理）风控严格，很容易 403 甚至封 IP，配置了也未必稳定。不配 = 少一个源（其他 18 个源正常），**等真遇到需要再说**。如果你确定要配，步骤见下。
 
 **申请步骤**：
 1. 打开 https://www.reddit.com/ → 注册/登录
@@ -89,9 +91,9 @@ REDDIT_PASSWORD=你的Reddit密码
 | 优先级 | Key | 没有会怎样 | 难度 |
 |--------|-----|-----------|------|
 | ⭐ P0 | DeepSeek | 英文不翻译 | 2 分钟 |
-| 🟢 P1 | trustmrr | 少一个源 | 2 分钟 |
+| ⭐ P0.5 | trustmrr | 少一个高质量源 | 2 分钟 |
 | 🟢 P1 | Product Hunt | 少一个源 | 5 分钟 |
-| 🟡 P2 | Reddit OAuth | Reddit 源不可用 | 5 分钟 |
+| ⚪ P2 | Reddit OAuth | Reddit 源不可用（可不配，易风控） | 5 分钟 |
 
 ## ✅ 配置后验证
 

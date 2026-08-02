@@ -132,11 +132,13 @@ crontab -e
 | Key | 作用 | 获取 | 优先级 |
 |-----|------|------|--------|
 | `DEEPSEEK_API_KEY` | 英文信号自动翻译中文 | https://platform.deepseek.com/ | ⭐ 推荐 |
-| `TRUSTMRR_API_KEY` | 已验证收入创业公司数据 | https://trustmrr.com/ | 🟢 可选 |
+| `TRUSTMRR_API_KEY` | 已验证收入创业公司数据（MRR/增长） | https://trustmrr.com/ | ⭐ 推荐 |
 | `PH_TOKEN` | Product Hunt 每日新品 | https://www.producthunt.com/v2/oauth/applications | 🟢 可选 |
-| `REDDIT_*` | Reddit 信号（IP 被封时需 OAuth） | https://www.reddit.com/prefs/apps | 🟡 可选 |
+| `REDDIT_*` | Reddit 信号 | — | ⚪ 可不配（易风控） |
 
 > 💡 **用了 Hermes 就不用重复配 DeepSeek Key**：采集脚本会自动读取 `~/.hermes/.env` 里的 `DEEPSEEK_API_KEY`（Hermes 自己的模型配置），无需在项目 `.env` 里再填一遍。只有不用 Hermes 时才需要手动配置。
+>
+> ⚪ **Reddit 建议不配**：Reddit 对数据中心 IP 风控严格，容易 403/封 IP，配置后也未必稳定。不配也不影响其他 18 个源，等真遇到需要再说。
 
 ## 🗂️ 目录结构
 
