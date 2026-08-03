@@ -1,6 +1,13 @@
 # 📡 雷达日报 Dashboard（分享版）
 
-![小程序机会页面](docs/screenshot-miniapp.png)
+> **🌗 双主题**：深色极简 / 暖色杂志，点顶栏 🌙/☀️ 按钮随时切换，也可用 `?theme=light` / `?theme=dark` 深链指定。
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshot-miniapp-dark.png" alt="小程序机会页面 · 深色极简主题"><br><b>深色极简</b></td>
+    <td align="center"><img src="docs/screenshot-miniapp-light.png" alt="小程序机会页面 · 暖色杂志主题"><br><b>暖色杂志</b></td>
+  </tr>
+</table>
 
 独立开发者的信号雷达——每天自动采集 **19 个国内外信息源**（App Store 新应用 / GitHub 热榜 / 即刻圈子 / 36氪 / 少数派 / 开源中国 / V2EX / Product Hunt / trustmrr…），生成可浏览的可视化面板，帮你发现产品机会。
 
@@ -151,7 +158,8 @@ radar-dashboard/
 │   ├── daily_signals.py    # 数据采集脚本（19 源）
 │   └── screenshot.py       # 生成 README 截图（Playwright）
 ├── docs/
-│   ├── screenshot-miniapp.png  # README 截图（小程序机会页）
+│   ├── screenshot-miniapp-dark.png   # README 截图（小程序机会 · 深色主题）
+│   ├── screenshot-miniapp-light.png  # README 截图（小程序机会 · 亮色主题）
 │   └── wechat-qrcode.png       # 公众号二维码（README 底部）
 ├── data/
 │   ├── reports/            # 日报 JSON
@@ -185,7 +193,9 @@ App Store 美国/日本/韩国、GitHub、Product Hunt 等英文内容不翻译�
 ```bash
 # 需要先启动服务（bash start.sh），并装好 playwright：
 venv/bin/pip install playwright
-venv/bin/python scripts/screenshot.py docs/screenshot-miniapp.png
+# 双主题各截一张（页面支持 ?theme= 深链）
+venv/bin/python scripts/screenshot.py docs/screenshot-miniapp-dark.png "?theme=dark#/miniapp"
+venv/bin/python scripts/screenshot.py docs/screenshot-miniapp-light.png "?theme=light#/miniapp"
 ```
 
 ---
