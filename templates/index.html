@@ -689,6 +689,11 @@ body {
         <span class="dot" style="background:var(--green)"></span>
         <span>📱 小程序机会</span>
       </a>
+      <a class="nav-item" href="#/indie-dev" data-route="indie-dev">
+        <span class="dot" style="background:var(--purple)"></span>
+        <span>🧑‍💻 独立开发者日报</span>
+        <span class="badge" data-badge="indie-dev">0</span>
+      </a>
       <a class="nav-item" href="#/stats" data-route="stats">
         <span class="dot" style="background:var(--teal)"></span>
         <span>统计趋势</span>
@@ -778,6 +783,18 @@ body {
 // ═══════════════════════════════════════════════════════
 
 const API = '';
+// 静态部署模式（EdgeOne Pages 等纯静态托管）：由构建脚本注入 window.__STATIC_MODE__ = true
+// 本地 Flask 运行时该变量不存在，走原有 /api 后端逻辑，两种模式共用同一份代码
+const STATIC_MODE = typeof window !== 'undefined' && window.__STATIC_MODE__ === true;
+const STATIC_BASE = 'radar-api/';    // 本地快照目录（兜底，部署时打包进 dist）
+// ── 远程数据源（每天自动更新，无需重新部署）──
+// 改成你的 GitHub raw 地址（必须以 /radar-api/ 结尾），例如：
+//   https://raw.githubusercontent.com/<你的用户名>/radar-dashboard/main/radar-api/
+// 留默认占位（含 OWNER）则只用本地快照。也可用 URL 参数 ?data=... 临时覆盖（免重新部署）。
+const REMOTE_DATA_BASE = (new URLSearchParams(location.search).get('data'))
+  || 'https://raw.githubusercontent.com/17678319606/radar-dashboard/main/radar-api/';
+const REMOTE_ENABLED = !REMOTE_DATA_BASE.includes('OWNER');
+const FAV_STORE_KEY = 'radar_favorites_v1';   // 静态模式下收藏存 localStorage
 let allReports = [];
 let moduleCounts = {};
 
@@ -793,8 +810,46 @@ function navigate(path) {
   render();
 }
 
+// ─── 静态模式适配层（无后端时使用）───
+function favLoad() {
+  try {
+    const raw = localStorage.getItem(FAV_STORE_KEY);
+    const arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function favSave(items) {
+  try { localStorage.setItem(FAV_STORE_KEY, JSON.stringify(items)); } catch (e) {}
+}
+function nowStamp() {
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+// 静态 GET：/reports → api/reports.json，/modules/mini-program → api/modules/mini-program.json
+async function staticGet(path) {
+  if (path === '/favorites') {
+    return favLoad().sort((a, b) => (b.created_at || '').localeCompare(a.created_at || ''));
+  }
+  if (path.startsWith('/favorites/check/')) {
+    const id = path.slice('/favorites/check/'.length);
+    return { exists: favLoad().some(f => f.id === id) };
+  }
+  const rel = path.replace(/^\//, '') + '.json';
+  // 优先远程（每日自动更新），失败回退本地打包快照
+  if (REMOTE_ENABLED) {
+    try {
+      const rr = await fetch(REMOTE_DATA_BASE + rel);
+      if (rr.ok) return await rr.json();
+    } catch (e) { /* 忽略，走本地兜底 */ }
+  }
+  const r = await fetch(STATIC_BASE + rel);
+  if (!r.ok) throw new Error('not found: ' + path);
+  return r.json();
+}
+
 // ─── API ───
 async function api(path) {
+  if (STATIC_MODE) return staticGet(path);
   const r = await fetch(API + '/api' + path);
   if (!r.ok) throw new Error(await r.text());
   return r.json();
@@ -941,6 +996,31 @@ async function removeFavorite(id, event) {
   }
 }
 async function apiPost(path, body) {
+  if (STATIC_MODE) {
+    if (path !== '/favorites') return { ok: true };
+    const payload = body || {};
+    const id = payload.id || favId(payload);
+    const favs = favLoad();
+    if (favs.some(f => f.id === id)) return { ok: true, id, duplicate: true };
+    favs.push({
+      id,
+      type: payload.type || 'signal',
+      title: payload.title || '',
+      title_cn: payload.title_cn || '',
+      name_cn: payload.name_cn || '',
+      desc_cn: payload.desc_cn || '',
+      url: payload.url || '',
+      source: payload.source || '',
+      source_label: payload.source_label || '',
+      date: payload.date || '',
+      module: payload.module || '',
+      desc: payload.desc || '',
+      raw: payload.raw || {},
+      created_at: nowStamp(),
+    });
+    favSave(favs);
+    return { ok: true, id };
+  }
   const r = await fetch(API + '/api' + path, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
@@ -950,6 +1030,12 @@ async function apiPost(path, body) {
   return r.json();
 }
 async function apiDelete(path) {
+  if (STATIC_MODE) {
+    if (!path.startsWith('/favorites/')) return { ok: true };
+    const id = path.slice('/favorites/'.length);
+    favSave(favLoad().filter(f => f.id !== id));
+    return { ok: true };
+  }
   const r = await fetch(API + '/api' + path, {method: 'DELETE'});
   if (!r.ok) throw new Error(await r.text());
   return r.json();
@@ -1117,6 +1203,75 @@ async function markFavorites(container) {
   } catch (e) { /* 静默失败 */ }
 }
 
+// ─── 独立开发者每日新增视图（key-free，读 /api/indie-dev）───
+async function renderIndieDev(container) {
+  let data;
+  try {
+    data = await api('/indie-dev');
+  } catch (err) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>${escapeHtml(err.message)}</p></div>`;
+    return;
+  }
+  const items = Array.isArray(data.items) ? data.items : [];
+  const badge = document.querySelector('[data-badge="indie-dev"]');
+  if (badge) badge.textContent = String(data.newCount || items.length);
+
+  if (!items.length) {
+    container.innerHTML = `
+      <div class="module-view-header">
+        <div class="empty-state">
+          <div class="icon">🧑‍💻</div>
+          <h3>暂无数据</h3>
+          <p>跑一次采集（daily_signals.py）就会有内容</p>
+        </div>
+      </div>`;
+    return;
+  }
+
+  const sc = { '已上线': 'var(--green)', '开发中': 'var(--orange)', '已关闭': 'var(--text-secondary)', '未知': 'var(--text-secondary)' };
+  let devs = items.map(dev => {
+    const prods = (dev.products || []).map(p => {
+      const c = sc[p.status] || 'var(--text-secondary)';
+      const name = p.url
+        ? `<a href="${escapeHtml(p.url)}" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;border-bottom:1px dashed var(--accent)">${escapeHtml(p.name)} ↗</a>`
+        : escapeHtml(p.name || '');
+      return `<li style="list-style:none;margin:8px 0;padding-left:14px;position:relative">
+        <span style="position:absolute;left:0;color:${c}">●</span>
+        <span style="font-weight:600">${name}</span>
+        <span style="color:${c};font-size:.75rem;margin-left:6px">${escapeHtml(p.status || '')}</span>
+        ${p.desc ? `<div style="color:var(--text-secondary);font-size:.82rem;margin-top:2px;line-height:1.45">${escapeHtml(p.desc)}</div>` : ''}
+      </li>`;
+    }).join('');
+    const gh = dev.github ? `<a href="${escapeHtml(dev.github)}" target="_blank" rel="noopener" style="margin-right:10px;color:var(--accent)">GitHub ↗</a>` : '';
+    const hp = dev.homepage ? `<a href="${escapeHtml(dev.homepage)}" target="_blank" rel="noopener" style="color:var(--accent)">主页 ↗</a>` : '';
+    return `<div style="border:1px solid var(--border);border-radius:12px;padding:14px 16px;margin-bottom:14px;background:var(--card)">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px">
+        <span style="font-weight:700;font-size:1rem">${escapeHtml(dev.developer || '匿名')}</span>
+        ${dev.city ? `<span style="color:var(--text-secondary);font-size:.8rem">📍 ${escapeHtml(dev.city)}</span>` : ''}
+        <span style="margin-left:auto;font-size:.8rem">${gh}${hp}</span>
+      </div>
+      <ul style="margin:0;padding:0">${prods}</ul>
+    </div>`;
+  }).join('');
+
+  const totalProds = items.reduce((s, d) => s + (d.products ? d.products.length : 0), 0);
+  const srcLink = data.source
+    ? `<a href="https://${escapeHtml(data.source)}" target="_blank" rel="noopener" style="font-size:.75rem;color:var(--text-secondary)">来源：${escapeHtml(data.source)} ↗</a>`
+    : '';
+  container.innerHTML = `
+    <div class="module-view-header">
+      <a class="back-btn" href="#/">← 返回时间线</a>
+      <h2>🧑‍💻 独立开发者日报</h2>
+      <div class="desc">
+        最新批次日期：<b>${escapeHtml(data.date || '—')}</b>　|
+        本次新增 <b style="color:var(--green)">${data.newCount || 0}</b> 个产品　|
+        本批共 ${totalProds} 个
+      </div>
+      <div style="margin-top:6px">${srcLink}</div>
+    </div>
+    <div>${devs}</div>`;
+}
+
 // ─── 渲染引擎 ───
 async function render() {
   const route = getRoute();
@@ -1137,6 +1292,9 @@ async function render() {
     } else if (parts[0] === 'miniapp') {
       title.textContent = '📱 小程序机会';
       await renderMiniProgram(content);
+    } else if (parts[0] === 'indie-dev') {
+      title.textContent = '🧑‍💻 独立开发者日报';
+      await renderIndieDev(content);
     } else if (parts[0] === 'stats') {
       title.textContent = '📊 统计与趋势';
       await renderStats(content);

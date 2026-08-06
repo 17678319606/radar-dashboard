@@ -1,32 +1,17 @@
-# Python
-__pycache__/
-*.py[cod]
+# 本地密钥 / 虚拟环境（含真实 DeepSeek Key 的 .env 切勿提交）
+.env
 venv/
 .venv/
+__pycache__/
+*.pyc
+dist/.env
 
-# 环境变量（包含 API Key，绝不上传！）
-.env
-.env.*
+# 构建产物：由 build_static.py 每次重新生成，不入库
+# （workflow 会把 dist/radar-api/ 复制到仓库根 radar-api/ 再提交）
+dist/
+.edgeone/
 
-# 个人数据（不提交，clone 后自动生成）
-data/favorites.json
-data/collect.log
+# 本地 Flask 运行产物
+*.log
 
-# 运行时生成的状态/凭据缓存（绝不上传！）
-data/daily_signals_state.json
-data/daily_signals_state.json.bak
-data/reddit_oauth_token.json
-
-# 示例数据保留在仓库（data/reports/2026-08-02.json 等），
-# 但新生成的个人数据文件不提交（规则：只保留示例，其余忽略）
-data/reports/*.json
-!data/reports/2026-08-02.json
-data/raw_signals/*.json
-!data/raw_signals/2026-08-02.json
-
-# macOS
-.DS_Store
-
-# IDE
-.idea/
-.vscode/
+# 注意：data/ 与 radar-api/ 必须可提交，是前端每日数据来源，切勿忽略

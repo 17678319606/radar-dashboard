@@ -30,6 +30,16 @@ bash start.sh
 # 访问 http://127.0.0.1:5080
 ```
 
+### ☁️ 想放到线上随时看？
+
+本仓库已支持一键构建为**纯静态站**，可托管到腾讯云 EdgeOne Pages 等任意静态平台：
+
+```bash
+bash update.sh    # 采集最新信号 + 生成 dist/（静态站）
+```
+
+然后部署 `dist/` 即可。详见 [`DEPLOY-EO.md`](DEPLOY-EO.md)。
+
 ### 🤖 不想手动装？让 AI 帮你
 
 把下面这段话发给任意 AI 编程助手（Hermes / Cursor / Claude Code…），它会帮你完成全部安装：
@@ -124,6 +134,18 @@ crontab -e
 3. 让 AI 按下面的格式整理成日报 JSON（**想改方向？把这里的话也改掉，见「自定义方向」**）：
    > 你是独立开发者的信号雷达。从上面信号里精选最有价值的 3-5 条，输出：1️⃣ 今日机会 2️⃣ 赚钱案例 3️⃣ 产品灵感 4️⃣ 增长技巧 5️⃣ 工具 6️⃣ 踩坑 7️⃣ 数据信号 8️⃣ **微信小程序机会（最高优先级，3-5 条：把当天信号映射成国内微信小程序能落地的选题，含标题/启发/建议/关键词/用户需求/痛点/做法/关联信号）** 🎯 今日心法。
 4. 把 AI 返回的 JSON 保存为 `data/reports/2026-08-02.json`（JSON 格式见上「Agent 阅读指南」，或直接让 AI 按这个结构输出）
+
+### 方式 A+：用 DeepSeek API 一条命令生成（本仓库新增）
+
+配好 `DEEPSEEK_API_KEY` 后：
+
+```bash
+./venv/bin/python scripts/gen_report.py                  # 生成今天的日报
+./venv/bin/python scripts/gen_report.py --dry-run        # 只看提示词和预估成本，不花钱
+./venv/bin/python scripts/gen_report.py --focus website  # miniapp（默认）/ website / overseas
+```
+
+单次约 ¥0.02-0.05。详见 [`DEPLOY-EO.md`](DEPLOY-EO.md)。
 
 ### 方式 B：接入 Hermes Agent（完整自动化）
 

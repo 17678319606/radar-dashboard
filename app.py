@@ -80,6 +80,7 @@ def get_module(module_name):
         'signals': 'dataSignals',
         'mini-program': 'miniProgram',
         'wisdom': 'dailyWisdom',
+        'indie-dev': 'indieDev',
     }
     key = module_map.get(module_name)
     if not key:
@@ -108,6 +109,19 @@ def get_module(module_name):
         except (json.JSONDecodeError, KeyError):
             continue
     return jsonify(results)
+
+
+@app.route('/api/indie-dev')
+def get_indie_dev():
+    """返回独立开发者每日新增（github.com/1c7/chinese-independent-developer）"""
+    path = REPORTS_DIR.parent / 'indie_dev.json'
+    if not path.exists():
+        return jsonify({'date': '', 'newCount': 0, 'items': [],
+                        'note': '尚未采集，先跑一次 daily_signals.py'}), 200
+    try:
+        return jsonify(json.loads(path.read_text(encoding='utf-8')))
+    except Exception:
+        return jsonify({'error': 'corrupted'}), 500
 
 
 @app.route('/api/raw-dates')

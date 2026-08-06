@@ -29,6 +29,38 @@ import requests
 # CONFIG
 # ============================================================
 SCRIPT_DIR = Path(__file__).resolve().parent
+
+
+def _load_dotenv():
+    """把 .env 里的配置注入环境变量（已存在的环境变量优先，不覆盖）
+
+    查找顺序：项目根 .env（install.sh 生成的就是这个）→ scripts/.env
+    → ~/.hermes/.env（Hermes 用户已有的 Key，自动复用）→ ~/.env
+
+    说明：原版只有 DEEPSEEK_API_KEY 会读 .env，且读的是 scripts/.env，
+    而 install.sh 把 .env 生成在项目根目录，导致按 README 填完不生效；
+    TRUSTMRR_API_KEY / PH_TOKEN / REDDIT_* 更是只认环境变量。
+    这里统一在启动时加载，填项目根 .env 即可全部生效。
+    """
+    for env_file in [SCRIPT_DIR.parent / '.env', SCRIPT_DIR / '.env',
+                     Path.home() / '.hermes' / '.env', Path.home() / '.env']:
+        try:
+            if not env_file.exists():
+                continue
+            for line in env_file.read_text().splitlines():
+                line = line.strip()
+                if not line or line.startswith('#') or '=' not in line:
+                    continue
+                k, v = line.split('=', 1)
+                k, v = k.strip(), v.strip().strip('"').strip("'")
+                if k and v and not os.environ.get(k):
+                    os.environ[k] = v
+        except Exception:
+            continue
+
+
+_load_dotenv()
+
 DATA_DIR = Path(os.environ.get('RADAR_DATA_DIR', SCRIPT_DIR.parent / 'data'))
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 STATE_FILE = DATA_DIR / 'daily_signals_state.json'
@@ -1005,17 +1037,18 @@ def _get_deepseek_key():
     """从环境变量或本地 .env 读取 DeepSeek API key
 
     读取优先级：
-    1. 环境变量 DEEPSEEK_API_KEY
-    2. 脚本目录 .env（项目自带）
-    3. ~/.hermes/.env（Hermes 用户已配置的 Key，复用无需重复配置）
-    4. 用户主目录 .env
+    1. 环境变量 DEEPSEEK_API_KEY（启动时 _load_dotenv 已把 .env 注入这里）
+    2. 项目根 .env（install.sh 生成的位置）
+    3. 脚本目录 .env
+    4. ~/.hermes/.env（Hermes 用户已配置的 Key，复用无需重复配置）
+    5. 用户主目录 .env
     """
     key = os.environ.get("DEEPSEEK_API_KEY", "")
     if key:
         return key
     try:
-        # 优先读脚本目录的 .env，其次 Hermes 配置，最后用户主目录 .env
-        for env_file in [SCRIPT_DIR / '.env', Path.home() / '.hermes' / '.env', Path.home() / '.env']:
+        for env_file in [SCRIPT_DIR.parent / '.env', SCRIPT_DIR / '.env',
+                         Path.home() / '.hermes' / '.env', Path.home() / '.env']:
             if env_file.exists():
                 for line in env_file.read_text().splitlines():
                     if line.startswith("DEEPSEEK_API_KEY="):
@@ -1158,6 +1191,185 @@ def format_time(ts):
 
 
 # ============================================================
+# 独立开发者列表源（github.com/1c7/chinese-independent-developer）
+# 解析 README 顶部「按添加日期分组」的列表，做逐日新增检测
+# 这个源是中文、结构化的，不需要 LLM 翻译，也不依赖 DeepSeek Key
+# ============================================================
+INDIE_DEV_REPO = "https://raw.githubusercontent.com/1c7/chinese-independent-developer/master/README.md"
+INDIE_DEV_STATE = DATA_DIR / 'indie_dev_state.json'
+
+_STATUS_MAP = {
+    'white_check_mark': '已上线',
+    'clock8': '开发中',
+    'x': '已关闭',
+}
+
+
+def _parse_indie_dev_readme(text):
+    """返回 [(date_str, [dev_dict,...]), ...]，按 README 出现顺序（最新在前）
+
+    dev_dict = {developer, city, github, homepage, products:[{name,url,desc,status}]}
+    """
+    lines = text.splitlines()
+    sections = []
+    cur_date = None
+    cur_devs = []
+    cur_dev = None
+    date_re = re.compile(r'^###\s*(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*号添加\s*$')
+    dev_re = re.compile(r'^####\s*(.+?)\(([^)]*)\)\s*-\s*(.*)$')
+    prod_re = re.compile(r'^\*\s*(?::([a-z0-9_]+):\s*)?\[([^\]]+)\]\(([^)]+)\)\s*[:：]?\s*(.*)$')
+    link_re = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
+
+    def flush_dev():
+        nonlocal cur_dev
+        if cur_dev is not None:
+            cur_devs.append(cur_dev)
+            cur_dev = None
+
+    for line in lines:
+        s = line.strip()
+        m = date_re.match(s)
+        if m:
+            flush_dev()
+            if cur_date is not None:
+                sections.append((cur_date, cur_devs))
+            cur_date = f"{int(m.group(1)):04d}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+            cur_devs = []
+            continue
+        if cur_date is None:
+            continue
+        dm = dev_re.match(s)
+        if dm:
+            flush_dev()
+            name = dm.group(1).strip()
+            city = dm.group(2).strip()
+            github = homepage = None
+            for lname, lurl in link_re.findall(dm.group(3)):
+                if 'github.com' in lurl and github is None:
+                    github = lurl
+                elif 'github.com' not in lurl and homepage is None:
+                    homepage = lurl
+            cur_dev = {'developer': name, 'city': city, 'github': github,
+                       'homepage': homepage, 'products': []}
+            continue
+        if cur_dev is not None:
+            pm = prod_re.match(s)
+            if pm:
+                emoji, pname, purl, pdesc = pm.group(1), pm.group(2), pm.group(3), pm.group(4)
+                status = _STATUS_MAP.get(emoji, '已上线' if emoji else '未知')
+                cur_dev['products'].append({
+                    'name': pname.strip(),
+                    'url': purl.strip(),
+                    'desc': pdesc.strip(),
+                    'status': status,
+                })
+    flush_dev()
+    if cur_date is not None:
+        sections.append((cur_date, cur_devs))
+    return sections
+
+
+def fetch_indie_dev():
+    """采集 1c7 中国独立开发者列表 → data/indie_dev.json（最新批次 + 逐日新增检测）
+
+    返回扁平化 items（source='indie-dev'），汇入 raw_signals 供信号流 / LLM 日报使用。
+    """
+    try:
+        resp = requests.get(INDIE_DEV_REPO, headers={'User-Agent': UA_BROWSER}, timeout=30)
+        resp.raise_for_status()
+        text = resp.text
+    except Exception as e:
+        print(f"[WARN] indie-dev 抓取失败: {e}")
+        return []
+
+    sections = _parse_indie_dev_readme(text)
+    if not sections:
+        print("[WARN] indie-dev 未解析到任何添加日期小节")
+        return []
+
+    # 读取上次状态（累计见过的产品 url + 上次捕获到的最新批次日期）
+    state = {}
+    if INDIE_DEV_STATE.exists():
+        try:
+            state = json.loads(INDIE_DEV_STATE.read_text())
+        except Exception:
+            state = {}
+    seen = set(state.get('seen_urls', []))
+    last_date = state.get('last_date', '')
+
+    # 选取出 last_date 之后的所有批次（处理漏跑多天的情况）；首次运行只取顶部最新一天的小节
+    fresh = [(d, devs) for d, devs in sections if d > last_date] if last_date else sections[:1]
+    if not fresh:
+        fresh = sections[:1]
+
+    all_products = []
+    max_date = last_date
+    for d, devs in fresh:
+        if d > max_date:
+            max_date = d
+        for dev in devs:
+            all_products.extend(dev['products'])
+
+    new_products = [p for p in all_products if p['url'] not in seen]
+    new_count = len(new_products)
+
+    items = []
+    for d, devs in fresh:
+        for dev in devs:
+            items.append({
+                'date': d,
+                'developer': dev['developer'],
+                'city': dev['city'],
+                'github': dev['github'],
+                'homepage': dev['homepage'],
+                'products': dev['products'],
+            })
+
+    out = {
+        'date': max_date,
+        'fetched_at': datetime.now(tz=timezone(timedelta(hours=8))).strftime('%Y-%m-%d %H:%M:%S'),
+        'source': 'github.com/1c7/chinese-independent-developer',
+        'newCount': new_count,
+        'totalProducts': len(all_products),
+        'items': items,
+    }
+    try:
+        (DATA_DIR / 'indie_dev.json').write_text(json.dumps(out, ensure_ascii=False, indent=2), encoding='utf-8')
+        seen.update(p['url'] for p in all_products)
+        INDIE_DEV_STATE.write_text(
+            json.dumps({'last_date': max_date, 'seen_urls': sorted(seen)}, ensure_ascii=False),
+            encoding='utf-8')
+        print(f"[INFO] indie-dev: 最新批次 {max_date}，本批 {len(all_products)} 个产品，其中新增 {new_count} 个")
+    except Exception as e:
+        print(f"[WARN] indie-dev 写文件失败: {e}")
+
+    flat = []
+    for dev in items:
+        batch_ts = None
+        try:
+            batch_dt = datetime.strptime(dev['date'], '%Y-%m-%d').replace(
+                tzinfo=timezone(timedelta(hours=8)))
+            batch_ts = int(batch_dt.timestamp())
+        except Exception:
+            batch_ts = None
+        for p in dev['products']:
+            flat.append({
+                'id': p['url'],
+                'source': 'indie-dev',
+                'title': p['name'],
+                'name': dev['developer'],
+                'url': p['url'],
+                'description': p['desc'],
+                'city': dev['city'],
+                'developer': dev['developer'],
+                'status': p['status'],
+                'date': dev['date'],
+                'timestamp': batch_ts,
+            })
+    return flat
+
+
+# ============================================================
 # MAIN
 # ============================================================
 
@@ -1180,6 +1392,7 @@ def main():
         "oschina": fetch_oschina,
         "jike": fetch_jike,
         "appstore": fetch_appstore,
+        "indie-dev": fetch_indie_dev,
     }
 
     all_results = {}
@@ -1333,7 +1546,7 @@ def main():
             continue
 
         # 按 points 排序
-        sorted_items = sorted(items, key=lambda x: (x.get("mrr", 0) if source_name == "trustmrr" else x["points"]), reverse=True)
+        sorted_items = sorted(items, key=lambda x: (x.get("mrr", 0) if source_name == "trustmrr" else x.get("points", 0)), reverse=True)
 
         source_label = {
             "trustmrr": "💰 trustmrr — 收入/收购信号",
@@ -1364,7 +1577,7 @@ def main():
             title = item["title"]
             url = item["url"]
             ts = format_time(item["timestamp"])
-            points_display = item["points"]
+            points_display = item.get("points", 0)
 
             # 根据不同来源显示不同关键指标
             extra = ""

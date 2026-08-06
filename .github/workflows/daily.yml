@@ -1,0 +1,61 @@
+name: 雷达日报每日自动更新
+
+# 每天 06:00 / 19:00（北京时间）自动跑一次：采集信号 → DeepSeek 生成日报 → 构建数据 → 提交回仓库
+# 站点外壳（EdgeOne 上的 dist/）只需部署一次，数据从此处每日自动变，无需重新部署、不依赖 WorkBuddy
+on:
+  schedule:
+    - cron: "0 22 * * *"   # 北京 06:00 = UTC 22:00
+    - cron: "0 11 * * *"   # 北京 19:00 = UTC 11:00
+  workflow_dispatch:       # 允许在 Actions 页面手动点一下触发
+
+permissions:
+  contents: write
+
+concurrency:
+  group: radar-daily
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 配置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 安装依赖
+        run: pip install -r requirements.txt
+
+      - name: 采集信号 + DeepSeek 生成日报 + 构建数据
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: bash update.sh
+
+      - name: 同步数据到仓库根 radar-api/（前端 raw.githubusercontent 拉的就是这里）
+        run: |
+          set -e
+          test -d dist/radar-api || { echo "::error::dist/radar-api 不存在，构建失败"; exit 1; }
+          rm -rf radar-api
+          cp -r dist/radar-api radar-api
+          echo "已同步文件数：$(find radar-api -type f -name '*.json' | wc -l)"
+          test -f radar-api/reports.json || { echo "::error::radar-api/reports.json 缺失"; exit 1; }
+
+      - name: 提交更新的数据
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A data/ radar-api/ 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "无数据变更，跳过提交"
+          else
+            git commit -m "chore: 每日自动更新 $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M')"
+            git pull --rebase --autostash origin main || true
+            git push
+          fi
