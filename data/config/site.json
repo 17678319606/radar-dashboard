@@ -3,7 +3,15 @@
     "name": "独立开发者雷达日报",
     "description": "为独立开发者/小程序创业者聚合每日产品机会、赚钱案例与数据信号。",
     "keywords": "独立开发者, 微信小程序, 创业机会, 雷达日报, 产品灵感",
-    "author": "李雪含"
+    "author": "独立开发者雷达日报"
+  },
+  "footer": {
+    "copyright": "独立开发者雷达日报",
+    "basedOn": {
+      "text": "本项目基于 susumr/radar-dashboard",
+      "url": "https://github.com/susumr/radar-dashboard"
+    },
+    "extraLinks": []
   },
   "compliance": {
     "icp": "豫ICP备2024069686号",

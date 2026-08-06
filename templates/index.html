@@ -6,7 +6,7 @@
 <title>独立开发者雷达日报</title>
 <meta name="description" content="为独立开发者/小程序创业者聚合每日产品机会、赚钱案例与数据信号。每日 06:00/19:00 自动更新。">
 <meta name="keywords" content="独立开发者, 微信小程序, 创业机会, 雷达日报, 产品灵感, 赚钱案例">
-<meta name="author" content="李雪含">
+<meta name="author" content="独立开发者雷达日报">
 <meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#fdfcf8" media="(prefers-color-scheme: light)">
 <meta property="og:title" content="独立开发者雷达日报">
@@ -285,9 +285,53 @@ body {
   font-size: .8rem; color: var(--text-secondary);
   background: var(--surface); padding: 4px 10px; border-radius: 6px;
 }
+/* 日报顶部：返回 + 上/下一期 */
+.daily-topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-bottom: 10px; flex-wrap: wrap;
+}
+.daily-pager { display: flex; gap: 8px; }
+.pager-btn {
+  font-size: .75rem; padding: 5px 12px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--card);
+  color: var(--text-secondary); text-decoration: none; white-space: nowrap;
+  transition: border-color .15s, color .15s;
+}
+a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
+.pager-btn.disabled { opacity: .35; cursor: default; }
+.stale-tip {
+  margin-top: 10px; padding: 8px 12px; border-radius: 8px;
+  background: var(--surface); border: 1px dashed var(--border);
+  font-size: .78rem; color: var(--text-secondary); line-height: 1.6;
+}
+/* 本期模块目录 */
+.module-toc {
+  display: flex; flex-wrap: wrap; gap: 8px;
+  margin: 0 0 24px;
+}
+.toc-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: .75rem; padding: 6px 12px; border-radius: 20px;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--text-secondary); text-decoration: none;
+  font-family: inherit; cursor: pointer;
+  transition: border-color .15s, color .15s, background-color .15s;
+}
+.toc-chip:hover, .toc-chip.active { border-color: var(--accent); color: var(--accent); }
+.toc-chip .toc-n {
+  font-size: .65rem; font-weight: 700; color: var(--text-secondary);
+  background: var(--surface); border-radius: 8px; padding: 0 6px; min-width: 18px; text-align: center;
+}
 .module-section {
   margin-bottom: 28px;
+  scroll-margin-top: 72px;
 }
+.module-note {
+  font-size: .74rem; color: var(--text-secondary);
+  margin: -6px 0 12px; line-height: 1.6;
+}
+.module-note a { color: var(--accent); text-decoration: none; }
+.module-note a:hover { text-decoration: underline; }
 .module-header {
   display: flex; align-items: center; gap: 8px;
   margin-bottom: 14px; padding-bottom: 10px;
@@ -307,7 +351,7 @@ body {
   transition: border-color .15s;
 }
 .module-item:hover { border-color: rgba(108,140,255,.25); }
-.module-item h4 { font-size: .9rem; font-weight: 600; margin-bottom: 8px; line-height: 1.4; }
+.module-item h4 { font-size: .95rem; font-weight: 600; margin-bottom: 8px; line-height: 1.5; }
 .module-item .label-row {
   display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
 }
@@ -315,9 +359,11 @@ body {
   font-size: .7rem; padding: 2px 8px; border-radius: 4px;
   background: var(--card); color: var(--text-secondary);
 }
+/* 正文可读性：行距拉开、限制单行字数（过长的行最伤阅读） */
 .module-item .field {
-  font-size: .82rem; color: var(--text-secondary);
-  margin-top: 6px;
+  font-size: .86rem; color: var(--text-secondary);
+  margin-top: 7px; line-height: 1.75; max-width: 78ch;
+  overflow-wrap: anywhere;
 }
 .module-item .field strong { color: var(--text); }
 .module-item .perspective {
@@ -709,6 +755,14 @@ body {
 .global-search:focus { border-color: var(--accent); }
 .global-search::placeholder { color: var(--text-secondary); opacity: .6; }
 
+/* ─── 阅读进度条 ─── */
+.read-progress {
+  position: fixed; top: 0; left: 0; height: 3px; width: 0;
+  background: linear-gradient(90deg, var(--accent), #4f46e5);
+  z-index: 120; transition: width .1s linear; pointer-events: none;
+  border-bottom-right-radius: 3px;
+}
+
 /* ─── Last Updated Note ─── */
 .last-updated {
   font-size: .72rem; color: var(--text-secondary); margin-bottom: 12px;
@@ -749,6 +803,24 @@ body {
   .donate-float { right: 12px; bottom: 12px; padding: 9px 13px; font-size: .8rem; }
   .scroll-top { right: 12px; bottom: 64px; }
   .donate-modal-content img { width: 180px; }
+
+  /* 移动端阅读优化：正文更大更松，卡片内边距收窄把宽度让给文字 */
+  .module-item { padding: 14px 14px; }
+  .module-item h4 { font-size: .96rem; line-height: 1.55; }
+  .module-item .field { font-size: .88rem; line-height: 1.8; max-width: none; }
+  /* 模块目录横向滑动，避免在小屏堆成一大坨占满首屏 */
+  .module-toc {
+    flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 18px; padding: 0 16px 6px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  }
+  .module-toc::-webkit-scrollbar { display: none; }
+  .toc-chip { flex: 0 0 auto; padding: 7px 13px; }
+  /* 触控目标不小于 40px，别让手指点不中 */
+  .daily-topbar { gap: 8px; }
+  .pager-btn { padding: 8px 14px; font-size: .78rem; }
+  .daily-header .source-stats { gap: 8px; }
+  .daily-header .source-stat { font-size: .74rem; padding: 3px 8px; }
+  .site-footer { padding: 18px 0 76px; }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -805,7 +877,11 @@ body {
       <div class="nav-section-title">概览</div>
       <a class="nav-item active" href="#/" data-route="home">
         <span class="dot" style="background:var(--accent)"></span>
-        <span>日报时间线</span>
+        <span>📋 今日日报</span>
+      </a>
+      <a class="nav-item" href="#/timeline" data-route="timeline">
+        <span class="dot" style="background:var(--accent)"></span>
+        <span>🗂 日报时间线</span>
       </a>
       <a class="nav-item" href="#/miniapp" data-route="miniapp">
         <span class="dot" style="background:var(--green)"></span>
@@ -904,11 +980,13 @@ body {
   <footer class="site-footer" id="siteFooter">
     <div class="footer-links"><a href="#/">首页</a> · <a href="#/sources">信息源</a> · <a href="#/favorites">收藏</a></div>
     <div id="complianceFooter">加载备案信息…</div>
-    <div style="margin-top:4px;opacity:.7">© <span id="footerYear">2026</span> 李雪含 · 独立开发者雷达日报</div>
+    <div class="footer-copy" style="margin-top:4px;opacity:.7">© <span id="footerYear">2026</span> <span id="footerCopyName">独立开发者雷达日报</span></div>
+    <div class="footer-credit" id="footerCredit" style="margin-top:4px;opacity:.62;font-size:.75rem"></div>
   </footer>
 </main>
 </div>
 
+<div class="read-progress" id="readProgress" role="progressbar" aria-label="阅读进度"></div>
 <div class="mobile-overlay" id="mobileOverlay"></div>
 
 <button class="scroll-top" id="scrollTop" aria-label="回到顶部" title="回到顶部">↑</button>
@@ -1053,6 +1131,36 @@ function renderCompliance() {
   wrap.innerHTML = html;
 }
 
+// 底部版权 + 上游项目致谢（由 site.json 的 footer 段驱动，改配置即生效，无需重新部署）
+function renderFooterMeta() {
+  const f = (siteConfig && siteConfig.footer) || {};
+  const nameEl = document.getElementById('footerCopyName');
+  if (nameEl) {
+    nameEl.textContent = f.copyright || (siteConfig && siteConfig.site && siteConfig.site.name) || '独立开发者雷达日报';
+  }
+  const credit = document.getElementById('footerCredit');
+  if (!credit) return;
+  const parts = [];
+  const b = f.basedOn;
+  if (b && (b.text || b.url)) {
+    const text = escapeHtml(b.text || b.url);
+    parts.push(b.url
+      ? `<a href="${escapeHtml(b.url)}" target="_blank" rel="noopener nofollow">${text} ↗</a>`
+      : text);
+  } else {
+    parts.push('本项目基于 <a href="https://github.com/susumr/radar-dashboard" target="_blank" rel="noopener nofollow">susumr/radar-dashboard ↗</a>');
+  }
+  if (Array.isArray(f.extraLinks)) {
+    for (const l of f.extraLinks) {
+      if (!l || !l.text) continue;
+      parts.push(l.url
+        ? `<a href="${escapeHtml(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.text)} ↗</a>`
+        : escapeHtml(l.text));
+    }
+  }
+  credit.innerHTML = parts.join(' · ');
+}
+
 function renderLastUpdated() {
   const el = document.getElementById('topUpdated');
   const wrap = document.getElementById('topUpdatedWrap');
@@ -1094,6 +1202,52 @@ function initScrollTop() {
   window.addEventListener('scroll', onScroll, { passive: true });
   btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
   onScroll();
+}
+
+// 阅读进度条
+function initReadProgress() {
+  const bar = document.getElementById('readProgress');
+  if (!bar) return;
+  const update = () => {
+    const doc = document.documentElement;
+    const total = doc.scrollHeight - doc.clientHeight;
+    const pct = total > 40 ? Math.min(100, Math.max(0, (doc.scrollTop / total) * 100)) : 0;
+    bar.style.width = pct + '%';
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  window.addEventListener('resize', update, { passive: true });
+  update();
+}
+
+// 键盘翻页：← / → 切换上下一期日报（不干扰输入框）
+let dailyNewerDate = null, dailyOlderDate = null;
+function initKeyboardNav() {
+  document.addEventListener('keydown', (e) => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const t = e.target;
+    if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+    if (e.key === 'ArrowLeft' && dailyNewerDate) {
+      location.hash = '#/daily/' + dailyNewerDate;
+    } else if (e.key === 'ArrowRight' && dailyOlderDate) {
+      location.hash = '#/daily/' + dailyOlderDate;
+    } else if (e.key === 'Escape') {
+      toggleDonate(false);
+    }
+  });
+}
+
+// 模块目录跳转：用事件委托 + scrollIntoView，避免改动 hash 触发路由
+function initTocJump() {
+  document.addEventListener('click', (e) => {
+    const chip = e.target.closest && e.target.closest('.toc-chip');
+    if (!chip) return;
+    e.preventDefault();
+    const target = document.getElementById(chip.dataset.sec);
+    if (!target) return;
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    document.querySelectorAll('.toc-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
 }
 
 // ─── 路由 ───
@@ -1146,11 +1300,32 @@ async function staticGet(path) {
 }
 
 // ─── API ───
+// 会话内缓存：切换视图时不再重复拉同一份 JSON（日报列表尤其常被复用）
+const _apiCache = new Map();
+const API_CACHE_TTL = 5 * 60 * 1000;
+function _cacheable(path) {
+  return !String(path).startsWith('/favorites');
+}
+function apiCacheClear(path) {
+  if (path) _apiCache.delete(path);
+  else _apiCache.clear();
+}
+
 async function api(path) {
-  if (STATIC_MODE) return staticGet(path);
-  const r = await fetch(API + '/api' + path);
-  if (!r.ok) throw new Error(await r.text());
-  return r.json();
+  if (_cacheable(path)) {
+    const hit = _apiCache.get(path);
+    if (hit && (Date.now() - hit.t) < API_CACHE_TTL) return hit.v;
+  }
+  let value;
+  if (STATIC_MODE) {
+    value = await staticGet(path);
+  } else {
+    const r = await fetch(API + '/api' + path);
+    if (!r.ok) throw new Error(await r.text());
+    value = await r.json();
+  }
+  if (_cacheable(path)) _apiCache.set(path, { t: Date.now(), v: value });
+  return value;
 }
 
 // ─── 我的收藏页 ───
@@ -1558,7 +1733,7 @@ async function renderIndieDev(container) {
     : '';
   container.innerHTML = `
     <div class="module-view-header">
-      <a class="back-btn" href="#/">← 返回时间线</a>
+      <a class="back-btn" href="#/">← 返回今日日报</a>
       <h2>🧑‍💻 独立开发者日报</h2>
       <div class="desc">
         最新批次日期：<b>${escapeHtml(data.date || '—')}</b>　|
@@ -1577,6 +1752,10 @@ async function render() {
   const content = document.getElementById('content');
   const title = document.getElementById('pageTitle');
 
+  // 离开日报视图时清掉翻页上下文，避免在其它页面误触发左右键跳转
+  dailyNewerDate = null;
+  dailyOlderDate = null;
+
   // 确保站点配置已加载（广告、备案、赞赏依赖它）
   await loadSiteConfig();
 
@@ -1588,7 +1767,11 @@ async function render() {
 
   try {
     if (parts.length === 0 || parts[0] === '') {
-      title.textContent = '📡 日报时间线';
+      // 首页 = 最新一期日报（无日报时自动降级为时间线）
+      await renderHomeLatest(content, title);
+      renderInlineAd(content);
+    } else if (parts[0] === 'timeline') {
+      title.textContent = '🗂 日报时间线';
       await renderTimeline(content);
       renderInlineAd(content);
     } else if (parts[0] === 'miniapp') {
@@ -1640,12 +1823,46 @@ async function render() {
   renderAds();
   renderDonation();
   renderCompliance();
+  renderFooterMeta();
   renderLastUpdated();
   // Update topbar stats
   updateTopStats();
 }
 
 // ─── 时间线视图 ───
+// ─── 首页 = 最新一期日报 ───
+function todayStr() {
+  const d = new Date(), p = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+}
+
+async function renderHomeLatest(container, titleEl) {
+  let reports = [];
+  try {
+    reports = await api('/reports');
+  } catch (e) {
+    reports = [];
+  }
+  allReports = Array.isArray(reports) ? reports : [];
+
+  // 没有任何日报 → 降级到时间线空状态，不留白屏
+  if (!allReports.length) {
+    if (titleEl) titleEl.textContent = '🗂 日报时间线';
+    await renderTimeline(container);
+    return;
+  }
+
+  const latest = allReports
+    .slice()
+    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))[0];
+  const isToday = latest.date === todayStr();
+
+  if (titleEl) {
+    titleEl.textContent = isToday ? `📋 今日日报 · ${latest.date}` : `📋 最新日报 · ${latest.date}`;
+  }
+  await renderDaily(container, latest.date, { home: true, stale: !isToday });
+}
+
 async function renderTimeline(container) {
   const reports = await api('/reports');
   allReports = reports;
@@ -1679,20 +1896,45 @@ async function renderTimeline(container) {
 }
 
 // ─── 日报详情视图 ───
-async function renderDaily(container, dateStr) {
+async function renderDaily(container, dateStr, opts) {
+  opts = opts || {};
   const report = await api(`/reports/${dateStr}`);
   if (!report || report.error) {
-    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>未找到该日报</h3></div>`;
+    container.innerHTML = `<div class="empty-state"><div class="icon">📭</div><h3>未找到该日报</h3>
+      <p>可以去 <a href="#/timeline" style="color:var(--accent)">日报时间线</a> 看看其它日期</p></div>`;
     return;
   }
 
   const mods = report.modules || {};
   const sources = report.sources || {};
 
+  // 上一期 / 下一期（需要日报列表；首页已加载过则直接复用）
+  if (!allReports || !allReports.length) {
+    try { allReports = await api('/reports'); } catch (e) { allReports = []; }
+  }
+  const dates = (allReports || [])
+    .map(r => r.date)
+    .filter(Boolean)
+    .sort((a, b) => String(b).localeCompare(String(a)));
+  const idx = dates.indexOf(report.date || dateStr);
+  const newer = idx > 0 ? dates[idx - 1] : null;
+  const older = idx >= 0 && idx < dates.length - 1 ? dates[idx + 1] : null;
+  dailyNewerDate = newer;
+  dailyOlderDate = older;
+
   let html = `
     <div class="daily-header">
-      <a class="back-btn" href="#/">← 返回时间线</a>
-      <div class="date-large">${report.date || dateStr}</div>
+      <div class="daily-topbar">
+        <a class="back-btn" href="#/timeline">← 日报时间线</a>
+        <div class="daily-pager">
+          ${newer ? `<a class="pager-btn" href="#/daily/${newer}" title="更新一期">← 更新</a>`
+                  : `<span class="pager-btn disabled">← 更新</span>`}
+          ${older ? `<a class="pager-btn" href="#/daily/${older}" title="更早一期">更早 →</a>`
+                  : `<span class="pager-btn disabled">更早 →</span>`}
+        </div>
+      </div>
+      <div class="date-large">${escapeHtml(report.date || dateStr)} 雷达日报</div>
+      ${opts.stale ? `<div class="stale-tip">⏳ 今天的日报还在路上，先看最新的这期。数据每日 06:00 / 19:00（北京时间）自动更新。</div>` : ''}
       <div class="source-stats">
         ${Object.entries(sources).map(([k, v]) =>
           `<span class="source-stat">📡 ${k}: <strong>${v}</strong></span>`
@@ -1710,20 +1952,47 @@ async function renderDaily(container, dateStr) {
     { key: 'pitfalls', emoji: '⚠️', label: '今日踩坑' },
     { key: 'dataSignals', emoji: '📊', label: '今日数据信号' },
     { key: 'miniProgram', emoji: '📱', label: '微信小程序机会' },
+    { key: 'indieDev', emoji: '🧑‍💻', label: '独立开发者新品（来自 1c7 列表）' },
     { key: 'dailyWisdom', emoji: '🧠', label: '今日心法' },
   ];
 
+  const hasData = (data) =>
+    !(!data || (Array.isArray(data) && data.length === 0) ||
+      (typeof data === 'object' && !Array.isArray(data) && !data.method));
+
+  // 模块目录：一屏看清今天有什么，点击直达（PC/移动通用）
+  const present = moduleOrder.filter(m => hasData(mods[m.key]));
+  if (present.length > 1) {
+    html += `<nav class="module-toc" aria-label="本期模块目录">
+      ${present.map(m => {
+        const d = mods[m.key];
+        const n = Array.isArray(d) ? d.length : 1;
+        return `<button type="button" class="toc-chip" data-sec="sec-${m.key}">${m.emoji} ${escapeHtml(m.label)}<span class="toc-n">${n}</span></button>`;
+      }).join('')}
+    </nav>`;
+  }
+
   for (const mod of moduleOrder) {
     const data = mods[mod.key];
-    if (!data || (Array.isArray(data) && data.length === 0) || (typeof data === 'object' && !Array.isArray(data) && !data.method)) {
+    if (!hasData(data)) {
       continue;
     }
 
-    html += `<div class="module-section module-color-${mod.key}">
+    html += `<div class="module-section module-color-${mod.key}" id="sec-${mod.key}">
       <div class="module-header">
         <h3>${mod.emoji} ${mod.label}</h3>
         <span class="count">${Array.isArray(data) ? data.length : 1} 条</span>
       </div>`;
+
+    // 独立开发者模块：如实标注来源与收录批次，不把「最近一批」说成「今天新增」
+    if (mod.key === 'indieDev') {
+      const m = report.indieDevMeta || {};
+      const bits = ['数据来自 <a href="https://github.com/1c7/chinese-independent-developer" target="_blank" rel="noopener">1c7/chinese-independent-developer ↗</a>'];
+      if (m.batchDate) bits.push(`收录批次 ${escapeHtml(String(m.batchDate))}`);
+      if (m.newCount) bits.push(`本批新增 <b style="color:var(--green)">${Number(m.newCount)}</b> 个`);
+      if (m.isToday) bits.push('<b style="color:var(--green)">今日更新</b>');
+      html += `<div class="module-note">${bits.join(' · ')}</div>`;
+    }
 
     if (mod.key === 'dailyWisdom') {
       const d = data;
@@ -1756,7 +2025,7 @@ function renderModuleItem(modKey, item) {
   let html = `<div class="module-item">`;
 
   // Title
-  const title = item.title || item.what || item.idea || item.suggestion || item.strategy || item.tool || item.lesson || item.observation || '(未命名)';
+  const title = item.title || item.product || item.what || item.idea || item.suggestion || item.strategy || item.tool || item.lesson || item.observation || '(未命名)';
   const sourceUrl = item.url || item.sourceUrl || item.source_url || '';
   const favObj = {type: 'report_item', title: String(title), url: sourceUrl,
     source: modKey || '', source_label: moduleLabel(modKey || ''), date: item.date || '',
@@ -1769,6 +2038,9 @@ function renderModuleItem(modKey, item) {
 
   // Labels
   const labels = [];
+  if (item.developer) labels.push(`🧑‍💻 ${item.developer}`);
+  if (item.city) labels.push(`📍 ${item.city}`);
+  if (item.status) labels.push(`🚦 ${item.status}`);
   if (item.revenue) labels.push(`💰 ${item.revenue}`);
   if (item.signal) labels.push(`📡 信号: ${item.signal}`);
   if (item.whyNow) labels.push(`✅ 为什么: ${item.whyNow}`);
@@ -1783,6 +2055,7 @@ function renderModuleItem(modKey, item) {
 
   // Fields
   const fields = [
+    { key: 'desc', label: '简介' },
     { key: 'suggestion', label: '建议' },
     { key: 'monetization', label: '变现路径' },
     { key: 'what', label: '做什么' },
@@ -1840,7 +2113,7 @@ async function renderModule(container, moduleName) {
 
   let html = `
     <div class="module-view-header">
-      <a class="back-btn" href="#/">← 返回时间线</a>
+      <a class="back-btn" href="#/">← 返回今日日报</a>
       <h2>${moduleLabels[moduleName] || moduleName}</h2>
       <div class="desc">共 ${items.length} 条记录，来自 ${new Set(items.map(i => i.date)).size} 天</div>
     </div>
@@ -2293,6 +2566,7 @@ function moduleLabel(key) {
     'opportunities': '机会', 'moneyCases': '赚钱案例', 'productInspirations': '产品灵感',
     'growthTips': '增长技巧', 'tools': '工具', 'pitfalls': '踩坑',
     'dataSignals': '数据信号', 'miniProgram': '小程序机会', 'dailyWisdom': '心法',
+    'indieDev': '独立开发者新品',
   };
   return map[key] || key;
 }
@@ -2307,6 +2581,7 @@ const moduleLabels = {
   'signals': '📊 今日数据信号 — 跨日聚合',
   'mini-program': '📱 微信小程序机会 — 跨日聚合',
   'wisdom': '🧠 今日心法 — 跨日聚合',
+  'indie-dev': '🧑‍💻 独立开发者新品 — 跨日聚合',
 };
 
 async function updateTopStats() {
@@ -2371,6 +2646,9 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
 initTheme();
 initMobileMenu();
 initScrollTop();
+initTocJump();
+initReadProgress();
+initKeyboardNav();
 window.addEventListener('popstate', render);
 window.addEventListener('DOMContentLoaded', () => {
   render();

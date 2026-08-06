@@ -33,6 +33,9 @@ BASE_DIR = SCRIPT_DIR.parent
 DATA_DIR = Path(os.environ.get('RADAR_DATA_DIR', BASE_DIR / 'data'))
 RAW_DIR = DATA_DIR / 'raw_signals'
 REPORTS_DIR = DATA_DIR / 'reports'
+INDIE_DEV_FILE = DATA_DIR / 'indie_dev.json'
+
+MAX_INDIE_DEV_ITEMS = 20       # 单期日报最多并入多少个独立开发者产品
 
 API_URL = os.environ.get('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1').rstrip('/') + '/chat/completions'
 MODEL = os.environ.get('DEEPSEEK_MODEL', 'deepseek-v4-flash')
@@ -146,6 +149,100 @@ def build_signal_text(raw):
     return '\n'.join(lines)
 
 
+def load_indie_dev():
+    """读取 1c7「中国独立开发者项目列表」采集结果，扁平化成日报条目。
+
+    返回 (items, meta)。meta 里带批次日期 / 本批新增数 / 来源，用于前端如实标注，
+    避免把「1c7 最近一批」误写成「今天新增」。
+    """
+    try:
+        data = json.loads(INDIE_DEV_FILE.read_text(encoding='utf-8'))
+    except Exception:
+        return [], {}
+
+    batch_date = data.get('date') or ''
+    items = []
+    for dev in (data.get('items') or []):
+        dev_date = dev.get('date') or batch_date
+        fallback_url = dev.get('homepage') or dev.get('github') or ''
+        for p in (dev.get('products') or []):
+            name = (p.get('name') or '').strip()
+            if not name:
+                continue
+            items.append({
+                'developer': (dev.get('developer') or '').strip(),
+                'city': (dev.get('city') or '').strip(),
+                'product': name,
+                'desc': _clip(p.get('desc'), 220),
+                'url': (p.get('url') or '').strip() or fallback_url,
+                'status': (p.get('status') or '').strip(),
+                'batchDate': dev_date,
+                'source': 'indie-dev',
+            })
+
+    meta = {
+        'batchDate': batch_date,
+        'newCount': data.get('newCount', 0),
+        'totalProducts': data.get('totalProducts', len(items)),
+        'source': data.get('source') or 'github.com/1c7/chinese-independent-developer',
+    }
+    return items[:MAX_INDIE_DEV_ITEMS], meta
+
+
+def merge_indie_dev(report, date_str):
+    """把 1c7 独立开发者内容确定性地并进日报的 indieDev 模块。
+
+    模型可能漏填或填错，这里做兜底 + 去重，保证每期日报都能带上这块内容。
+    """
+    items, meta = load_indie_dev()
+    if not items:
+        return 0, meta
+
+    mods = report.setdefault('modules', {})
+    existing = mods.get('indieDev')
+    if not isinstance(existing, list):
+        existing = []
+
+    def _key(it):
+        return (
+            str(it.get('product') or it.get('title') or '').strip().lower(),
+            str(it.get('url') or '').strip().lower().rstrip('/'),
+        )
+
+    # 模型生成的条目常缺 developer/city/status，用 1c7 原始数据补全，而不是简单丢弃
+    index = {}
+    for x in existing:
+        if isinstance(x, dict):
+            index.setdefault(_key(x), x)
+            # 产品名单独再建一次索引，URL 不一致时也能命中
+            name = str(x.get('product') or x.get('title') or '').strip().lower()
+            if name:
+                index.setdefault((name, ''), x)
+
+    added = enriched = 0
+    for it in items:
+        hit = index.get(_key(it)) or index.get((it['product'].strip().lower(), ''))
+        if hit is not None:
+            for field in ('developer', 'city', 'status', 'url', 'desc'):
+                if it.get(field) and not str(hit.get(field) or '').strip():
+                    hit[field] = it[field]
+                    enriched += 1
+            hit.setdefault('source', 'indie-dev')
+            hit.setdefault('batchDate', it.get('batchDate'))
+            continue
+        index[_key(it)] = it
+        index[(it['product'].strip().lower(), '')] = it
+        existing.append(it)
+        added += 1
+
+    mods['indieDev'] = existing
+    meta['isToday'] = bool(meta.get('batchDate') == date_str)
+    meta['mergedCount'] = added
+    meta['enrichedFields'] = enriched
+    report['indieDevMeta'] = meta
+    return added, meta
+
+
 def build_prompt(raw, date_str, focus):
     return (
         f"以下是 {date_str} 从约 20 个国内外信息源采集到的原始信号。\n"
@@ -233,6 +330,12 @@ def main():
 
     report['date'] = args.date
     report.setdefault('sources', {k: len(v) for k, v in (raw.get('sources') or {}).items()})
+
+    # 兜底并入 1c7 独立开发者内容（模型漏填也不会丢）
+    idd_added, idd_meta = merge_indie_dev(report, args.date)
+    if idd_meta:
+        print(f'   indieDev: 1c7 批次 {idd_meta.get("batchDate") or "—"}'
+              f'（本批新增 {idd_meta.get("newCount", 0)}）→ 并入 {idd_added} 条')
 
     REPORTS_DIR.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding='utf-8')
