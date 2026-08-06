@@ -330,6 +330,25 @@ def get_trends():
     ])
 
 
+@app.route('/api/config')
+def get_site_config():
+    """站点配置：备案、广告、赞赏等（可远程热更新，无需重新部署前端）"""
+    path = REPORTS_DIR.parent / 'config' / 'site.json'
+    default = {
+        'site': {'name': '独立开发者雷达日报', 'description': '', 'keywords': '', 'author': ''},
+        'compliance': {'icp': '', 'icpUrl': '', 'police': '', 'policeUrl': ''},
+        'ads': {'enabled': False, 'slots': []},
+        'donation': {'enabled': False, 'title': '', 'desc': '', 'qrUrl': '', 'buttonText': ''},
+        'update': {'autoUpdateNote': ''},
+    }
+    if not path.exists():
+        return jsonify(default)
+    try:
+        return jsonify(json.loads(path.read_text(encoding='utf-8')))
+    except Exception:
+        return jsonify(default)
+
+
 # ─── Frontend ───────────────────────────────────────────────────────────────
 
 @app.route('/')

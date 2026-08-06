@@ -36,6 +36,8 @@ jobs:
       - name: 采集信号 + DeepSeek 生成日报 + 构建数据
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          DEEPSEEK_BASE_URL: ${{ vars.DEEPSEEK_BASE_URL || 'https://api.deepseek.com/v1' }}
+          DEEPSEEK_MODEL: ${{ vars.DEEPSEEK_MODEL || 'deepseek-v4-flash' }}
         run: bash update.sh
 
       - name: 同步数据到仓库根 radar-api/（前端 raw.githubusercontent 拉的就是这里）

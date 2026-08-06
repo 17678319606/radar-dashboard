@@ -2,8 +2,18 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>独立开发者雷达日报</title>
+<meta name="description" content="为独立开发者/小程序创业者聚合每日产品机会、赚钱案例与数据信号。每日 06:00/19:00 自动更新。">
+<meta name="keywords" content="独立开发者, 微信小程序, 创业机会, 雷达日报, 产品灵感, 赚钱案例">
+<meta name="author" content="李雪含">
+<meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#fdfcf8" media="(prefers-color-scheme: light)">
+<meta property="og:title" content="独立开发者雷达日报">
+<meta property="og:description" content="每日自动采集 20+ 信息源，生成独立开发者/小程序创业机会雷达。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://radar-dashboard-7zsuaod4.edgeone.cool/">
+<meta name="twitter:card" content="summary_large_image">
 <style>
 /* ─── Reset & Base ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -619,20 +629,132 @@ body {
 }
 .back-btn:hover { opacity: .8; }
 
+/* ─── Ad Slots ─── */
+.ad-slot { margin-bottom: 16px; }
+.ad-slot:empty { display: none; }
+.ad-slot[data-position="top"] { margin: 0 0 16px; }
+.ad-slot[data-position="sidebar"] { margin: 12px 0 0; }
+.ad-slot[data-position="inline-after-header"] { margin: 14px 0 8px; }
+.ad-slot iframe, .ad-slot img { max-width: 100%; border-radius: 8px; display: block; }
+
+/* ─── Site Footer / Compliance ─── */
+.site-footer {
+  margin-top: 40px; padding: 20px 0 40px;
+  border-top: 1px solid var(--border); text-align: center;
+  font-size: .75rem; color: var(--text-secondary); line-height: 1.8;
+}
+.site-footer a { color: var(--text-secondary); text-decoration: none; }
+.site-footer a:hover { color: var(--accent); text-decoration: underline; }
+.site-footer .footer-links { margin-bottom: 8px; }
+
+/* ─── Donation ─── */
+.donate-float {
+  position: fixed; right: 18px; bottom: 18px;
+  z-index: 90; display: flex; align-items: center; gap: 6px;
+  background: linear-gradient(135deg, var(--accent), #4f46e5);
+  color: #fff; border: none; border-radius: 50px;
+  padding: 10px 16px; font-size: .85rem; font-weight: 600;
+  box-shadow: 0 4px 16px rgba(0,0,0,.25); cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.donate-float:hover { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,0,0,.3); }
+.donate-modal { display: none; position: fixed; inset: 0; z-index: 100; align-items: center; justify-content: center; }
+.donate-modal.open { display: flex; }
+.donate-modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(2px); }
+.donate-modal-content {
+  position: relative; background: var(--card); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px; max-width: 360px; width: calc(100% - 32px);
+  text-align: center; z-index: 1; box-shadow: 0 20px 50px rgba(0,0,0,.35);
+}
+.donate-modal-content h3 { font-size: 1.1rem; margin-bottom: 8px; }
+.donate-modal-content p { font-size: .82rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.6; }
+.donate-modal-content img { width: 220px; height: auto; border-radius: 12px; }
+.donate-close {
+  position: absolute; top: 10px; right: 12px; background: none; border: none;
+  color: var(--text-secondary); font-size: 1.4rem; cursor: pointer; line-height: 1;
+}
+
+/* ─── Scroll to Top ─── */
+.scroll-top {
+  position: fixed; right: 18px; bottom: 74px;
+  z-index: 89; display: none;
+  background: var(--card); border: 1px solid var(--border); color: var(--text);
+  width: 40px; height: 40px; border-radius: 50%;
+  align-items: center; justify-content: center; cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2); font-size: 1.1rem;
+  transition: background-color .15s, border-color .15s, transform .15s;
+}
+.scroll-top:hover { border-color: var(--accent); transform: translateY(-2px); }
+.scroll-top.visible { display: flex; }
+
+/* ─── Mobile Menu ─── */
+.mobile-menu-btn {
+  display: none; align-items: center; justify-content: center;
+  background: var(--card); border: 1px solid var(--border); color: var(--text);
+  width: 34px; height: 34px; border-radius: 8px; cursor: pointer; flex-shrink: 0;
+}
+.mobile-menu-btn svg { width: 18px; height: 18px; }
+.mobile-overlay {
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45);
+  z-index: 50; backdrop-filter: blur(1px);
+}
+.mobile-overlay.open { display: block; }
+
+/* ─── Global Search ─── */
+.global-search {
+  background: var(--surface); border: 1px solid var(--border); color: var(--text);
+  border-radius: 8px; padding: 8px 14px; font-size: .85rem; font-family: inherit;
+  width: 220px; outline: none;
+}
+.global-search:focus { border-color: var(--accent); }
+.global-search::placeholder { color: var(--text-secondary); opacity: .6; }
+
+/* ─── Last Updated Note ─── */
+.last-updated {
+  font-size: .72rem; color: var(--text-secondary); margin-bottom: 12px;
+}
+
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
-  .sidebar { width: 56px; min-width: 56px; }
-  .sidebar-header { padding: 16px 12px 12px; }
-  .sidebar-header h1, .sidebar-header .sub,
-  .nav-section-title, .nav-item span, .badge, .sidebar-footer { display: none; }
-  .nav-item { justify-content: center; padding: 10px; border-radius: 6px; }
-  .nav-item .dot { width: 6px; height: 6px; }
-  .nav-section { margin-bottom: 2px; }
+  .layout { position: relative; }
+  .sidebar {
+    position: fixed; left: 0; top: 0; bottom: 0;
+    width: 260px; min-width: 260px;
+    transform: translateX(-100%); transition: transform .25s ease;
+    z-index: 60; border-right: none; box-shadow: 4px 0 24px rgba(0,0,0,.35);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-header { padding: 20px 16px 14px; }
+  .sidebar-header h1 { font-size: 1rem; }
+  .nav-item { justify-content: flex-start; padding: 9px 12px; }
+  .nav-item span { display: inline; }
+  .nav-section-title, .badge, .sidebar-footer { display: block; }
+  .mobile-menu-btn { display: flex; margin-right: 8px; }
+  .main { width: 100%; }
+  .topbar { padding: 10px 14px; }
+  .topbar-inner { gap: 8px; }
+  .topbar h2 { font-size: .9rem; }
+  .topbar .stats { display: none; }
+  .global-search { width: 130px; padding: 7px 10px; font-size: .8rem; }
   .content { padding: 16px; }
   .timeline-grid { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-  .topbar .stats { display: none; }
-  .topbar-inner { padding: 0 4px; }
+  .raw-layout { flex-direction: column; }
+  .raw-sources { width: 100%; position: static; flex-direction: row; overflow-x: auto; padding: 6px; }
+  .raw-source-item { white-space: nowrap; }
+  .module-view-header h2 { font-size: 1.1rem; }
+  .daily-header .date-large { font-size: 1.4rem; }
+  .mp-grid, .source-grid { grid-template-columns: 1fr; }
+  .mp-filter, .global-search { width: 100%; }
+  .donate-float { right: 12px; bottom: 12px; padding: 9px 13px; font-size: .8rem; }
+  .scroll-top { right: 12px; bottom: 64px; }
+  .donate-modal-content img { width: 180px; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar { width: 200px; min-width: 200px; }
+  .content { padding: 20px; }
+  .timeline-grid { grid-template-columns: repeat(2, 1fr); }
 }
 
 /* ─── Expandable ─── */
@@ -752,6 +874,7 @@ body {
   </nav>
   <div class="sidebar-footer">
     <span id="reportCount">加载中...</span>
+    <div class="ad-slot" id="adSidebar" data-position="sidebar"></div>
   </div>
 </aside>
 
@@ -759,11 +882,14 @@ body {
 <main class="main">
   <div class="topbar">
     <div class="topbar-inner">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="打开菜单" title="菜单">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <h2 id="pageTitle">日报时间线</h2>
       <div class="stats" id="topStats">
         <span class="stat-item">📡 <strong id="topTotal">-</strong> 份日报</span>
         <span class="stat-item">📦 <strong id="topModules">-</strong> 模块</span>
-        <span class="stat-item">📊 <strong id="topTrend">-</strong> 趋势</span>
+        <span class="stat-item" title="数据最后更新时间" id="topUpdatedWrap">⏱ <strong id="topUpdated">-</strong></span>
       </div>
       <button class="theme-toggle" id="themeToggle" aria-label="切换明暗主题" title="切换明暗主题">
         <svg class="ico-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
@@ -771,11 +897,33 @@ body {
       </button>
     </div>
   </div>
+  <div class="ad-slot" id="adTop" data-position="top"></div>
   <div class="content" id="content">
     <div class="loading"><div class="spinner"></div>加载中...</div>
   </div>
+  <footer class="site-footer" id="siteFooter">
+    <div class="footer-links"><a href="#/">首页</a> · <a href="#/sources">信息源</a> · <a href="#/favorites">收藏</a></div>
+    <div id="complianceFooter">加载备案信息…</div>
+    <div style="margin-top:4px;opacity:.7">© <span id="footerYear">2026</span> 李雪含 · 独立开发者雷达日报</div>
+  </footer>
 </main>
 </div>
+
+<div class="mobile-overlay" id="mobileOverlay"></div>
+
+<button class="scroll-top" id="scrollTop" aria-label="回到顶部" title="回到顶部">↑</button>
+
+<div class="donate-modal" id="donateModal" role="dialog" aria-modal="true" aria-labelledby="donateTitle">
+  <div class="donate-modal-backdrop" onclick="toggleDonate(false)"></div>
+  <div class="donate-modal-content">
+    <button class="donate-close" onclick="toggleDonate(false)" aria-label="关闭">×</button>
+    <h3 id="donateTitle">支持雷达日报</h3>
+    <p id="donateDesc">如果这份日报对你有启发，欢迎赞赏支持。</p>
+    <img id="donateQr" src="" alt="赞赏二维码" loading="lazy" width="220" height="220">
+  </div>
+</div>
+
+<button class="donate-float" id="donateFloat" aria-label="赞赏支持" title="赞赏支持">☕ 赞赏支持</button>
 
 <script>
 // ═══════════════════════════════════════════════════════
@@ -797,6 +945,156 @@ const REMOTE_ENABLED = !REMOTE_DATA_BASE.includes('OWNER');
 const FAV_STORE_KEY = 'radar_favorites_v1';   // 静态模式下收藏存 localStorage
 let allReports = [];
 let moduleCounts = {};
+let siteConfig = null;
+
+// ─── 站点配置（备案 / 广告 / 赞赏） ───
+async function loadSiteConfig() {
+  if (siteConfig) return siteConfig;
+  try {
+    siteConfig = await api('/config');
+  } catch (e) {
+    siteConfig = {};
+  }
+  return siteConfig;
+}
+
+function renderAds() {
+  if (!siteConfig || !siteConfig.ads || !siteConfig.ads.enabled) {
+    document.querySelectorAll('.ad-slot').forEach(el => el.innerHTML = '');
+    return;
+  }
+  const slots = siteConfig.ads.slots || [];
+  const byPosition = {};
+  slots.filter(s => s.enabled).forEach(s => {
+    byPosition[s.position] = byPosition[s.position] || [];
+    byPosition[s.position].push(s);
+  });
+
+  const fill = (id, pos) => {
+    const el = document.getElementById(id);
+    if (!el || !byPosition[pos]) { if (el) el.innerHTML = ''; return; }
+    // 只取第一个启用的该位置广告
+    const ad = byPosition[pos][0];
+    let html = '';
+    if (ad.type === 'html') {
+      html = `<div class="ad-content">${ad.content || ''}</div>`;
+    } else if (ad.type === 'image' && ad.imageUrl) {
+      html = `<a href="${escapeHtml(ad.url || '#')}" target="_blank" rel="noopener"><img src="${escapeHtml(ad.imageUrl)}" alt="${escapeHtml(ad.alt || '广告')}" loading="lazy"></a>`;
+    } else if (ad.type === 'script' && ad.scriptUrl) {
+      html = `<script src="${escapeHtml(ad.scriptUrl)}" async><\/script>`;
+    }
+    el.innerHTML = html;
+  };
+
+  fill('adTop', 'top');
+  fill('adSidebar', 'sidebar');
+}
+
+function renderInlineAd(container) {
+  if (!siteConfig || !siteConfig.ads || !siteConfig.ads.enabled) return;
+  const slots = (siteConfig.ads.slots || []).filter(s => s.enabled && s.position === 'inline-after-header');
+  if (!slots.length) return;
+  const ad = slots[0];
+  const div = document.createElement('div');
+  div.className = 'ad-slot';
+  div.dataset.position = 'inline-after-header';
+  if (ad.type === 'html') div.innerHTML = ad.content || '';
+  else if (ad.type === 'image' && ad.imageUrl) {
+    div.innerHTML = `<a href="${escapeHtml(ad.url || '#')}" target="_blank" rel="noopener"><img src="${escapeHtml(ad.imageUrl)}" alt="${escapeHtml(ad.alt || '广告')}" loading="lazy"></a>`;
+  }
+  if (container.firstElementChild) container.insertBefore(div, container.firstElementChild.nextSibling);
+  else container.appendChild(div);
+}
+
+function renderDonation() {
+  const d = siteConfig && siteConfig.donation;
+  const btn = document.getElementById('donateFloat');
+  const modal = document.getElementById('donateModal');
+  if (!d || !d.enabled) {
+    if (btn) btn.style.display = 'none';
+    return;
+  }
+  if (btn) {
+    btn.textContent = d.buttonText || '☕ 赞赏支持';
+    btn.style.display = 'flex';
+    btn.onclick = () => toggleDonate(true);
+  }
+  const titleEl = document.getElementById('donateTitle');
+  const descEl = document.getElementById('donateDesc');
+  const qrEl = document.getElementById('donateQr');
+  if (titleEl) titleEl.textContent = d.title || '支持雷达日报';
+  if (descEl) descEl.textContent = d.desc || '如果这份日报对你有启发，欢迎赞赏支持。';
+  if (qrEl) qrEl.src = d.qrUrl || '';
+}
+
+function toggleDonate(show) {
+  const modal = document.getElementById('donateModal');
+  if (!modal) return;
+  if (show) modal.classList.add('open');
+  else modal.classList.remove('open');
+}
+
+function renderCompliance() {
+  const c = siteConfig && siteConfig.compliance;
+  const wrap = document.getElementById('complianceFooter');
+  if (!wrap) return;
+  if (!c || (!c.icp && !c.police)) {
+    wrap.innerHTML = '';
+    return;
+  }
+  let html = '';
+  if (c.icp && c.icpUrl) html += `<a href="${escapeHtml(c.icpUrl)}" target="_blank" rel="noopener">${escapeHtml(c.icp)}</a>`;
+  else if (c.icp) html += escapeHtml(c.icp);
+  if (c.police) {
+    if (html) html += ' · ';
+    if (c.policeUrl) html += `<a href="${escapeHtml(c.policeUrl)}" target="_blank" rel="noopener">${escapeHtml(c.police)}</a>`;
+    else html += escapeHtml(c.police);
+  }
+  wrap.innerHTML = html;
+}
+
+function renderLastUpdated() {
+  const el = document.getElementById('topUpdated');
+  const wrap = document.getElementById('topUpdatedWrap');
+  if (!el || !wrap) return;
+  // 从报告日期里取最新一天
+  let latest = '';
+  if (allReports && allReports.length) {
+    latest = allReports[0].date || '';
+  }
+  if (!latest) {
+    wrap.style.display = 'none';
+    return;
+  }
+  wrap.style.display = '';
+  el.textContent = latest;
+}
+
+// ─── Mobile Menu ───
+function initMobileMenu() {
+  const btn = document.getElementById('mobileMenuBtn');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('mobileOverlay');
+  if (!btn || !sidebar || !overlay) return;
+  const open = () => { sidebar.classList.add('open'); overlay.classList.add('open'); };
+  const close = () => { sidebar.classList.remove('open'); overlay.classList.remove('open'); };
+  btn.addEventListener('click', open);
+  overlay.addEventListener('click', close);
+  document.querySelectorAll('#nav a').forEach(a => a.addEventListener('click', close));
+}
+
+// ─── Scroll to Top ───
+function initScrollTop() {
+  const btn = document.getElementById('scrollTop');
+  if (!btn) return;
+  const onScroll = () => {
+    if (window.scrollY > 400) btn.classList.add('visible');
+    else btn.classList.remove('visible');
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  onScroll();
+}
 
 // ─── 路由 ───
 function getRoute() {
@@ -1279,6 +1577,9 @@ async function render() {
   const content = document.getElementById('content');
   const title = document.getElementById('pageTitle');
 
+  // 确保站点配置已加载（广告、备案、赞赏依赖它）
+  await loadSiteConfig();
+
   // Update active nav
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
   const navKey = parts[0] === 'module' ? `module-${parts[1]}` : (parts[0] || 'home');
@@ -1289,9 +1590,11 @@ async function render() {
     if (parts.length === 0 || parts[0] === '') {
       title.textContent = '📡 日报时间线';
       await renderTimeline(content);
+      renderInlineAd(content);
     } else if (parts[0] === 'miniapp') {
       title.textContent = '📱 小程序机会';
       await renderMiniProgram(content);
+      renderInlineAd(content);
     } else if (parts[0] === 'indie-dev') {
       title.textContent = '🧑‍💻 独立开发者日报';
       await renderIndieDev(content);
@@ -1310,6 +1613,7 @@ async function render() {
     } else if (parts[0] === 'daily' && parts[1]) {
       title.textContent = `📋 ${parts[1]} 日报详情`;
       await renderDaily(content, parts[1]);
+      renderInlineAd(content);
     } else if (parts[0] === 'module' && parts[1]) {
       const labels = {
         'opportunities': '📌 机会库',
@@ -1324,6 +1628,7 @@ async function render() {
       };
       title.textContent = labels[parts[1]] || '模块视图';
       await renderModule(content, parts[1]);
+      renderInlineAd(content);
     } else {
       content.innerHTML = '<div class="empty-state"><div class="icon">🤷</div><h3>页面不存在</h3></div>';
     }
@@ -1331,6 +1636,11 @@ async function render() {
     content.innerHTML = `<div class="empty-state"><div class="icon">⚠️</div><h3>加载失败</h3><p>${err.message}</p></div>`;
   }
 
+  // 通用后处理
+  renderAds();
+  renderDonation();
+  renderCompliance();
+  renderLastUpdated();
   // Update topbar stats
   updateTopStats();
 }
@@ -2059,8 +2369,13 @@ document.getElementById('themeToggle')?.addEventListener('click', () => {
 
 // ─── 启动 ───
 initTheme();
+initMobileMenu();
+initScrollTop();
 window.addEventListener('popstate', render);
-window.addEventListener('DOMContentLoaded', render);
+window.addEventListener('DOMContentLoaded', () => {
+  render();
+  document.getElementById('footerYear').textContent = new Date().getFullYear();
+});
 </script>
 </body>
 </html>

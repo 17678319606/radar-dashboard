@@ -34,8 +34,8 @@ DATA_DIR = Path(os.environ.get('RADAR_DATA_DIR', BASE_DIR / 'data'))
 RAW_DIR = DATA_DIR / 'raw_signals'
 REPORTS_DIR = DATA_DIR / 'reports'
 
-API_URL = 'https://api.deepseek.com/chat/completions'
-MODEL = os.environ.get('DEEPSEEK_MODEL', 'deepseek-chat')
+API_URL = os.environ.get('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1').rstrip('/') + '/chat/completions'
+MODEL = os.environ.get('DEEPSEEK_MODEL', 'deepseek-v4-flash')
 
 MAX_ITEMS_PER_SOURCE = 12      # 每个源最多喂多少条，控制 token 成本
 MAX_TITLE_LEN = 120

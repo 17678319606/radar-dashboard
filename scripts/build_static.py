@@ -48,6 +48,7 @@ def collect_routes():
         '/api/stats',
         '/api/trends',
         '/api/indie-dev',
+        '/api/config',
     ]
     for f in sorted(REPORTS_DIR.glob('*.json')):
         routes.append(f'/api/reports/{f.stem}')
