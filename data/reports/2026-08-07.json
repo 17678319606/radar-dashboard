@@ -1,342 +1,266 @@
 {
   "date": "2026-08-07",
   "tags": [
-    "#微信小程序",
+    "#小程序",
     "#AI",
     "#独立开发",
-    "#效率工具",
-    "#开源",
-    "#短剧",
-    "#解压",
-    "#简历"
+    "#钓鱼",
+    "#拼豆"
   ],
   "modules": {
     "opportunities": [
       {
-        "title": "GPT-5.6 Sol 调优与免费无限用 Luna，AI 应用成本再降",
-        "why": "OpenAI 宣布为 GPT-5.6 Sol 调优并让免费用户无限使用 Luna，意味着开发者可以用更低成本接入强大 AI，过去受限于 API 费用的产品可以重新考虑商业化。",
-        "how": "搭建一个轻量 AI 工具，如 AI 写作助手、AI 口语陪练、AI 简历优化，利用免费额度降低冷启动成本，先跑通验证再逐步收费。",
+        "title": "AI比价站：全网AI信息聚合比价",
+        "why": "AI API价格混乱、限速不透明，开发者需要按「每元可用量」选最划算方案，比价是刚需。",
+        "how": "聚合国产官方套餐（GLM/Kimi/通义/豆包等）的真实Token额度、限速和单价，横向对比免费活动与中转行情。",
         "keywords": [
-          "GPT-5.6",
-          "AI 应用",
-          "低成本"
-        ],
-        "source": "oschina"
-      },
-      {
-        "title": "本地 AI 重新成为卖点：WitNote 把 AI 放回 Mac",
-        "why": "用户对隐私和数据安全的关注提升，本地运行的 AI 工具能抢占那些不愿上传数据的用户。",
-        "how": "开发本地优先的小工具，如本地文件搜索、本地笔记 AI 总结、本地照片分类，强调数据不出设备。",
-        "keywords": [
-          "本地 AI",
-          "隐私",
-          "效率工具"
-        ],
-        "source": "v2ex"
-      },
-      {
-        "title": "自然语言搜索本地素材：一个被忽视的痛点",
-        "why": "视频创作者和个人用户素材越积越多，传统文件夹搜索效率低，该需求在 V2EX 上引发共鸣。",
-        "how": "做一款本地素材搜索工具，支持自然语言描述查找图片/视频/音频，初期可先做桌面版，之后若能云端化可平移至小程序提供云端素材管理。",
-        "keywords": [
-          "素材管理",
-          "自然语言搜索",
-          "创作者"
-        ],
-        "source": "v2ex"
-      },
-      {
-        "title": "短剧应用多地区上架，市场持续升温",
-        "why": "GoodDrama 短剧观看平台在 App Store 中国区、韩国区等多个地区新上架，说明短剧出海和本地化需求旺盛。",
-        "how": "聚焦短剧推荐、影评、台词分享等周边工具，或为短剧创作者提供剪辑、字幕、封面制作的小程序，避免直接做播放平台的高版权门槛。",
-        "keywords": [
-          "短剧",
-          "内容消费",
-          "出海"
+          "AI比价",
+          "API价格"
         ],
         "source": "indie-dev"
       },
       {
-        "title": "Easy 简历开源，验证简历制作 SaaS 付费可行",
-        "why": "该服务上线一年半 VIP 付费 3000+，且选择开源，说明细分领域工具能赚钱，同时开源能放大品牌影响力。",
-        "how": "借鉴其模式，针对程序员、应届生、教师等垂直人群做更有针对性的简历工具，并用 AI 提供个性化建议。",
+        "title": "不空：钓鱼天气与鱼情记录",
+        "why": "野钓用户痛点明确——天气直接影响鱼情，但普通天气App不提供鱼情维度。",
+        "how": "网页免登录查询十种目标鱼的评分、24小时趋势和较好时段，App端提供7日鱼情和钓点记录。",
         "keywords": [
-          "简历",
-          "SaaS",
-          "垂直人群"
+          "钓鱼",
+          "天气",
+          "鱼情"
         ],
-        "source": "v2ex"
+        "source": "indie-dev"
       }
     ],
     "moneyCases": [
       {
-        "title": "Easy 简历：开源变现的典型案例",
-        "what": "一套面向多场景的简历制作 SaaS，包含所见即所得编辑器、AI 流式诊断、微信小程序登录，上线一年半 VIP 付费 3000+。",
-        "revenue": "付费 3000+（未公开具体金额）",
-        "how": "免费基础功能 + VIP 付费高级模板和 AI 诊断，同时通过开源引流获取大量开发者用户，形成社区闭环。",
+        "title": "tl;dv 会议记录工具",
+        "what": "自动记录和总结会议内容，已累积181,874场会议，验证了AI会议记录需求。",
+        "revenue": "未披露",
+        "how": "嵌入视频会议平台，靠AI转录+总结能力吸引订阅用户，公开会议记录作信任背书。",
+        "source": "lobsters"
+      },
+      {
+        "title": "Redock 手机终端",
+        "what": "为ClaudeCode/Codex等Agent开发流适配的手机终端，iOS版本运营后决定开发Android版，证明能活下去。",
+        "revenue": "未披露",
+        "how": "面向AI编程用户提供移动端Agent控制体验，通过订阅或买断赚钱，社区内测获得反馈。",
+        "source": "v2ex"
+      }
+    ],
+    "sideHustles": [
+      {
+        "title": "用AI编程工具接单做小工具",
+        "why": "不懂开发的人也能用GPT做出油猴插件，说明AI降低开发门槛，接单市场存在。",
+        "how": "在闲鱼/小红书发帖接定制小脚本、插件、简单网页，用Claude Code/Codex辅助开发，按单收费。",
+        "revenue": "几十到几百元/单",
         "source": "v2ex"
       },
       {
-        "title": "Ready For Real Life：60 美元高价教育应用",
-        "what": "一款教授现代礼仪和心理韧性的教育应用，在美国区 App Store 标价 60 美元。",
-        "revenue": "未知，但定价策略值得参考",
-        "how": "针对特定人群的自我提升需求，提供体系化课程，用高定价筛选高质量用户，也说明数字教育产品有大幅溢价空间。",
-        "source": "appstore-us"
-      },
-      {
-        "title": "十字绣解压应用：小品类也能登录 App Store",
-        "what": "Cross Stitch: Antistress 在多地区上架，提供十字绣图案帮助放松解压。",
-        "revenue": "未知",
-        "how": "抓住解压刚需，以简单交互和丰富图案吸引用户，可配合内购解锁更多图集或去除广告。",
-        "source": "appstore-cn"
+        "title": "运营利基工具站挂广告/打赏",
+        "why": "小而美工具（如AI比价、钓鱼天气）需求稳定，维护成本低，靠SEO获取自然流量。",
+        "how": "选择细分人群（开发者/钓鱼佬），快速上线轻量网页，用广告或打赏变现，持续更新数据保持粘性。",
+        "revenue": "不确定，取决于流量",
+        "source": "indie-dev"
       }
     ],
     "productInspirations": [
       {
-        "title": "Screen Time Lock：数字断连工具",
-        "idea": "市面上已经有多款屏幕时间管理应用，说明用户对自己的手机依赖有焦虑，可以做一个更温和的「番茄钟 + 屏幕使用统计」小程序，帮助用户培养专注习惯。",
-        "source": "appstore-tw"
+        "title": "拼豆图纸生成器",
+        "idea": "上传照片自动生成拼豆图纸，并开放5品牌1406色号数据集，用开放数据树立权威。",
+        "source": "v2ex"
       },
       {
-        "title": "Nota AI：会议转写并总结",
-        "idea": "AI 自动把会议录音转文字并生成摘要，对于需要开会的职场人是刚需。可以做一个微信小程序版，依托微信语音识别能力，提供「录音 + 转写 + 总结」一条龙，重点保护隐私，支持本地处理。",
-        "source": "appstore-jp"
-      },
-      {
-        "title": "DrawDB：在线数据库图表编辑器",
-        "idea": "免费简洁的数据库设计工具，适合独立开发者在画 ER 图时用。可以做一个更轻量的微信小程序，用作数据库设计沟通展示，方便在手机上随时查看。",
-        "source": "github-js"
-      },
-      {
-        "title": "Cross Stitch：数字十字绣",
-        "idea": "像素填色游戏在多个应用商店上新，验证了解压类休闲游戏的潜力。可移植到小程序，做成「数字油画」或「十字绣」玩法，社交分享到朋友圈。",
+        "title": "十字绣解压应用",
+        "idea": "App Store新上架Cross Stitch Antistress，用虚拟十字绣模拟解压，可考虑做小游戏或小程序。",
         "source": "appstore-cn"
       },
       {
-        "title": "VoiceLogue：语音日志",
-        "idea": "用语音记录心情和想法，比打字更快更真实。可以结合情绪分析做成「情绪日记」小程序，让用户记录后生成周报月报，发现自己情绪变化。",
-        "source": "appstore-cn"
+        "title": "屏幕时间锁定",
+        "idea": "多区App Store新上架屏幕时间管理工具，但小程序受限，可转为「专注打卡」或「使用统计」思路。",
+        "source": "appstore-us"
+      },
+      {
+        "title": "视频静音剪切器",
+        "idea": "CutSense自动剪切UGC视频中的静音片段，适合做简单视频工具，小程序端可尝试。",
+        "source": "appstore-kr"
       }
     ],
     "growthTips": [
       {
-        "title": "在 V2EX 分享创造并赠送软件",
-        "tip": "一个开发者用「送软件」的方式在 V2EX 推广自己的 macOS 工具，评论区热情高。独立开发者在产品初期可以采取「分享创造 + 免费兑换码」的方式，快速获得种子用户和反馈。",
+        "title": "在V2EX分享开发过程",
+        "tip": "多个「分享创造」帖在V2EX获得关注，发布产品开发心得能高效获取第一批用户和反馈。",
         "source": "v2ex"
       },
       {
-        "title": "开源核心模块，放大项目影响力",
-        "tip": "Easy 简历在付费情况不错的情况下选择开源，不仅没有损失付费用户，反而通过开发者社区获得了大量曝光和信任，并带动了 VIP 转化。开源部分模块可以作为增长策略。",
+        "title": "开放数据建立信任",
+        "tip": "拼豆图纸生成器把1406个色号做成开放数据集，既是内容又是引流钩子，吸引精准用户。",
         "source": "v2ex"
-      },
-      {
-        "title": "关注多地区 App Store 新上架，寻找可复制灵感",
-        "tip": "观察不同国家地区新上架的应用，比如短剧、屏幕锁定、十字绣等反复出现，说明这些需求跨地区存在。可以快速将验证过的模式本地化，抢时间差。",
-        "source": "appstore-kr"
       }
     ],
     "tools": [
       {
-        "title": "immersive-translate：沉浸式双语网页翻译扩展",
-        "what": "支持输入框翻译、鼠标悬停翻译、PDF 和 Epub，被广泛使用。",
-        "url": "https://github.com/immersive-translate/immersive-translate",
-        "source": "github-zh"
-      },
-      {
-        "title": "DrawDB：免费在线数据库图表编辑器",
-        "what": "免费、简单、直观的数据库 ER 图绘制工具，还能生成 SQL。",
+        "title": "drawdb",
+        "what": "免费、简单、直观的在线数据库图表编辑器和SQL生成器。",
         "url": "https://github.com/drawdb-io/drawdb",
         "source": "github-js"
       },
       {
-        "title": "awesome-gpt-image-2：工业级提示词引擎与模板库",
-        "what": "包含 470+ 案例逆向工程和 20+ 套模板，帮助写出更专业的 AI 绘画提示词。",
-        "url": "https://github.com/freestylefly/awesome-gpt-image-2",
-        "source": "github-js"
-      },
-      {
-        "title": "mise：开发工具、环境变量和任务运行器",
-        "what": "一站式管理开发工具链和环境变量，替代 asdf 等工具。",
-        "url": "https://github.com/jdx/mise",
+        "title": "Prime Agent",
+        "what": "自我改进的编程智能体，开源，可执行长期自主任务。",
+        "url": "https://github.com/PrimeIntellect-ai/prime-agent",
         "source": "github"
       },
       {
-        "title": "CowAgent：开源超级 AI 代理框架",
-        "what": "支持任务规划、工具调用、记忆和自我进化，多模型多平台接入，可快速搭建个性化 AI 助手。",
-        "url": "https://github.com/zhayujie/CowAgent",
-        "source": "github-zh"
+        "title": "agent-skills",
+        "what": "为AI编码智能体提供生产级工程技能，来自addyosmani。",
+        "url": "https://github.com/addyosmani/agent-skills",
+        "source": "github"
       },
       {
-        "title": "HowToCook",
-        "what": "程序员做饭指南，开源菜谱。",
-        "url": "https://github.com/Anduin2017/HowToCook",
-        "source": "github-zh"
+        "title": "Web-Dev-For-Beginners",
+        "what": "微软的Web开发入门教程，24节课12周免费学。",
+        "url": "https://github.com/microsoft/Web-Dev-For-Beginners",
+        "source": "github-js"
       },
       {
-        "title": "MiroFish",
-        "what": "简洁通用的群体智能引擎，预测万物。",
-        "url": "https://github.com/666ghj/MiroFish",
+        "title": "grok2api",
+        "what": "支持多账户的Grok Build、Web和Console API网关。",
+        "url": "https://github.com/chenyme/grok2api",
         "source": "github"
       }
     ],
     "pitfalls": [
       {
-        "title": "Vibe Coding 项目容易被推翻重做",
-        "pitfall": "WitNote 作者将被 AI 辅助编程的第一个版本完全重写，原因是初始架构不可扩展、AI 生成代码难以维护。",
-        "lesson": "用 AI 快速原型时，也要留出时间做架构设计，技术债积累到一定程度必须及时重构，否则成本更高。",
-        "source": "v2ex"
+        "title": "「被动收入」陷阱吞噬了一代创业者",
+        "pitfall": "盲目追求被动收入而忽视真实问题，容易做出没人用的产品。",
+        "lesson": "先解决一个具体痛点，再考虑收入模式，被动收入是结果不是目标。",
+        "source": "reddit-sidehustle"
       },
       {
-        "title": "GitHub 再次大规模服务降级",
-        "pitfall": "开发者依赖的 GitHub 当天出现降级，影响代码托管和 CI/CD。",
-        "lesson": "关键基础设施不要依赖单一厂商，重要仓库要定期做离线备份，同时准备备用代码托管平台。",
-        "source": "oschina"
-      },
-      {
-        "title": "微信小微发力但用户感知弱",
-        "pitfall": "微信给小微开了很多入口，如公众号总结、拍照问答、朋友圈 AI 帮写，但用户认为「没啥用」。",
-        "lesson": "大厂力推的 AI 功能未必能击中真实需求。独立开发者可以从更垂直的小切口切入，解决具体场景，而不是做万能入口。",
-        "source": "v2ex"
+        "title": "Namecheap账户被交给未验证第三方",
+        "pitfall": "账户安全存在隐患，平台失误可能导致域名和网站失控。",
+        "lesson": "关键资产启用2FA，域名和服务器分散在不同供应商，避免单点风险。",
+        "source": "hackernews"
       }
     ],
     "dataSignals": [
       {
-        "title": "多地区 App Store 短剧应用上架，短剧全球化趋势明显",
-        "signal": "GoodDrama 在 CN、KR 等区上架，说明短剧消费习惯已向海外蔓延，相关工具和服务有出海机会。",
-        "source": "appstore-cn"
+        "title": "屏幕时间管理应用多区上架",
+        "signal": "Screen Time Lock等屏幕锁定工具在美、韩、台湾区App Store新上架，数字健康需求持续增长。",
+        "source": "appstore-us"
       },
       {
-        "title": "屏幕时间管理应用在多国商店同时出现",
-        "signal": "Screen Time Lock 在 TW、KR 等区上架，反映全球用户对数字健康和防沉迷的需求上升，这类工具通常玩法简单、可快速复制。",
+        "title": "AI会议转录成为效率工具标配",
+        "signal": "Nota AI在台湾、日本、韩国等多区上架，AI转录需求常态化。",
         "source": "appstore-tw"
       },
       {
-        "title": "GitHub 上 agent-skills 类项目集中爆发",
-        "signal": "多个技能库项目如 agent-skills、superpowers、impeccable 等同时涌现，开发者社区正在为 AI 代理积累最佳实践，这预示 AI 代理开发即将变得更加标准化、工程化。",
-        "source": "github"
+        "title": "短剧应用在亚洲多区扩散",
+        "signal": "GoodDrama短剧观看应用在中、韩等多区上架，国内短剧出海有空间。",
+        "source": "appstore-cn"
       },
       {
-        "title": "Easy 简历 VIP 付费 3000+，细分工具盈利模型再次被验证",
-        "signal": "在免费工具泛滥的市场，深度解决一个细分问题（简历）并加入 AI 功能，用户愿意为省时间付费。",
-        "source": "v2ex"
+        "title": "OpenAI扩大免费用户访问GPT-5.6 Luna",
+        "signal": "AI大模型能力免费化趋势，开发者的API成本将下降，需关注成本敏感型工具机会。",
+        "source": "oschina"
       }
     ],
     "miniProgram": [
       {
-        "title": "AI 简历诊断与优化助手",
-        "insight": "Easy 简历开源且付费用户 3000+，说明简历市场仍有空间，但现有产品偏重编辑器，AI 诊断是亮点。",
-        "suggestion": "做一个轻量小程序，用户上传/粘贴简历文本，AI 自动分析内容中与目标岗位的匹配度，给出关键词优化建议、量化修改示例，并提供几套免费排版模板。",
+        "title": "钓鱼天气与鱼情预报小程序",
+        "insight": "野钓用户需要天气对鱼情的影响，现有天气App不提供鱼情维度。",
+        "suggestion": "做一个「钓鱼天气」小程序，输入地点和日期，给出钓鱼指数、最佳时段和目标鱼评分。",
         "keywords": [
-          "简历优化",
-          "AI 诊断",
-          "求职"
+          "钓鱼",
+          "天气",
+          "鱼情"
         ],
-        "userNeed": "求职者希望快速知道自己的简历哪里不足，如何修改才能更受 HR 青睐。",
-        "painPoint": "不会写简历、不知道怎么把经历表达成 HR 看得懂的语言、改起来费时。",
-        "howToBuild": "利用 Claude/GPT API 解析简历，设定 prompt 让其扮演 HR/行业专家，输出结构化建议；前端用微信原生组件做一个简洁的编辑和展示区，数据存云开发。",
-        "relatedSignal": "Easy 简历服务上线一年半，VIP 付费 3000+",
+        "userNeed": "野钓用户想知道今天适不适合钓鱼、什么时候去最好。",
+        "painPoint": "普通天气App只有降雨气温，没有气压、湿度、风向对鱼口的影响；钓鱼人群有明确需求。",
+        "howToBuild": "接入高德/和风天气API，结合鱼种习性规则（如气压变化、温度区间）计算评分；首版免登录，支持城市选择；后续可加钓点记录和鱼获分享。",
+        "relatedSignal": "「不空：钓鱼天气与鱼情记录」网站&App",
+        "source": "indie-dev"
+      },
+      {
+        "title": "拼豆图纸生成小程序",
+        "insight": "拼豆爱好者需要将任意图片转成拼豆图纸，但市面工具少且色号不全。",
+        "suggestion": "做「拼豆图纸生成」小程序，上传图片，自动生成带色号标注的格子图，支持按品牌输出。",
+        "keywords": [
+          "拼豆",
+          "图纸",
+          "色号"
+        ],
+        "userNeed": "拼豆玩家想把自己喜欢的图片做成拼豆作品，需要图纸。",
+        "painPoint": "手工画图纸繁琐，色号对照难；已有开放数据集（1406色号）可复用。",
+        "howToBuild": "前端用Canvas处理图片，量化颜色后匹配最近色号，生成PDF或图片；数据用开源色卡；先做免费版，之后收费导出高清图纸。",
+        "relatedSignal": "「做了个拼豆图纸生成器，顺便把5个品牌1406个色号做成开放数据集」（v2ex）",
         "source": "v2ex"
       },
       {
-        "title": "语音情绪日记 + 解压像素画",
-        "insight": "VoiceLogue 语音日志和 Cross Stitch 解压应用同时出现，说明情绪记录与解压有结合潜力。",
-        "suggestion": "做一个「用说话记录心情」的小程序，录一段语音，AI 转成文字并给出情绪标签，同时提供像素填色小游戏让用户放松。每日打卡积累心情曲线，可分享给好友。",
+        "title": "AI API 比价小程序",
+        "insight": "国内AI厂商众多，价格和额度不透明，开发者有比价需求。",
+        "suggestion": "做「AI API 比价」小程序，收录国内主流大模型（GLM/Kimi/通义/豆包等）的实时价格、Token额度、限速，按「每元可用量」排序。",
         "keywords": [
-          "语音日记",
-          "情绪管理",
-          "解压"
+          "AI",
+          "API",
+          "比价"
         ],
-        "userNeed": "很多人不习惯用文字写日记，但愿意用语音倾诉；同时需要简单机制排解压力。",
-        "painPoint": "打字麻烦、情绪来了说不出写不出；找不到快速放松的轻量方式。",
-        "howToBuild": "用微信同声传译插件做语音转文字，情绪分析可调用云端 API（如情感分析），像素画用 Canvas 实现，预置十余套图案，支持自定义颜色并分享到朋友圈。",
-        "relatedSignal": "VoiceLogue 语音日志 + Cross Stitch 十字绣解压",
-        "source": "appstore-cn"
+        "userNeed": "开发者/企业在选择大模型API时考虑成本和性能。",
+        "painPoint": "各家价格页面不统一，隐藏限速和免费额度，缺少横向对比。",
+        "howToBuild": "用爬虫定时抓取官方定价页，手动维护部分数据；提供筛选和排序；可加「计算器」输入需求算出最优方案；通过广告或会员变现。",
+        "relatedSignal": "「AI 比价 | 全网 AI 信息聚合比价站」网站",
+        "source": "indie-dev"
       },
       {
-        "title": "数字十字绣 / 像素填色解压工具",
-        "insight": "Cross Stitch 在 CN/US/TW 多区上架，核心玩法简单魔性，适合小程序即用即走。",
-        "suggestion": "做一个「数字油画」小程序，用户按数字点击填色，完成后生成动态图分享。可加入「每日一画」挑战，提供素材库，用广告或内购解锁高级图案。",
+        "title": "十字绣/像素画解压小程序",
+        "insight": "App Store上「十字绣解压」等解压类应用登上榜单，说明轻量解压需求旺盛。",
+        "suggestion": "做「像素十字绣」小程序，提供像素画布和虚拟十字绣模拟，用户可点击填色，生成作品分享。",
         "keywords": [
-          "像素画",
           "解压",
-          "休闲游戏"
+          "十字绣",
+          "像素画"
         ],
-        "userNeed": "碎片时间想轻松一下，又不想玩太重的游戏；喜欢有成就感的创作体验。",
-        "painPoint": "实体现有成本高、麻烦，线上的像素画 App 下载安装成本高，小程序则即点即玩。",
-        "howToBuild": "用 Canvas 渲染，内置一批像素画的 SVG 数据，分为简单/中等/困难难度；支持保存到相册或分享到朋友圈；可用激励视频广告换取放大镜道具。",
-        "relatedSignal": "Cross Stitch: Antistress 在多地区上架",
+        "userNeed": "用户想在碎片时间通过简单重复的手工活动放松心情。",
+        "painPoint": "真实十字绣成本高、耗时长；手机上需要轻量、无广告、即点即玩的应用。",
+        "howToBuild": "用Canvas画网格，预设图案或让用户导入图片自动像素化；加入音效和震动反馈；打卡和作品墙增强留存。",
+        "relatedSignal": "「Cross Stitch Antistress」应用（appstore-cn/tw）",
         "source": "appstore-cn"
-      },
-      {
-        "title": "AI 绘画提示词宝典",
-        "insight": "github 上 awesome-gpt-image-2 有 470+ 案例且持续更新，AI 绘画用户急需提示词灵感。",
-        "suggestion": "做一个提示词分类查询小程序，涵盖各种风格、场景、镜头、质感等标签，支持搜索、收藏、一键复制，并附带示例图展示。可逐步加入用户投稿和每日推荐。",
-        "keywords": [
-          "AI 绘画",
-          "提示词",
-          "灵感"
-        ],
-        "userNeed": "AI 绘画用户（包括使用 Midjourney、GPT-Image、Stable Diffusion 的）生成图时不知道怎么写提示词，或写的质量不稳定。",
-        "painPoint": "不知道如何组合提示词、缺乏参考模板、在网页和工具间切换麻烦。",
-        "howToBuild": "构建结构化的提示词数据库，按主题分类，每条包含中英文提示词和示例图；小程序用云开发存储数据，支持模糊搜索和标签筛选，分享功能引导裂变。",
-        "relatedSignal": "GPT-Image2 提示词工程模板库",
-        "source": "github-js"
-      },
-      {
-        "title": "短剧抢先看与好评榜",
-        "insight": "短剧应用 GoodDrama 在多个地区商店上架，说明此内容消费形式火热；但用户面临「剧太多不知道看哪部」的痛点。",
-        "suggestion": "做一款短剧导航小程序，收集各平台短剧信息（不提供播放源），按类型、热度、口碑排行，允许用户评分和评论，并附上跳转原平台观看的链接。",
-        "keywords": [
-          "短剧",
-          "榜单",
-          "内容推荐"
-        ],
-        "userNeed": "短剧爱好者想快速找到好看的剧，避免踩雷。",
-        "painPoint": "短剧数量多、质量参差不齐，没有集中评价和筛选渠道。",
-        "howToBuild": "先用人工收集整理短期剧数据（名称、类型、简介、平台），通过爬虫或社区众包更新；小程序端以卡片流展示，支持分类筛选和关键词搜索，并引导关注公众号沉淀老用户。注意版权风险，只做信息索引不改提供播放。",
-        "relatedSignal": "GoodDrama 短剧观看平台多区上架",
-        "source": "appstore-kr"
       }
     ],
     "indieDev": [
       {
-        "developer": "WitNote 作者（昵称未透露）",
-        "city": "未知",
-        "product": "WitNote",
-        "desc": "macOS 原生笔记应用，专注写作并集成本地 AI，近期完全重构发布 2.0.1。",
-        "url": "https://www.v2ex.com/t/1232801",
-        "status": "已发布 2.0.1",
-        "source": "v2ex"
+        "developer": "the-beating-light-of-the-nail",
+        "city": "",
+        "product": "AI 比价",
+        "desc": "全网 AI 信息聚合比价站——国产官方套餐（GLM / Kimi / 通义 / 豆包等）的真实 Token 额度与限速、各家 API 单价、免费 Token 活动、低价 API 中转与海外账号行情一张表横向比，按「每元可用量」选出最划算方案",
+        "url": "https://www.china-ai-arbitrage.xyz",
+        "status": "已上线",
+        "batchDate": "2026-08-07",
+        "source": "indie-dev"
       },
       {
-        "developer": "Quick-SSH 作者（昵称未透露）",
-        "city": "未知",
-        "product": "Quick-SSH",
-        "desc": "Rust 编写的轻量化 TUI SSH 连接管理工具，解决频繁输入服务器连接信息的痛点。",
-        "url": "https://www.v2ex.com/t/1232796",
-        "status": "已发布",
-        "source": "v2ex"
-      },
-      {
-        "developer": "CloudPlatter 作者（昵称未透露）",
-        "city": "未知",
-        "product": "CloudPlatter",
-        "desc": "开源 macOS 应用，将网易云音乐播放状态变成全屏黑胶唱片桌面，并可自定义视觉元素。",
-        "url": "https://www.v2ex.com/t/1232787",
-        "status": "已开源",
-        "source": "v2ex"
+        "developer": "不空团队",
+        "city": "",
+        "product": "不空：钓鱼天气与鱼情记录",
+        "desc": "面向野钓用户的钓鱼天气与分鱼种鱼情工具，网页免登录查询十种目标鱼的当前评分、未来 24 小时趋势和较好时段；iPhone App 另提供未来 7 日鱼情、私有钓点和鱼获记录 - [App Store](https://apps.apple.com/cn/app/id6791599314)",
+        "url": "https://bhtq.cn",
+        "status": "已上线",
+        "batchDate": "2026-08-07",
+        "source": "indie-dev"
       }
     ],
     "dailyWisdom": {
-      "method": "今天打开你的产品原型，找 3 位目标用户做一次真实演示，演示时只提一个问题：『这个功能你愿意付费吗？如果愿意，你愿意付多少钱？』全程录音，结束后整理出他们犹豫的点。",
-      "why": "通过极小规模的需求检验，快速判断方向是否值得做。犹豫和反问比「挺好」更有信息量，能帮你避免开发出无人付费的东西。"
+      "method": "今天就把你产品里的一个功能免费开放，并在V2EX/小红书发帖分享你的开发过程和心得。",
+      "why": "通过免费功能吸引精准用户，社区发帖能获得第一批反馈和口碑，验证需求后再做付费功能。"
     }
   },
   "sources": {
+    "indie-dev": 2,
+    "lobsters": 25,
     "v2ex": 30,
     "sspai": 10,
-    "oschina": 30,
-    "indie-dev": 2,
+    "hackernews": 53,
+    "reddit-sidehustle": 39,
     "appstore-cn": 20,
     "appstore-tw": 20,
     "appstore-us": 20,
@@ -346,5 +270,14 @@
     "github": 17,
     "github-js": 13,
     "github-zh": 20
+  },
+  "indieDevMeta": {
+    "batchDate": "2026-08-07",
+    "newCount": 2,
+    "totalProducts": 2,
+    "source": "github.com/1c7/chinese-independent-developer",
+    "isToday": true,
+    "mergedCount": 2,
+    "enrichedFields": 0
   }
 }
