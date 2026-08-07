@@ -317,6 +317,29 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   border-bottom: 1px solid var(--warn-text);
 }
 .global-stale[hidden] { display: none; }
+
+/* ─── 订阅引导 CTA（非阻塞、可关闭，提升留存） ─── */
+.subscribe-cta {
+  display: flex; align-items: center; gap: 12px;
+  margin: 12px 16px 0; padding: 10px 14px;
+  background: linear-gradient(135deg, rgba(108,140,255,.18), rgba(79,70,229,.14));
+  border: 1px solid rgba(108,140,255,.35);
+  border-radius: 10px;
+}
+.subscribe-cta[hidden] { display: none; }
+.subscribe-cta .sub-text { font-size: .82rem; color: var(--text); flex: 1; line-height: 1.5; }
+.subscribe-cta .sub-btn {
+  flex-shrink: 0; background: var(--accent); color: #fff;
+  font-size: .8rem; font-weight: 600; text-decoration: none;
+  padding: 6px 14px; border-radius: 8px; white-space: nowrap;
+  transition: filter .15s;
+}
+.subscribe-cta .sub-btn:hover { filter: brightness(1.12); }
+.subscribe-cta .sub-close {
+  flex-shrink: 0; background: none; border: none; color: var(--text-secondary);
+  font-size: 1.2rem; line-height: 1; cursor: pointer; padding: 0 4px;
+}
+.subscribe-cta .sub-close:hover { color: var(--text); }
 /* 本期模块目录 */
 .module-toc {
   display: flex; flex-wrap: wrap; gap: 8px;
@@ -992,12 +1015,17 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
       </button>
     </div>
   </div>
+  <div id="subscribeCta" class="subscribe-cta" hidden>
+    <span class="sub-text">📬 订阅内容更新通知，每天新刊第一时间送达，不再错过机会</span>
+    <a class="sub-btn" href="https://jinbufenzi.com/go/dingyuetuisong" target="_blank" rel="noopener noreferrer">去订阅 →</a>
+    <button class="sub-close" id="subClose" aria-label="关闭订阅提示" title="关闭">×</button>
+  </div>
   <div class="ad-slot" id="adTop" data-position="top"></div>
   <div class="content" id="content">
     <div class="loading"><div class="spinner"></div>加载中...</div>
   </div>
   <footer class="site-footer" id="siteFooter">
-    <div class="footer-links"><a href="#/">首页</a> · <a href="#/sources">信息源</a> · <a href="#/favorites">收藏</a></div>
+    <div class="footer-links"><a href="#/">首页</a> · <a href="#/sources">信息源</a> · <a href="#/favorites">收藏</a> · <a href="https://jinbufenzi.com/go/dingyuetuisong" target="_blank" rel="noopener noreferrer">订阅更新通知</a></div>
     <div id="complianceFooter">加载备案信息…</div>
     <div class="footer-copy" style="margin-top:4px;opacity:.7">© <span id="footerYear">2026</span> <span id="footerCopyName">进步分子日报</span></div>
     <div class="footer-credit" id="footerCredit" style="margin-top:4px;opacity:.62;font-size:.75rem"></div>
@@ -1374,16 +1402,17 @@ async function staticGet(path) {
       if (lr.ok) return await lr.json();
     } catch (e) { /* 本地缺失则走远程 */ }
   }
-  // 数据优先「本地部署副本」（由自动化部署的 dist/radar-api 提供，即每日最新），
-  // 远程（jsDelivr 镜像）仅作兜底；二者都带缓存击穿参数，确保重新部署后立刻刷新
-  const r = await fetch(STATIC_BASE + rel + q);
-  if (r.ok) return await r.json();
+  // 数据优先「远程每日更新源」（jsDelivr 镜像的 root radar-api/，由 CI 每日刷新），
+  // 本地部署副本 dist/radar-api 仅作兜底；保证「一次部署」后用户始终看到最新日报，
+  // 无需每次自动更新都重新部署站点外壳。config 已在上方优先用本地副本。
   if (REMOTE_ENABLED) {
     try {
       const rr = await fetch(REMOTE_DATA_BASE + rel + q);
       if (rr.ok) return await rr.json();
-    } catch (e) { /* 忽略 */ }
+    } catch (e) { /* 远程不可达则走本地兜底 */ }
   }
+  const r = await fetch(STATIC_BASE + rel + q);
+  if (r.ok) return await r.json();
   throw new Error('not found: ' + path);
 }
 
@@ -2768,8 +2797,9 @@ window.addEventListener('popstate', render);
 async function checkGlobalStale() {
   try {
     const reports = await staticGet('reports');
-    const list = (reports && reports.reports) || [];
-    const date = (list[0] && list[0].date) || (reports && reports.date);
+    // reports.json 实为报告摘要列表（按日期倒序）；兼容 {reports:[...]} 旧结构
+    const list = Array.isArray(reports) ? reports : ((reports && reports.reports) || []);
+    const date = (list[0] && list[0].date) || '';
     if (!date) return;
     const today = new Date().toISOString().slice(0, 10);
     const banner = document.getElementById('globalStale');
@@ -2784,10 +2814,27 @@ async function checkGlobalStale() {
   } catch (e) { /* 忽略：不影响主流程 */ }
 }
 
+// 订阅引导横幅：未关闭过则展示（localStorage 记忆），点击×后不再弹出；页脚另有常驻入口
+function initSubscribeCta() {
+  const el = document.getElementById('subscribeCta');
+  const closeBtn = document.getElementById('subClose');
+  if (!el) return;
+  let dismissed = false;
+  try { dismissed = localStorage.getItem('radar_sub_dismissed') === '1'; } catch (e) {}
+  if (!dismissed) el.hidden = false;
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      el.hidden = true;
+      try { localStorage.setItem('radar_sub_dismissed', '1'); } catch (e) {}
+    });
+  }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   render();
   document.getElementById('footerYear').textContent = new Date().getFullYear();
   checkGlobalStale();
+  initSubscribeCta();
 });
 </script>
 </body>

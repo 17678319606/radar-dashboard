@@ -76,3 +76,20 @@ jobs:
             git pull --rebase --autostash origin main || true
             git push
           fi
+
+      - name: 验证 CDN 可达性（推送后端到端校验）
+        run: |
+          set -e
+          TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          URL="https://raw.githubusercontent.com/17678319606/radar-dashboard/main/radar-api/reports.json"
+          for i in $(seq 1 6); do
+            sleep 10
+            GEN=$(curl -sL "$URL" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['date'] if isinstance(d,list) and d else '')" 2>/dev/null || true)
+            if [ "$GEN" = "$TODAY" ]; then
+              echo "✅ CDN 已可取到今日日报 ($TODAY)"
+              exit 0
+            fi
+            echo "  第 $i 次：CDN 暂未更新（当前=$GEN），重试…"
+          done
+          echo "::error::推送后 60s 内 CDN 仍未提供今日日报，端到端更新可能失败"
+          exit 1
