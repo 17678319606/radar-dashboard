@@ -66,7 +66,7 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 STATE_FILE = DATA_DIR / 'daily_signals_state.json'
 LOOKBACK_HOURS = 48
 MAX_ITEMS_PER_SOURCE = 50
-MAX_PARALLEL = 11
+MAX_PARALLEL = 14
 
 TRUSTMRR_API_KEY = os.environ.get("TRUSTMRR_API_KEY", "")
 PH_TOKEN = os.environ.get("PH_TOKEN", "")
@@ -74,7 +74,7 @@ PH_TOKEN = os.environ.get("PH_TOKEN", "")
 # 中文翻译增强（GitHub / trustmrr / Product Hunt 等英文源 → 中文主标题）
 # key 从环境变量 DEEPSEEK_API_KEY 或 ~/.hermes/.env 读取
 ENHANCE_ZH = os.environ.get("ENHANCE_ZH", "1") == "1"
-ZH_SOURCES = ["github", "trustmrr", "producthunt", "appstore-cn", "appstore-tw", "appstore-us", "appstore-jp", "appstore-kr"]  # 需要翻译的英文源
+ZH_SOURCES = ["github", "trustmrr", "producthunt", "appstore-cn", "appstore-tw", "appstore-us", "appstore-jp", "appstore-kr", "hackernews", "lobsters"]  # 需要翻译的英文源
 
 # Reddit OAuth（推荐，绕开 IP 封锁）— 在 https://www.reddit.com/prefs/apps 注册 script app 获取
 # 未设置时自动 fallback 到 pullpush.io 镜像
@@ -1216,7 +1216,9 @@ def _parse_indie_dev_readme(text):
     cur_devs = []
     cur_dev = None
     date_re = re.compile(r'^###\s*(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*号添加\s*$')
-    dev_re = re.compile(r'^####\s*(.+?)\(([^)]*)\)\s*-\s*(.*)$')
+    # 城市括号可选：有的开发者条目省略城市，如「#### foo - [Github](url)」
+    # 分隔符必须用「空格-空格」( \s+-\s+ )，避免开发者名里的连字符（如 the-beating-...）被误判为分隔
+    dev_re = re.compile(r'^####\s*(.+?)\s*(?:\(([^)]*)\))?\s+-\s+(.*)$')
     prod_re = re.compile(r'^\*\s*(?::([a-z0-9_]+):\s*)?\[([^\]]+)\]\(([^)]+)\)\s*[:：]?\s*(.*)$')
     link_re = re.compile(r'\[([^\]]+)\]\(([^)]+)\)')
 
@@ -1242,7 +1244,7 @@ def _parse_indie_dev_readme(text):
         if dm:
             flush_dev()
             name = dm.group(1).strip()
-            city = dm.group(2).strip()
+            city = (dm.group(2) or '').strip()
             github = homepage = None
             for lname, lurl in link_re.findall(dm.group(3)):
                 if 'github.com' in lurl and github is None:
@@ -1285,7 +1287,14 @@ def fetch_indie_dev():
     sections = _parse_indie_dev_readme(text)
     if not sections:
         print("[WARN] indie-dev 未解析到任何添加日期小节")
-        return []
+        return _load_existing_indie_dev_items()
+
+    # 仅保留「有产品」的批次，避免空批次（如某天无更新）覆盖掉上一期的好数据
+    sections_nonempty = [(d, devs) for d, devs in sections
+                         if any(dev.get('products') for dev in devs)]
+    if not sections_nonempty:
+        print("[WARN] indie-dev 解析到的小节均无产品，保留上一次数据")
+        return _load_existing_indie_dev_items()
 
     # 读取上次状态（累计见过的产品 url + 上次捕获到的最新批次日期）
     state = {}
@@ -1297,10 +1306,11 @@ def fetch_indie_dev():
     seen = set(state.get('seen_urls', []))
     last_date = state.get('last_date', '')
 
-    # 选取出 last_date 之后的所有批次（处理漏跑多天的情况）；首次运行只取顶部最新一天的小节
-    fresh = [(d, devs) for d, devs in sections if d > last_date] if last_date else sections[:1]
+    # 选取出 last_date 之后的所有「非空」批次（处理漏跑多天的情况）；
+    # 首次运行或没有更新时，回退到最新一个非空批次，保证日报始终有内容
+    fresh = [(d, devs) for d, devs in sections_nonempty if d > last_date] if last_date else sections_nonempty[:1]
     if not fresh:
-        fresh = sections[:1]
+        fresh = sections_nonempty[:1]
 
     all_products = []
     max_date = last_date
@@ -1309,6 +1319,10 @@ def fetch_indie_dev():
             max_date = d
         for dev in devs:
             all_products.extend(dev['products'])
+
+    # 极端兜底：若本批解析为空（理论上不会到这里），保留旧文件
+    if not all_products:
+        return _load_existing_indie_dev_items()
 
     new_products = [p for p in all_products if p['url'] not in seen]
     new_count = len(new_products)
@@ -1369,6 +1383,126 @@ def fetch_indie_dev():
     return flat
 
 
+def _load_existing_indie_dev_items():
+    """解析失败/空批次时，回退读回上一次成功写盘的 indie_dev.json（扁平化 items）。"""
+    try:
+        if not INDIE_DEV_FILE.exists():
+            return []
+        data = json.loads(INDIE_DEV_FILE.read_text(encoding='utf-8'))
+        flat = []
+        for dev in (data.get('items') or []):
+            for p in (dev.get('products') or []):
+                flat.append({
+                    'id': p.get('url'),
+                    'source': 'indie-dev',
+                    'title': p.get('name'),
+                    'name': dev.get('developer'),
+                    'url': p.get('url'),
+                    'description': p.get('desc'),
+                    'city': dev.get('city'),
+                    'developer': dev.get('developer'),
+                    'status': p.get('status'),
+                    'date': dev.get('date'),
+                    'timestamp': None,
+                })
+        return flat
+    except Exception:
+        return []
+
+
+# ============================================================
+# SOURCE 13: Hacker News（Algolia 公开 API，免费无密钥）
+# ============================================================
+
+def fetch_hackernews():
+    """抓取 Hacker News 当日热门 + Show HN（独立开发者高浓度信号源）"""
+    items = []
+    lookback_ts = int(time.time()) - (LOOKBACK_HOURS * 3600)
+    seen_ids = set()
+    try:
+        # 取 Top 故事中较新的 + Show HN，独立开发者相关度高
+        for tag in ("front_page", "show_hn"):
+            url = "https://hn.algolia.com/api/v1/search"
+            r = requests.get(url, params={"tags": tag, "numericFilters": f"created_at_i>{lookback_ts}", "hitsPerPage": 30},
+                             headers={"User-Agent": UA_BROWSER}, timeout=12)
+            r.raise_for_status()
+            for h in r.json().get("hits", []):
+                hid = str(h.get("objectID", ""))
+                if not hid or hid in seen_ids:
+                    continue
+                ts = h.get("created_at_i") or 0
+                if ts < lookback_ts:
+                    continue
+                seen_ids.add(hid)
+                title = (h.get("title") or h.get("story_title") or "").strip()
+                if not title:
+                    continue
+                items.append(make_item(
+                    source="hackernews",
+                    item_id=hid,
+                    title=title,
+                    url=h.get("url") or f"https://news.ycombinator.com/item?id={hid}",
+                    points=h.get("points", 0) or 0,
+                    timestamp=ts,
+                    description=(h.get("story_text") or "")[:400],
+                    extra_tags=[tag],
+                    extra_fields={
+                        "comments": h.get("num_comments", 0) or 0,
+                        "author": h.get("author", ""),
+                    },
+                ))
+    except Exception as e:
+        print(f"[ERROR] hackernews: {e}")
+    return items
+
+
+# ============================================================
+# SOURCE 14: Lobsters（公开 JSON API，免费无密钥）
+# ============================================================
+
+def fetch_lobsters():
+    """抓取 Lobsters 热门（技术/独立开发向社区）"""
+    items = []
+    lookback_ts = int(time.time()) - (LOOKBACK_HOURS * 3600)
+    seen_ids = set()
+    try:
+        r = requests.get("https://lobste.rs/hottest.json",
+                         headers={"User-Agent": UA_BROWSER}, timeout=12)
+        r.raise_for_status()
+        for h in r.json():
+            hid = str(h.get("short_id") or h.get("id") or "")
+            if not hid or hid in seen_ids:
+                continue
+            ts = h.get("created_at") or 0
+            try:
+                ts = int(datetime.fromisoformat(ts.replace("Z", "+00:00")).timestamp())
+            except Exception:
+                ts = int(time.time())
+            if ts < lookback_ts:
+                continue
+            seen_ids.add(hid)
+            title = (h.get("title") or "").strip()
+            if not title:
+                continue
+            items.append(make_item(
+                source="lobsters",
+                item_id=hid,
+                title=title,
+                url=h.get("url") or f"https://lobste.rs/s/{hid}",
+                points=h.get("score", 0) or 0,
+                timestamp=ts,
+                description=(h.get("description") or "")[:400],
+                extra_tags=["lobsters"],
+                extra_fields={
+                    "comments": h.get("comment_count", 0) or 0,
+                    "tags": h.get("tags", []) or [],
+                },
+            ))
+    except Exception as e:
+        print(f"[ERROR] lobsters: {e}")
+    return items
+
+
 # ============================================================
 # MAIN
 # ============================================================
@@ -1393,6 +1527,8 @@ def main():
         "jike": fetch_jike,
         "appstore": fetch_appstore,
         "indie-dev": fetch_indie_dev,
+        "hackernews": fetch_hackernews,
+        "lobsters": fetch_lobsters,
     }
 
     all_results = {}

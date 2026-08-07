@@ -14,6 +14,10 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://radar-dashboard-7zsuaod4.edgeone.cool/">
 <meta name="twitter:card" content="summary_large_image">
+<link rel="canonical" href="https://radar-dashboard-7zsuaod4.edgeone.cool/">
+<script type="application/ld+json" id="jsonld-website">
+{"@context":"https://schema.org","@type":"WebSite","name":"独立开发者雷达日报","url":"https://radar-dashboard-7zsuaod4.edgeone.cool/","description":"每日自动采集 20+ 信息源，生成独立开发者/小程序创业机会雷达。","inLanguage":"zh-CN"}
+</script>
 <style>
 /* ─── Reset & Base ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1014,11 +1018,10 @@ const API = '';
 const STATIC_MODE = typeof window !== 'undefined' && window.__STATIC_MODE__ === true;
 const STATIC_BASE = 'radar-api/';    // 本地快照目录（兜底，部署时打包进 dist）
 // ── 远程数据源（每天自动更新，无需重新部署）──
-// 改成你的 GitHub raw 地址（必须以 /radar-api/ 结尾），例如：
-//   https://raw.githubusercontent.com/<你的用户名>/radar-dashboard/main/radar-api/
-// 留默认占位（含 OWNER）则只用本地快照。也可用 URL 参数 ?data=... 临时覆盖（免重新部署）。
+// 默认用 jsDelivr 镜像（国内访问更快、CORS 友好）；也可用 ?data= 参数临时覆盖为任意源。
+// 留默认占位（含 OWNER）则只用本地快照。
 const REMOTE_DATA_BASE = (new URLSearchParams(location.search).get('data'))
-  || 'https://raw.githubusercontent.com/17678319606/radar-dashboard/main/radar-api/';
+  || 'https://cdn.jsdelivr.net/gh/17678319606/radar-dashboard@main/radar-api/';
 const REMOTE_ENABLED = !REMOTE_DATA_BASE.includes('OWNER');
 const FAV_STORE_KEY = 'radar_favorites_v1';   // 静态模式下收藏存 localStorage
 let allReports = [];
@@ -1037,6 +1040,10 @@ async function loadSiteConfig() {
 }
 
 function renderAds() {
+  // AdSense 自动广告：配置 ads.adsenseClient 即生效（与 slot 开关无关，改 config 即生效）
+  if (siteConfig && siteConfig.ads && siteConfig.ads.adsenseClient) {
+    injectAdsense(siteConfig.ads.adsenseClient);
+  }
   if (!siteConfig || !siteConfig.ads || !siteConfig.ads.enabled) {
     document.querySelectorAll('.ad-slot').forEach(el => el.innerHTML = '');
     return;
@@ -1178,6 +1185,33 @@ function renderLastUpdated() {
   el.textContent = latest;
 }
 
+// SEO：动态注入/清理 JSON-LD 结构化数据（每日日报作为 Article，便于搜索引擎收录）
+function injectJsonLd(obj) {
+  let s = document.getElementById('jsonld-dynamic');
+  if (!s) {
+    s = document.createElement('script');
+    s.type = 'application/ld+json';
+    s.id = 'jsonld-dynamic';
+    document.head.appendChild(s);
+  }
+  s.textContent = JSON.stringify(obj);
+}
+function clearJsonLd() {
+  const s = document.getElementById('jsonld-dynamic');
+  if (s) s.textContent = '';
+}
+
+// AdSense 自动广告：配置 ads.adsenseClient 后零代码生效（改 config 即生效，无需重新部署 SPA）
+function injectAdsense(client) {
+  if (!client || window.__adsenseInjected) return;
+  window.__adsenseInjected = true;
+  const s = document.createElement('script');
+  s.async = true;
+  s.crossOrigin = 'anonymous';
+  s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(client);
+  document.head.appendChild(s);
+}
+
 // ─── Mobile Menu ───
 function initMobileMenu() {
   const btn = document.getElementById('mobileMenuBtn');
@@ -1262,6 +1296,12 @@ function navigate(path) {
   render();
 }
 
+// 缓存击穿：reports 列表每 10 分钟刷新一次，避免 CDN/浏览器长期缓存导致「内容不更新」
+function cacheBust(rel) {
+  // 每次构建注入 __BUILD_TS__；用版本戳做缓存击穿，保证重新部署后浏览器/CDN 拉到新数据，杜绝「内容不刷新」
+  return '?t=' + (window.__BUILD_TS__ || Math.floor(Date.now() / 60000));
+}
+
 // ─── 静态模式适配层（无后端时使用）───
 function favLoad() {
   try {
@@ -1287,16 +1327,25 @@ async function staticGet(path) {
     return { exists: favLoad().some(f => f.id === id) };
   }
   const rel = path.replace(/^\//, '') + '.json';
-  // 优先远程（每日自动更新），失败回退本地打包快照
+  const q = cacheBust(rel);
+  // config（站点级：备案/广告/footer）优先用本地部署副本，避免被每日自动构建覆盖
+  if (path === '/config') {
+    try {
+      const lr = await fetch(STATIC_BASE + rel + q);
+      if (lr.ok) return await lr.json();
+    } catch (e) { /* 本地缺失则走远程 */ }
+  }
+  // 数据优先「本地部署副本」（由自动化部署的 dist/radar-api 提供，即每日最新），
+  // 远程（jsDelivr 镜像）仅作兜底；二者都带缓存击穿参数，确保重新部署后立刻刷新
+  const r = await fetch(STATIC_BASE + rel + q);
+  if (r.ok) return await r.json();
   if (REMOTE_ENABLED) {
     try {
-      const rr = await fetch(REMOTE_DATA_BASE + rel);
+      const rr = await fetch(REMOTE_DATA_BASE + rel + q);
       if (rr.ok) return await rr.json();
-    } catch (e) { /* 忽略，走本地兜底 */ }
+    } catch (e) { /* 忽略 */ }
   }
-  const r = await fetch(STATIC_BASE + rel);
-  if (!r.ok) throw new Error('not found: ' + path);
-  return r.json();
+  throw new Error('not found: ' + path);
 }
 
 // ─── API ───
@@ -1755,6 +1804,8 @@ async function render() {
   // 离开日报视图时清掉翻页上下文，避免在其它页面误触发左右键跳转
   dailyNewerDate = null;
   dailyOlderDate = null;
+  // 清理上一张日报的 Article 结构化数据（避免非日报页残留）
+  clearJsonLd();
 
   // 确保站点配置已加载（广告、备案、赞赏依赖它）
   await loadSiteConfig();
@@ -1827,6 +1878,8 @@ async function render() {
   renderLastUpdated();
   // Update topbar stats
   updateTopStats();
+  // SEO：同步页面 <title>（H1 已设置，这里同步浏览器标签标题）
+  document.title = (title && title.textContent ? title.textContent + ' · ' : '') + '独立开发者雷达日报';
 }
 
 // ─── 时间线视图 ───
@@ -1921,6 +1974,18 @@ async function renderDaily(container, dateStr, opts) {
   const older = idx >= 0 && idx < dates.length - 1 ? dates[idx + 1] : null;
   dailyNewerDate = newer;
   dailyOlderDate = older;
+
+  // SEO：每日日报作为 Article 结构化数据，便于搜索引擎收录
+  injectJsonLd({
+    '@context': 'https://schema.org',
+    '@type': 'Article',
+    'headline': (report.date || dateStr) + ' 独立开发者雷达日报',
+    'datePublished': (report.date || dateStr),
+    'dateModified': (report.date || dateStr),
+    'author': { '@type': 'Organization', 'name': (siteConfig && siteConfig.footer && siteConfig.footer.copyright) || '独立开发者雷达日报' },
+    'publisher': { '@type': 'Organization', 'name': '独立开发者雷达日报' },
+    'mainEntityOfPage': { '@type': 'WebPage', '@url': 'https://radar-dashboard-7zsuaod4.edgeone.cool/#/daily/' + (report.date || dateStr) }
+  });
 
   let html = `
     <div class="daily-header">

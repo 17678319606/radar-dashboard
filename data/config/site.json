@@ -21,6 +21,7 @@
   },
   "ads": {
     "enabled": true,
+    "adsenseClient": "",
     "slots": [
       {
         "id": "top-banner",

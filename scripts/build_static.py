@@ -35,8 +35,35 @@ MODULE_NAMES = [
 
 INJECT_SNIPPET = (
     "<script>window.__STATIC_MODE__ = true;</script>\n"
+    f"<script>window.__BUILD_TS__ = {int(__import__('time').time())};</script>\n"
     "<!-- 静态部署模式：API 读预渲染 JSON，收藏存 localStorage -->\n"
 )
+
+
+SITE_URL = 'https://radar-dashboard-7zsuaod4.edgeone.cool'
+
+
+def _generate_seo_assets(out_dir: Path):
+    """生成 robots.txt 与 sitemap.xml（含每日日报 URL），便于搜索引擎收录"""
+    # robots.txt
+    robots = BASE_DIR / 'robots.txt'
+    if robots.exists():
+        shutil.copy(robots, out_dir / 'robots.txt')
+    else:
+        (out_dir / 'robots.txt').write_text(
+            f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n", encoding='utf-8')
+
+    # sitemap.xml：首页 + 每一期日报
+    urls = [f"{SITE_URL}/"]
+    for f in sorted(REPORTS_DIR.glob('*.json'), reverse=True):
+        urls.append(f"{SITE_URL}/#/daily/{f.stem}")
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>',
+           '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for u in urls:
+        xml.append(f"  <url><loc>{u}</loc></url>")
+    xml.append('</urlset>')
+    (out_dir / 'sitemap.xml').write_text('\n'.join(xml) + '\n', encoding='utf-8')
+    print(f'   SEO: robots.txt + sitemap.xml（{len(urls)} 个 URL）')
 
 
 def collect_routes():
@@ -93,6 +120,9 @@ def build(out_dir: Path):
     static_src = BASE_DIR / 'static'
     if static_src.exists():
         shutil.copytree(static_src, out_dir / 'static', dirs_exist_ok=True)
+
+    # SEO：根目录静态文件（robots / sitemap / public）
+    _generate_seo_assets(out_dir)
 
     size = sum(f.stat().st_size for f in out_dir.rglob('*') if f.is_file())
     print(f'✅ 静态站点已生成: {out_dir}')

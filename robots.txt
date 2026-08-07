@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://radar-dashboard-7zsuaod4.edgeone.cool/sitemap.xml

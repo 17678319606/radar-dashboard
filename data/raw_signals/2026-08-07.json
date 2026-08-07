@@ -814,7 +814,7 @@
         "topic": ""
       }
     ],
-    "sspai": [
+    "jike-ai-explore": [
       {
         "id": "sspai:link:3938349641",
         "title": "本周看什么 | 最近值得一看的 10 部作品",
@@ -925,12 +925,12 @@
         "title_cn": "",
         "name_cn": "",
         "desc_cn": "",
-        "url": "https://sspai.com/post/113139",
+        "url": "https://m.okjike.com/originalPosts/6a758ab0bd0563695b05433c",
         "points": 0,
         "timestamp": 1786103076,
         "description": "",
         "extra_tags": [
-          "工具"
+          "AI探索站"
         ],
         "category": "",
         "artist": "",
@@ -943,7 +943,7 @@
         "stars_today": 0,
         "repo": "",
         "node": "",
-        "topic": ""
+        "topic": "AI探索站"
       },
       {
         "id": "sspai:link:191555625",
@@ -951,12 +951,12 @@
         "title_cn": "",
         "name_cn": "",
         "desc_cn": "",
-        "url": "https://sspai.com/post/112916",
+        "url": "https://m.okjike.com/originalPosts/6a758a3cbd0563695b0537e9",
         "points": 0,
         "timestamp": 1786103076,
         "description": "",
         "extra_tags": [
-          "工具"
+          "AI探索站"
         ],
         "category": "",
         "artist": "",
@@ -969,7 +969,7 @@
         "stars_today": 0,
         "repo": "",
         "node": "",
-        "topic": ""
+        "topic": "AI探索站"
       },
       {
         "id": "sspai:link:2991492788",
@@ -977,12 +977,12 @@
         "title_cn": "",
         "name_cn": "",
         "desc_cn": "",
-        "url": "https://sspai.com/post/113017",
+        "url": "https://mp.weixin.qq.com/s/bFR52i8SZghE12fZJL4rpA",
         "points": 0,
         "timestamp": 1786103076,
         "description": "",
         "extra_tags": [
-          "工具"
+          "AI探索站"
         ],
         "category": "",
         "artist": "",
@@ -995,7 +995,7 @@
         "stars_today": 0,
         "repo": "",
         "node": "",
-        "topic": ""
+        "topic": "AI探索站"
       },
       {
         "id": "sspai:link:540583908",
@@ -1003,12 +1003,12 @@
         "title_cn": "",
         "name_cn": "",
         "desc_cn": "",
-        "url": "https://sspai.com/post/113110",
+        "url": "https://m.okjike.com/originalPosts/6a75279c43e8ed60d029c80e",
         "points": 0,
         "timestamp": 1786103076,
         "description": "",
         "extra_tags": [
-          "工具"
+          "AI探索站"
         ],
         "category": "",
         "artist": "",
@@ -1021,7 +1021,7 @@
         "stars_today": 0,
         "repo": "",
         "node": "",
-        "topic": ""
+        "topic": "AI探索站"
       },
       {
         "id": "sspai:link:183032678",
@@ -1029,12 +1029,12 @@
         "title_cn": "",
         "name_cn": "",
         "desc_cn": "",
-        "url": "https://sspai.com/post/112831",
+        "url": "https://m.okjike.com/originalPosts/6a745d2bcfb5d08b3e3a86aa",
         "points": 0,
         "timestamp": 1786103076,
         "description": "",
         "extra_tags": [
-          "工具"
+          "AI探索站"
         ],
         "category": "",
         "artist": "",
@@ -1047,7 +1047,7 @@
         "stars_today": 0,
         "repo": "",
         "node": "",
-        "topic": ""
+        "topic": "AI探索站"
       },
       {
         "id": "sspai:link:3709097337",
@@ -1055,12 +1055,12 @@
         "title_cn": "",
         "name_cn": "",
         "desc_cn": "",
-        "url": "https://sspai.com/post/112953",
+        "url": "https://m.okjike.com/originalPosts/6a743af3756bbb6658aa5676",
         "points": 0,
         "timestamp": 1786103076,
         "description": "",
         "extra_tags": [
-          "工具"
+          "人工智能讨论组"
         ],
         "category": "",
         "artist": "",
@@ -1073,7 +1073,217 @@
         "stars_today": 0,
         "repo": "",
         "node": "",
-        "topic": ""
+        "topic": "人工智能讨论组"
+      },
+      {
+        "id": "jike-ai-discuss:jike-ai-discuss:link:4027777241",
+        "title": "这是我见过最接地气、最实在的一个“搞钱“项目了：一家新疆早餐店的老板，利用 AI ，直接去做品牌、搞设计、看法务，硬是把一家店开到了 6 家店，营业额直接翻...",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://mp.weixin.qq.com/s/tGgcLxYLOdKbt4KyxyQ1sw",
+        "points": 0,
+        "timestamp": 1785985993,
+        "description": "一人公司，营业额翻倍！今年 AI 赛道最接地气的搞钱项目来了~        这是我见过最接地气、最实在的一个“搞钱“项目了：一家新疆早餐店的老板，利用 AI ，直接去做品牌、搞设计、看法务，硬是把一家店开到了 6 家店，营业额直接翻倍。最近不管是字节、腾讯、阿里、百度等大厂，其实都在下沉去抢占整个 Work Agent 的生态，俨然已经成了兵家必争之地....而对于大部分普通人来说，最普遍的需求就是：如何能更低门槛、更易用地去使用 AI Agent，来解决自己在企业运营或创业运营过程中的日常实际问题，这个早餐店老板的用法就简单直接。AI 不是高高在上的产物，而是能丝滑进入各家各户的水和电..前段时间去参加纳米 Work 发布会的时候，听到老周说“智能体也有自己的 Scaling Law”，这个观点还是比较有意思的。比如接入的知识、合适的工具、配备的相关技能，以及多",
+        "extra_tags": [
+          "人工智能讨论组"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "人工智能讨论组"
+      }
+    ],
+    "jike-engineer": [
+      {
+        "id": "jike-engineer:jike-engineer:6a75c139141b85b2929615ec",
+        "title": "AV 女优 vibe coding 转做程序员？👨‍💻 已经到这个程度了吗？🤣",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://m.okjike.com/originalPosts/6a75c139141b85b2929615ec",
+        "points": 0,
+        "timestamp": 1786102073,
+        "description": "AV 女优 vibe coding 转做程序员？👨‍💻已经到这个程度了吗？🤣",
+        "extra_tags": [
+          "工程师的日常"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "工程师的日常"
+      },
+      {
+        "id": "jike-engineer:jike-engineer:6a7586a4d6b1bd7079aaabce",
+        "title": "deepseek v4 flash 太快，太好用了，目前复杂代码实现还不放心交给它。等 v4 pro 出来再试试。",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://m.okjike.com/originalPosts/6a7586a4d6b1bd7079aaabce",
+        "points": 0,
+        "timestamp": 1786087076,
+        "description": "deepseek v4 flash 太快，太好用了，目前复杂代码实现还不放心交给它。等 v4 pro 出来再试试。",
+        "extra_tags": [
+          "工程师的日常"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "工程师的日常"
+      },
+      {
+        "id": "jike-engineer:jike-engineer:link:4036061773",
+        "title": "我又来骗注册换 token 了，实在是不够用",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://mp.weixin.qq.com/s/R_ZfpgIXzWnCB9apfn1MFQ",
+        "points": 0,
+        "timestamp": 1786076275,
+        "description": "Kimi K3 治好了我的拖延症        我又来骗注册换 token 了，实在是不够用",
+        "extra_tags": [
+          "工程师的日常"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "工程师的日常"
+      },
+      {
+        "id": "jike-engineer:jike-engineer:6a755b82756bbb6658c6b1a0",
+        "title": "昨天在获取一个数据源，DeepseekV4 flash 自己注册了邮箱并逆向注册了一个数据源网站，并试图通过合成验证 Tokon 来突破网站的验证机制，然后它成功了。很多科幻...",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://m.okjike.com/originalPosts/6a755b82756bbb6658c6b1a0",
+        "points": 0,
+        "timestamp": 1786076034,
+        "description": "昨天在获取一个数据源，DeepseekV4 flash 自己注册了邮箱并逆向注册了一个数据源网站，并试图通过合成验证 Tokon 来突破网站的验证机制，然后它成功了。很多科幻小说才有的东西都会开始涌现，包括灾难。事实上，DeepSeek V4 Flash 也具备对很多商业付费网站的破解能力，但因为模型权重而拒绝服务，但是它把实现方案都说出来了，只是不执行。而作为开源模型，重新调整权重它就没有任何约束了。",
+        "extra_tags": [
+          "工程师的日常"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "工程师的日常"
+      },
+      {
+        "id": "jike-engineer:jike-engineer:6a7551aabd0563695bffa15e",
+        "title": "最近用 Agent 的一个感受：Agent 可以同时开几十个，并行跑任务，效率提升非常明显。但很快发现，真正的瓶颈不是机器，而是人的注意力。 注意力终究是有限的，我...",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://m.okjike.com/originalPosts/6a7551aabd0563695bffa15e",
+        "points": 0,
+        "timestamp": 1786073514,
+        "description": "最近用 Agent 的一个感受：Agent 可以同时开几十个，并行跑任务，效率提升非常明显。但很快发现，真正的瓶颈不是机器，而是人的注意力。注意力终究是有限的，我自己5个以上就顾不过来了，就开始明显感觉管理不过来了。不同任务之间会互相影响，状态不同步，甚至会出现各自都做对了，但放在一起出问题或者仓库前后对不上的情况。这也让我第一次更深刻理解了过去程序员为什么大量时间花在维护代码、重构系统、解决兼容问题上。写代码只是开始，真正难的是管理复杂度。未来可能不是一个人被 AI 替代，而是一个人管理一群 Agent。人的角色，可能也会从执行者，慢慢变成架构师、决策者和系统管理者。AI 不会完全代替人，带来的最大变化，也许不是让机器替人干活，而是把过去隐藏在团队协作和软件工程里的复杂问题，放大到了一个人面前。",
+        "extra_tags": [
+          "工程师的日常"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "工程师的日常"
+      },
+      {
+        "id": "jike-engineer:jike-engineer:6a745d21e956e446c152a2a8",
+        "title": "在codex，workbuddy等AI coding 工具满天飞的时代，我居然在公司用notepad古法编程…保存格式txt 国企的世界和外面是割裂的🌝",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://m.okjike.com/originalPosts/6a745d21e956e446c152a2a8",
+        "points": 0,
+        "timestamp": 1786010913,
+        "description": "在codex，workbuddy等AI coding 工具满天飞的时代，我居然在公司用notepad古法编程…保存格式txt国企的世界和外面是割裂的🌝",
+        "extra_tags": [
+          "工程师的日常"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "工程师的日常"
+      },
+      {
+        "id": "jike-engineer:jike-engineer:6a74121acfb5d08b3e32ce9f",
+        "title": "DeepSeek flash 有种 baby agi 的感觉，估计 Pro 感觉会更强烈。模型速度快真的很重要，七点多工作到 12 点出头，感觉压缩了一天的工作量，下午可以干点别的了。...",
+        "title_cn": "",
+        "name_cn": "",
+        "desc_cn": "",
+        "url": "https://m.okjike.com/originalPosts/6a74121acfb5d08b3e32ce9f",
+        "points": 0,
+        "timestamp": 1785991706,
+        "description": "DeepSeek flash 有种 baby agi 的感觉，估计 Pro 感觉会更强烈。模型速度快真的很重要，七点多工作到 12 点出头，感觉压缩了一天的工作量，下午可以干点别的了。最近在开始测试规模化并发协同的工作方式，也确实只有速度足够快、足够便宜、并且有很强的处理能力的模型才可以摸索这种工作方式。其次 ，V4 Flash 能够围绕一个目标自主研究多种策略然后想办法实现，惊讶😲，Claude 的 Opus  往往会有很多幻觉与胡说八道，GPT5.6 Sol 则是速度太慢，没有那么灵活，再来就是保守开发， 而 DeepSeek 则是给你又快又好地有效交付。",
+        "extra_tags": [
+          "工程师的日常"
+        ],
+        "category": "",
+        "artist": "",
+        "price": "",
+        "icon": "",
+        "region": "",
+        "board": "",
+        "language": "",
+        "stars_total": 0,
+        "stars_today": 0,
+        "repo": "",
+        "node": "",
+        "topic": "工程师的日常"
       }
     ],
     "appstore-cn": [

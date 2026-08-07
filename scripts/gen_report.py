@@ -16,12 +16,15 @@
     website   网站 / Web 应用方向
     overseas  出海产品方向
 
-Key 读取顺序：环境变量 → 项目根 .env → scripts/.env → ~/.hermes/.env → ~/.env
+Key 读取顺序：环境变量 → 项目根 .env（gitignore，切勿提交）→ scripts/.env →
+  ~/.hermes/.env → ~/.env → macOS 钥匙串（radar-dashboard / deepseek 服务名，加密存储）
+生产部署走 GitHub Actions 加密 Secret（secrets.DEEPSEEK_API_KEY），密钥绝不进入前端或公开仓库。
 """
 
 import argparse
 import json
 import os
+import subprocess
 import sys
 from datetime import date
 from pathlib import Path
@@ -51,9 +54,8 @@ FOCUS_PROMPTS = {
         "因此 `miniProgram`（微信小程序机会）是**最高优先级模块，必须给足 3-5 条**，"
         "每条都要把当天的信号**映射成一个国内微信小程序能落地的具体选题**，"
         "而不是复述原信号。海外信号也要做本地化映射（如「美国区某记账 App 上新」→「国内某人群的极简记账小程序」）。\n"
-        "另外信号里有一个 `indie-dev` 源（来自 github.com/1c7/chinese-independent-developer 的「中国独立开发者项目列表」），"
-        "它每天收录一批国内独立开发者新上线的网站/App。请从中挑选 1-3 个最值得关注的，"
-        "填进 `indieDev` 模块（developer/city/product/desc/url/status 照实填），并可把其中特别契合小程序的映射到 `miniProgram`。"
+        "注意：`indieDev` 模块**不要你生成**——它由系统直接从 github.com/1c7/chinese-independent-developer"
+        "（「中国独立开发者项目列表」）确定性并入，你只需在 `miniProgram` 里把其中特别契合小程序的选题做本地化映射即可。"
     ),
     'website': (
         "你的读者是**独立开发者**，主攻**网站 / Web 应用**（SaaS、工具站、内容站）。\n"
@@ -82,7 +84,7 @@ JSON_SCHEMA_HINT = """严格输出如下结构的 JSON（不要 markdown 代码�
     "dataSignals":        [{"title":"", "signal":"", "source":""}],
     "miniProgram":        [{"title":"", "insight":"", "suggestion":"", "keywords":["",""],
                             "userNeed":"", "painPoint":"", "howToBuild":"", "relatedSignal":"", "source":""}],
-    "indieDev":           [{"developer":"", "city":"", "product":"", "desc":"", "url":"", "status":"", "source":""}],
+    "indieDev":           [],  // 此模块由系统自动并入 1c7 中国独立开发者列表，你无需填写
     "dailyWisdom":        {"method":"", "why":""}
   }
 }
@@ -94,6 +96,23 @@ JSON_SCHEMA_HINT = """严格输出如下结构的 JSON（不要 markdown 代码�
 - 不要编造信号里没有的数据（收入、用户数等），没有就不写
 - `dailyWisdom.method` 是一条今天就能执行的具体做法，不要鸡汤
 """
+
+
+def _read_keychain(service, account):
+    """macOS Keychain 回退读取（密钥以加密形式存储在登录钥匙串，磁盘非明文）。
+
+    返回密钥字符串或 None。仅在 macOS 且未设置环境变量时调用，CI（Linux）不受影响。
+    """
+    if sys.platform != 'darwin':
+        return None
+    try:
+        out = subprocess.run(
+            ['security', 'find-generic-password', '-s', service, '-a', account, '-w'],
+            capture_output=True, text=True, timeout=10,
+        )
+        return out.stdout.strip() or None
+    except Exception:
+        return None
 
 
 def _load_dotenv():
@@ -112,6 +131,12 @@ def _load_dotenv():
                     os.environ[k] = v
         except Exception:
             continue
+    # 本地 Mac：若环境变量与 .env 都缺失，尝试从钥匙串读取（加密存储，避免磁盘明文）
+    if not os.environ.get('DEEPSEEK_API_KEY'):
+        kc = (_read_keychain('radar-dashboard', 'DEEPSEEK_API_KEY')
+              or _read_keychain('deepseek', 'DEEPSEEK_API_KEY'))
+        if kc:
+            os.environ['DEEPSEEK_API_KEY'] = kc
 
 
 def _clip(s, n):
@@ -190,57 +215,29 @@ def load_indie_dev():
 
 
 def merge_indie_dev(report, date_str):
-    """把 1c7 独立开发者内容确定性地并进日报的 indieDev 模块。
+    """把 1c7 独立开发者内容确定性地并入日报的 indieDev 模块。
 
-    模型可能漏填或填错，这里做兜底 + 去重，保证每期日报都能带上这块内容。
+    此模块为 1c7 权威来源，模型不再生成（避免编造）。直接以 1c7 数据为准，
+    保证每期日报的「独立开发者新品」均为真实存在的项目。
     """
     items, meta = load_indie_dev()
     if not items:
+        meta['isToday'] = bool(meta.get('batchDate') == date_str)
+        meta['mergedCount'] = 0
+        meta['enrichedFields'] = 0
+        report['indieDevMeta'] = meta
+        report.setdefault('modules', {})['indieDev'] = []
         return 0, meta
 
     mods = report.setdefault('modules', {})
-    existing = mods.get('indieDev')
-    if not isinstance(existing, list):
-        existing = []
-
-    def _key(it):
-        return (
-            str(it.get('product') or it.get('title') or '').strip().lower(),
-            str(it.get('url') or '').strip().lower().rstrip('/'),
-        )
-
-    # 模型生成的条目常缺 developer/city/status，用 1c7 原始数据补全，而不是简单丢弃
-    index = {}
-    for x in existing:
-        if isinstance(x, dict):
-            index.setdefault(_key(x), x)
-            # 产品名单独再建一次索引，URL 不一致时也能命中
-            name = str(x.get('product') or x.get('title') or '').strip().lower()
-            if name:
-                index.setdefault((name, ''), x)
-
-    added = enriched = 0
-    for it in items:
-        hit = index.get(_key(it)) or index.get((it['product'].strip().lower(), ''))
-        if hit is not None:
-            for field in ('developer', 'city', 'status', 'url', 'desc'):
-                if it.get(field) and not str(hit.get(field) or '').strip():
-                    hit[field] = it[field]
-                    enriched += 1
-            hit.setdefault('source', 'indie-dev')
-            hit.setdefault('batchDate', it.get('batchDate'))
-            continue
-        index[_key(it)] = it
-        index[(it['product'].strip().lower(), '')] = it
-        existing.append(it)
-        added += 1
-
+    # 不以模型产出为底（模型可能编造），直接以 1c7 数据为准
+    existing = [it for it in items if isinstance(it, dict)]
     mods['indieDev'] = existing
     meta['isToday'] = bool(meta.get('batchDate') == date_str)
-    meta['mergedCount'] = added
-    meta['enrichedFields'] = enriched
+    meta['mergedCount'] = len(existing)
+    meta['enrichedFields'] = 0
     report['indieDevMeta'] = meta
-    return added, meta
+    return len(existing), meta
 
 
 def build_prompt(raw, date_str, focus):

@@ -54,7 +54,7 @@
           "内容消费",
           "出海"
         ],
-        "source": "appstore-cn"
+        "source": "jike-ai-discuss"
       },
       {
         "title": "Easy 简历开源，验证简历制作 SaaS 付费可行",
@@ -323,6 +323,13 @@
   "sources": {
     "v2ex": 30,
     "sspai": 10,
+    "oschina": 30,
+    "lobsters": 25,
+    "hackernews": 50,
+    "v2ex": 30,
+    "jike-ai-explore": 9,
+    "jike-ai-discuss": 3,
+    "jike-engineer": 7,
     "appstore-cn": 20,
     "appstore-tw": 20,
     "appstore-us": 20,
