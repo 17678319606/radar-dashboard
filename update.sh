@@ -15,7 +15,9 @@ $PY scripts/daily_signals.py 2>&1 | tail -5
 
 echo ""
 echo "🤖 [2/3] 用 DeepSeek 生成今日日报（没配 Key 会自动跳过）..."
-$PY scripts/gen_report.py --force 2>&1 | tail -14 || true
+# 统一用「上海时区」的今天作为报告日期，避免 GitHub runner(UTC) 与校验步骤(上海)的时区错位
+TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+$PY scripts/gen_report.py --date "$TODAY" --force 2>&1 | tail -14 || true
 
 echo ""
 echo "🏗  [3/3] 生成静态站..."
