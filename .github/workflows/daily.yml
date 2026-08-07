@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: radar-daily
@@ -93,3 +94,37 @@ jobs:
           done
           echo "::error::推送后 60s 内 CDN 仍未提供今日日报，端到端更新可能失败"
           exit 1
+
+      - name: CI 失败通知（GitHub 原生 Issue + 邮件）
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '[CI失败] 进步分子日报自动更新未成功';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `## ⚠️ 自动化日报生成失败\n\n- 触发事件：${context.eventName}\n- 时间（UTC）：${new Date().toISOString()}\n- 运行日志：${runUrl}\n\n请检查：采集链路 / DeepSeek API 配额 / 构建步骤 / CDN 可达性。\n本 Issue 由 GitHub Actions 失败时自动创建，GitHub 会通过原生通知（站内 + 邮件）提醒仓库关注者。`;
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 100
+            });
+            const existing = issues.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing.number,
+                body: `🔁 再次失败 @ ${new Date().toISOString()}\n运行日志：${runUrl}`
+              });
+              console.log(`已向现有 issue #${existing.number} 追加失败记录`);
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ['ci-failure', 'automated']
+              });
+              console.log('已创建 CI 失败通知 issue');
+            }
