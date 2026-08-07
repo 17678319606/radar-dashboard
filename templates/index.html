@@ -3,20 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>进步分子日报</title>
+<title>进步分子雷达日报</title>
 <meta name="description" content="为独立开发者与副业玩家聚合每日产品机会、赚钱案例、独立开发者新品与数据信号。每日 06:00/19:00 自动更新。">
-<meta name="keywords" content="进步分子, 副业, 独立开发者, 赚钱, 产品灵感, 雷达日报, 小程序创业">
-<meta name="author" content="进步分子日报">
+<meta name="keywords" content="进步分子雷达日报, 进步分子, 副业, 独立开发者, 赚钱, 产品灵感, 雷达日报, 小程序创业">
+<meta name="author" content="进步分子雷达日报">
 <meta name="theme-color" content="#0b0d12" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#fdfcf8" media="(prefers-color-scheme: light)">
-<meta property="og:title" content="进步分子日报">
+<meta property="og:title" content="进步分子雷达日报">
 <meta property="og:description" content="每日自动采集 20+ 信息源，生成独立开发者/副业赚钱机会雷达。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://radar-dashboard-7zsuaod4.edgeone.cool/">
 <meta name="twitter:card" content="summary_large_image">
+<meta property="og:image" content="https://radar-dashboard-7zsuaod4.edgeone.cool/og-cover.svg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:image" content="https://radar-dashboard-7zsuaod4.edgeone.cool/og-cover.svg">
 <link rel="canonical" href="https://radar-dashboard-7zsuaod4.edgeone.cool/">
 <script type="application/ld+json" id="jsonld-website">
-{"@context":"https://schema.org","@type":"WebSite","name":"进步分子日报","url":"https://radar-dashboard-7zsuaod4.edgeone.cool/","description":"每日自动采集 20+ 信息源，生成独立开发者/副业赚钱机会雷达。","inLanguage":"zh-CN"}
+{"@context":"https://schema.org","@type":"WebSite","name":"进步分子雷达日报","url":"https://radar-dashboard-7zsuaod4.edgeone.cool/","description":"每日自动采集 20+ 信息源，生成独立开发者/副业赚钱机会雷达。","inLanguage":"zh-CN"}
 </script>
 <style>
 /* ─── Reset & Base ─── */
@@ -901,11 +905,20 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 </head>
 <body>
 
+<!-- 阅读进度条 + 回顶（P0 阅读体验优化） -->
+<div class="read-progress" id="readProgress"></div>
+<button class="back-top" id="backTop" type="button" aria-label="回到顶部" hidden>↑ 顶部</button>
+<style>
+.read-progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,#6ea8fe,#a78bfa);z-index:50;transition:width .1s}
+.back-top{position:fixed;right:18px;bottom:22px;z-index:50;padding:8px 12px;border:none;border-radius:999px;background:var(--card);color:var(--text);box-shadow:0 4px 16px rgba(0,0,0,.35);cursor:pointer;font-size:.85rem}
+.back-top:hover{background:var(--card-hover)}
+</style>
+
 <!-- ═══ Sidebar ═══ -->
 <div class="layout">
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
-    <h1>📡 雷达日报</h1>
+    <h1>📡 进步分子雷达日报</h1>
     <div class="sub">独立开发者信号面板</div>
   </div>
   <nav class="sidebar-nav" id="nav">
@@ -1027,7 +1040,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   <footer class="site-footer" id="siteFooter">
     <div class="footer-links"><a href="#/">首页</a> · <a href="#/sources">信息源</a> · <a href="#/favorites">收藏</a> · <a href="https://jinbufenzi.com/go/dingyuetuisong" target="_blank" rel="noopener noreferrer">订阅更新通知</a></div>
     <div id="complianceFooter">加载备案信息…</div>
-    <div class="footer-copy" style="margin-top:4px;opacity:.7">© <span id="footerYear">2026</span> <span id="footerCopyName">进步分子日报</span></div>
+    <div class="footer-copy" style="margin-top:4px;opacity:.7">© <span id="footerYear">2026</span> <span id="footerCopyName">进步分子雷达日报</span></div>
     <div class="footer-credit" id="footerCredit" style="margin-top:4px;opacity:.62;font-size:.75rem"></div>
   </footer>
 </main>
@@ -1042,7 +1055,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   <div class="donate-modal-backdrop" onclick="toggleDonate(false)"></div>
   <div class="donate-modal-content">
     <button class="donate-close" onclick="toggleDonate(false)" aria-label="关闭">×</button>
-    <h3 id="donateTitle">支持雷达日报</h3>
+    <h3 id="donateTitle">支持进步分子雷达日报</h3>
     <p id="donateDesc">如果这份日报对你有启发，欢迎赞赏支持。</p>
     <img id="donateQr" src="" alt="赞赏二维码" loading="lazy" width="220" height="220">
   </div>
@@ -1151,7 +1164,7 @@ function renderDonation() {
   const titleEl = document.getElementById('donateTitle');
   const descEl = document.getElementById('donateDesc');
   const qrEl = document.getElementById('donateQr');
-  if (titleEl) titleEl.textContent = d.title || '支持雷达日报';
+  if (titleEl) titleEl.textContent = d.title || '支持进步分子雷达日报';
   if (descEl) descEl.textContent = d.desc || '如果这份日报对你有启发，欢迎赞赏支持。';
   if (qrEl) {
     qrEl.onerror = () => { qrEl.style.display = 'none'; };
@@ -1190,7 +1203,7 @@ function renderFooterMeta() {
   const f = (siteConfig && siteConfig.footer) || {};
   const nameEl = document.getElementById('footerCopyName');
   if (nameEl) {
-    nameEl.textContent = f.copyright || (siteConfig && siteConfig.site && siteConfig.site.name) || '进步分子日报';
+    nameEl.textContent = f.copyright || (siteConfig && siteConfig.site && siteConfig.site.name) || '进步分子雷达日报';
   }
   const credit = document.getElementById('footerCredit');
   if (!credit) return;
@@ -1948,7 +1961,7 @@ async function render() {
   // Update topbar stats
   updateTopStats();
   // SEO：同步页面 <title>（H1 已设置，这里同步浏览器标签标题）
-  document.title = (title && title.textContent ? title.textContent + ' · ' : '') + '进步分子日报';
+  document.title = (title && title.textContent ? title.textContent + ' · ' : '') + '进步分子雷达日报';
 }
 
 // ─── 时间线视图 ───
@@ -1999,7 +2012,7 @@ async function renderTimeline(container) {
     container.innerHTML = `
       <div class="empty-state">
         <div class="icon">📡</div>
-        <h3>还没有雷达日报</h3>
+        <h3>还没有进步分子雷达日报</h3>
         <p>每天 06:00 / 19:00（北京时间）自动更新，数据会展示在这里</p>
         <div class="hint">⏳ 首次数据将在下一次自动更新后出现<br>也可以让 AI 手动跑一次更新</div>
       </div>`;
@@ -2012,7 +2025,7 @@ async function renderTimeline(container) {
     html += `
       <a class="timeline-card card" href="#/daily/${r.date}">
         <div class="date-badge">${r.date}</div>
-        <div class="card-title">${r.date} 雷达日报</div>
+        <div class="card-title">${r.date} 进步分子雷达日报</div>
         <div class="card-meta">${r.moduleCount} 个模块 · ${r.signalCount || '-'} 条精选</div>
         ${moduleList.length ? '<div class="module-chips">' +
           moduleList.map(m => `<span class="chip">${moduleLabel(m)}</span>`).join('') +
@@ -2054,11 +2067,11 @@ async function renderDaily(container, dateStr, opts) {
   injectJsonLd({
     '@context': 'https://schema.org',
     '@type': 'Article',
-    'headline': (report.date || dateStr) + ' 进步分子日报',
+    'headline': (report.date || dateStr) + ' 进步分子雷达日报',
     'datePublished': (report.date || dateStr),
     'dateModified': (report.date || dateStr),
-    'author': { '@type': 'Organization', 'name': (siteConfig && siteConfig.footer && siteConfig.footer.copyright) || '进步分子日报' },
-    'publisher': { '@type': 'Organization', 'name': '进步分子日报' },
+    'author': { '@type': 'Organization', 'name': (siteConfig && siteConfig.footer && siteConfig.footer.copyright) || '进步分子雷达日报' },
+    'publisher': { '@type': 'Organization', 'name': '进步分子雷达日报' },
     'mainEntityOfPage': { '@type': 'WebPage', '@url': 'https://radar-dashboard-7zsuaod4.edgeone.cool/#/daily/' + (report.date || dateStr) }
   });
 
@@ -2073,7 +2086,7 @@ async function renderDaily(container, dateStr, opts) {
                   : `<span class="pager-btn disabled">更早 →</span>`}
         </div>
       </div>
-      <div class="date-large">${escapeHtml(report.date || dateStr)} 雷达日报</div>
+      <div class="date-large">${escapeHtml(report.date || dateStr)} 进步分子雷达日报</div>
       ${opts.stale ? `<div class="stale-tip">⏳ 今天的日报还在路上，先看最新的这期。数据每日 06:00 / 19:00（北京时间）自动更新。</div>` : ''}
       <div class="source-stats">
         ${Object.entries(sources).map(([k, v]) =>
@@ -2835,6 +2848,19 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('footerYear').textContent = new Date().getFullYear();
   checkGlobalStale();
   initSubscribeCta();
+  // 阅读进度条 + 回顶
+  const rp = document.getElementById('readProgress');
+  const bt = document.getElementById('backTop');
+  const onScroll = () => {
+    const h = document.documentElement;
+    const max = h.scrollHeight - h.clientHeight;
+    const p = max > 0 ? (h.scrollTop / max) * 100 : 0;
+    if (rp) rp.style.width = p + '%';
+    if (bt) bt.hidden = (h.scrollTop < 400);
+  };
+  window.addEventListener('scroll', onScroll, { passive: true });
+  if (bt) bt.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+  onScroll();
 });
 </script>
 </body>

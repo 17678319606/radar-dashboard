@@ -1,4 +1,4 @@
-# 📡 雷达日报 Dashboard（分享版）
+# 📡 进步分子雷达日报 Dashboard（分享版）
 
 > **🌗 双主题**：深色极简 / 暖色杂志，点顶栏 🌙/☀️ 按钮随时切换，也可用 `?theme=light` / `?theme=dark` 深链指定。
 
@@ -149,7 +149,7 @@ crontab -e
 
 ### 方式 B：接入 Hermes Agent（完整自动化）
 
-雷达日报原生跑在 [Hermes Agent](https://hermes-agent.nousresearch.com) 上，配置 cron 后每天 08:45 自动采集 → AI 生成日报 → 推送到 Telegram。
+进步分子雷达日报原生跑在 [Hermes Agent](https://hermes-agent.nousresearch.com) 上，配置 cron 后每天 08:45 自动采集 → AI 生成日报 → 推送到 Telegram。
 
 **如果朋友有 Hermes**：把 `hermes-integration/HERMES-INTEGRATION.md` 发给 Hermes 对话，让它自动配置（采集脚本注册 + skill 导入 + cron 创建）。详见该文件。
 
@@ -224,7 +224,7 @@ venv/bin/python scripts/screenshot.py docs/screenshot-miniapp-light.png "?theme=
 
 ## 📱 联系作者
 
-我是独立开发者 susumr，这个雷达日报是我的日常工具，顺手开源分享。如果你也在做独立开发 / 小程序，欢迎关注我的公众号交流：
+我是独立开发者 susumr，这个进步分子雷达日报是我的日常工具，顺手开源分享。如果你也在做独立开发 / 小程序，欢迎关注我的公众号交流：
 
 <p align="center">
   <img src="docs/wechat-qrcode.png" alt="公众号二维码" width="480">

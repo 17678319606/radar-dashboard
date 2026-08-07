@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Radar Dashboard — 独立开发者雷达日报 可视化面板"""
+"""Radar Dashboard — 进步分子雷达日报 可视化面板"""
 
 import json
 import os
@@ -336,7 +336,7 @@ def get_site_config():
     """站点配置：备案、广告、赞赏等（可远程热更新，无需重新部署前端）"""
     path = REPORTS_DIR.parent / 'config' / 'site.json'
     default = {
-        'site': {'name': '独立开发者雷达日报', 'description': '', 'keywords': '', 'author': ''},
+        'site': {'name': '进步分子雷达日报', 'description': '', 'keywords': '', 'author': ''},
         'compliance': {'icp': '', 'icpUrl': '', 'police': '', 'policeUrl': ''},
         'ads': {'enabled': False, 'slots': []},
         'donation': {'enabled': False, 'title': '', 'desc': '', 'qrUrl': '', 'buttonText': ''},
