@@ -104,6 +104,7 @@ V2EX_NODES = ["create", "share", "programmer"]  # 分享创造 / 分享发现 / 
 KR36_FEED = "https://36kr.com/feed"              # 创投/科技媒体 RSS
 SSPAI_FEED = "https://sspai.com/feed"            # 少数派：效率工具/数字生活 RSS
 OSCHINA_FEED = "https://www.oschina.net/news/rss"  # 开源中国：开源项目动态 RSS
+RUANYIFENG_FEED = "https://www.ruanyifeng.com/blog/atom.xml"  # 阮一峰周刊：科技/独立开发高质量信号（国内稳定可达）
 
 # 即刻圈子（通过 RSSHub 公共实例）
 JIKA_TOPICS = [
@@ -781,11 +782,12 @@ def fetch_v2ex():
 # SOURCE 7-9: 国内 RSS 源 (36氪 / 少数派 / 开源中国)
 # ============================================================
 
-def _parse_rss_feed(url, source, tag_hint, max_items=30):
-    """通用 RSS 解析：返回 items 列表"""
+def _parse_rss_feed(url, source, tag_hint, max_items=30, lookback_hours=LOOKBACK_HOURS):
+    """通用 RSS 解析：返回 items 列表（兼容 RSS 2.0 与 Atom，含命名空间容错）"""
     import xml.etree.ElementTree as ET
+    ATOM = "{http://www.w3.org/2005/Atom}"
     items = []
-    lookback_ts = int(time.time()) - (LOOKBACK_HOURS * 3600)
+    lookback_ts = int(time.time()) - (lookback_hours * 3600)
 
     try:
         r = requests.get(url, headers={"User-Agent": UA_BROWSER}, timeout=12)
@@ -802,7 +804,7 @@ def _parse_rss_feed(url, source, tag_hint, max_items=30):
 
         for entry in entries[:max_items]:
             # 提取 title / link / pubDate
-            title_el = entry.find("title")
+            title_el = entry.find("title") or entry.find(f"{ATOM}title")
             title = (title_el.text or "").strip() if title_el is not None else ""
             title = title.replace("<![CDATA[", "").replace("]]>", "").strip()
             if not title:
@@ -824,20 +826,20 @@ def _parse_rss_feed(url, source, tag_hint, max_items=30):
                     ts = int(parsedate_to_datetime(date_el.text).timestamp())
                 except Exception:
                     try:
-                        ts = int(datetime.fromisoformat(date_el.text.strip()).timestamp())
+                        ts = int(datetime.fromisoformat(date_el.text.strip().replace("Z", "+00:00")).timestamp())
                     except Exception:
                         pass
 
             if ts < lookback_ts:
                 continue
 
-            desc_el = entry.find("description") or entry.find("summary")
+            desc_el = entry.find("description") or entry.find("summary") or entry.find(f"{ATOM}summary")
             desc = ""
             if desc_el is not None and desc_el.text:
                 desc = re.sub(r"<[^>]+>", "", desc_el.text)[:400]
 
             # id: 优先 guid，否则用 link hash
-            guid_el = entry.find("guid") or entry.find("id")
+            guid_el = entry.find("guid") or entry.find("id") or entry.find(f"{ATOM}id")
             item_id = ""
             if guid_el is not None and guid_el.text:
                 item_id = guid_el.text.strip()[:100]
@@ -877,6 +879,11 @@ def fetch_sspai():
 def fetch_oschina():
     """开源中国 — 开源项目动态"""
     return _parse_rss_feed(OSCHINA_FEED, "oschina", "开源")
+
+
+def fetch_ruanyifeng():
+    """阮一峰周刊（科技爱好者周刊）— 国内稳定可达，独立开发/产品信号浓度高"""
+    return _parse_rss_feed(RUANYIFENG_FEED, "ruanyifeng", "周刊", lookback_hours=24 * 14)
 
 
 # ============================================================
@@ -1603,6 +1610,7 @@ def main():
         "kr36": fetch_kr36,
         "sspai": fetch_sspai,
         "oschina": fetch_oschina,
+        "ruanyifeng": fetch_ruanyifeng,
         "jike": fetch_jike,
         "appstore": fetch_appstore,
         "indie-dev": fetch_indie_dev,

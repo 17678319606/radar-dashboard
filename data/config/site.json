@@ -59,7 +59,7 @@
     "enabled": true,
     "title": "支持进步分子日报持续运转",
     "desc": "如果这份日报对你有启发，欢迎赞赏支持，让我能持续采集更多信号、迭代功能。",
-    "qrUrl": "https://raw.githubusercontent.com/17678319606/radar-dashboard/main/docs/donate-qrcode.jpg",
+    "qrUrl": "/donate-qrcode.jpg",
     "buttonText": "☕ 赞赏支持"
   },
   "update": {

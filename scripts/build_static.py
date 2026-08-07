@@ -18,6 +18,7 @@ import argparse
 import json
 import shutil
 import sys
+from datetime import datetime
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -67,6 +68,44 @@ def _generate_seo_assets(out_dir: Path):
     print(f'   SEO: robots.txt + sitemap.xml（{len(urls)} 个 URL）')
 
 
+def _generate_rss(out_dir: Path, site_url: str):
+    """生成 RSS 2.0 feed（最近 20 期日报），便于订阅与搜索引擎收录"""
+    items = []
+    for f in sorted(REPORTS_DIR.glob('*.json'), reverse=True)[:20]:
+        try:
+            data = json.loads(f.read_text(encoding='utf-8'))
+        except Exception:
+            continue
+        date = data.get('date', f.stem)
+        mods = (data.get('modules') or {})
+        cnt = sum(len(v) for v in mods.values() if isinstance(v, list))
+        try:
+            pub = datetime.strptime(date, '%Y-%m-%d').strftime('%a, %d %b %Y 00:00:00 +0800')
+        except Exception:
+            pub = ''
+        desc = f'本期含 {cnt} 条精选信号（机会 / 副业 / 小程序 / 工具等）'
+        items.append(
+            '    <item>\n'
+            f'      <title>进步分子日报 {date}</title>\n'
+            f'      <link>{site_url}/#/daily/{date}</link>\n'
+            f'      <guid isPermaLink="false">{site_url}/#/daily/{date}</guid>\n'
+            f'      <pubDate>{pub}</pubDate>\n'
+            f'      <description>{desc}</description>\n'
+            '    </item>'
+        )
+    xml = [
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<rss version="2.0"><channel>',
+        '  <title>进步分子日报</title>',
+        f'  <link>{site_url}/</link>',
+        '  <description>每日自动采集 20+ 信息源，生成独立开发者 / 副业赚钱机会雷达。</description>',
+        '  <language>zh-CN</language>',
+        f'  <image><url>{site_url}/donate-qrcode.jpg</url><title>进步分子日报</title><link>{site_url}</link></image>',
+    ] + items + ['</channel></rss>']
+    (out_dir / 'rss.xml').write_text('\n'.join(xml) + '\n', encoding='utf-8')
+    print(f'   SEO: rss.xml（{len(items)} 期）')
+
+
 def collect_routes():
     """列出需要预渲染的 API 路由"""
     routes = [
@@ -89,9 +128,9 @@ def collect_routes():
 
 
 def build(out_dir: Path):
-    if out_dir.exists():
-        shutil.rmtree(out_dir)
-    out_dir.mkdir(parents=True)
+    # 增量构建：仅覆盖同名产物，不整体清空 dist/，
+    # 避免本地重跑 update.sh 时触发批量删除安全拦截而中断
+    out_dir.mkdir(parents=True, exist_ok=True)
 
     client = app.test_client()
     ok, failed = 0, []
@@ -122,8 +161,16 @@ def build(out_dir: Path):
     if static_src.exists():
         shutil.copytree(static_src, out_dir / 'static', dirs_exist_ok=True)
 
-    # SEO：根目录静态文件（robots / sitemap / public）
+    # 赞赏二维码等同域静态资源（避免依赖 raw.githubusercontent，国内常不可达且未打进 dist → 404）
+    docs_dir = BASE_DIR / 'docs'
+    for img in ('donate-qrcode.jpg', 'wechat-qrcode.png'):
+        src = docs_dir / img
+        if src.exists():
+            shutil.copy(src, out_dir / img)
+
+    # SEO：根目录静态文件（robots / sitemap / rss / public）
     _generate_seo_assets(out_dir)
+    _generate_rss(out_dir, SITE_URL)
 
     size = sum(f.stat().st_size for f in out_dir.rglob('*') if f.is_file())
     print(f'✅ 静态站点已生成: {out_dir}')

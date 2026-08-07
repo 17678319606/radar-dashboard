@@ -26,6 +26,7 @@ import json
 import os
 import subprocess
 import sys
+import time
 from datetime import date
 from pathlib import Path
 
@@ -242,6 +243,90 @@ def merge_indie_dev(report, date_str):
     return len(existing), meta
 
 
+def build_fallback_report(raw, date_str, focus):
+    """DeepSeek 不可用时的兜底：直接用原始信号拼出结构化日报，保证站点每日有新鲜内容。
+
+    不做 LLM 润色，质量低于正常日报，但能避免「时间线停更 / 站点空白」。
+    """
+    sources = (raw.get('sources') or {})
+
+    def _top(keys, n):
+        out = []
+        for k in keys:
+            for it in (sources.get(k) or [])[:n]:
+                out.append(it)
+        return out[:n]
+
+    def _norm(it):
+        title = it.get('title_cn') or it.get('name_cn') or it.get('title') or it.get('name') or '(无标题)'
+        desc = it.get('desc_cn') or it.get('desc') or it.get('summary') or it.get('description') or ''
+        return title, _clip(desc, 200), it.get('url', ''), it.get('source', '')
+
+    mods = {}
+    opp = []
+    for it in _top(['github', 'github-js', 'github-zh', 'hackernews', 'lobsters'], 6):
+        t, d, u, s = _norm(it)
+        opp.append({'title': t, 'why': d, 'how': '', 'keywords': [], 'source': s})
+    mods['opportunities'] = opp
+
+    mc = []
+    for it in _top(['trustmrr'], 4):
+        t, d, u, s = _norm(it)
+        mc.append({'title': t, 'what': d, 'revenue': it.get('mrr') or '', 'how': '', 'source': s})
+    mods['moneyCases'] = mc
+
+    sh = []
+    for it in _top(['reddit-sidehustle'], 5):
+        t, d, u, s = _norm(it)
+        sh.append({'title': t, 'why': d, 'how': '', 'revenue': '', 'source': s})
+    mods['sideHustles'] = sh
+
+    pi = []
+    for it in _top(['appstore-cn', 'appstore-us', 'v2ex', 'producthunt'], 5):
+        t, d, u, s = _norm(it)
+        pi.append({'title': t, 'idea': d, 'source': s})
+    mods['productInspirations'] = pi
+
+    gt = []
+    for it in _top(['36kr', 'sspai', 'oschina', 'ruanyifeng', 'jike-ai-explore', 'jike-engineer'], 5):
+        t, d, u, s = _norm(it)
+        gt.append({'title': t, 'tip': d, 'source': s})
+    mods['growthTips'] = gt
+
+    tl = []
+    for it in _top(['appstore-cn', 'appstore-us'], 4):
+        t, d, u, s = _norm(it)
+        tl.append({'title': t, 'what': d, 'url': u, 'source': s})
+    mods['tools'] = tl
+
+    mods['pitfalls'] = []
+    ds = []
+    for it in _top(['hackernews', 'lobsters'], 4):
+        t, d, u, s = _norm(it)
+        ds.append({'title': t, 'signal': d, 'source': s})
+    mods['dataSignals'] = ds
+
+    mp = []
+    for it in _top(['appstore-cn', 'v2ex'], 4):
+        t, d, u, s = _norm(it)
+        mp.append({'title': t, 'insight': d, 'suggestion': '', 'keywords': [], 'userNeed': '',
+                   'painPoint': '', 'howToBuild': '', 'relatedSignal': '', 'source': s})
+    mods['miniProgram'] = mp
+
+    mods['dailyWisdom'] = {
+        'method': '今天挑上面一个方向，花 30 分钟写一页纸方案（用户 / 痛点 / 怎么赚钱），不写代码也行。',
+        'why': '行动胜过空想，先验证想法是否成立。',
+    }
+
+    return {
+        'date': date_str,
+        'tags': ['#每日信号', '#' + date_str],
+        'modules': mods,
+        'sources': {k: len(v) for k, v in sources.items()},
+        'fallback': True,
+    }
+
+
 def build_prompt(raw, date_str, focus):
     return (
         f"以下是 {date_str} 从约 20 个国内外信息源采集到的原始信号。\n"
@@ -288,44 +373,58 @@ def main():
         print('\n...（--dry-run，未调用 API）')
         return
 
+    report = None
+    usage = {}
     key = os.environ.get('DEEPSEEK_API_KEY', '')
     if not key:
-        print('❌ 没找到 DEEPSEEK_API_KEY。在项目根目录 .env 里填一行：')
-        print('   DEEPSEEK_API_KEY=sk-你的key')
-        print('   （申请：https://platform.deepseek.com/ → API Keys）')
-        sys.exit(1)
+        print('⚠️ 未配置 DEEPSEEK_API_KEY，使用「信号直出」兜底日报（无 LLM 润色，保证每日有内容）')
+    else:
+        print('🤖 调用 DeepSeek 生成日报中（约 30-90 秒，失败自动兜底）...')
+        for attempt in range(2):
+            try:
+                resp = requests.post(
+                    API_URL,
+                    headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
+                    json={
+                        'model': MODEL,
+                        'messages': [
+                            {'role': 'system', 'content': '你是资深独立开发者的信号分析师，擅长从海量信息里筛出能落地赚钱的产品机会。只输出 JSON。'},
+                            {'role': 'user', 'content': prompt},
+                        ],
+                        'response_format': {'type': 'json_object'},
+                        'temperature': 0.7,
+                    },
+                    timeout=300,
+                )
+                if resp.status_code != 200:
+                    print(f'⚠️ API HTTP {resp.status_code}（第 {attempt+1} 次）：{resp.text[:200]}')
+                    if attempt == 0:
+                        time.sleep(5); continue
+                    break
+                body = resp.json()
+                content = body['choices'][0]['message']['content']
+                try:
+                    report = json.loads(content)
+                except json.JSONDecodeError:
+                    bad = REPORTS_DIR / f'{args.date}.raw.txt'
+                    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+                    bad.write_text(content)
+                    print(f'⚠️ 模型返回非合法 JSON（第 {attempt+1} 次），原文存 {bad}')
+                    if attempt == 0:
+                        time.sleep(3); continue
+                    break
+                usage = body.get('usage', {})
+                break
+            except Exception as e:
+                print(f'⚠️ API 异常 {e}（第 {attempt+1} 次）')
+                if attempt == 0:
+                    time.sleep(5); continue
+                break
+        if report is None:
+            print('⚠️ DeepSeek 不可用，回退到「信号直出」兜底日报')
 
-    print('🤖 调用 DeepSeek 生成日报中（约 30-90 秒）...')
-    resp = requests.post(
-        API_URL,
-        headers={'Authorization': f'Bearer {key}', 'Content-Type': 'application/json'},
-        json={
-            'model': MODEL,
-            'messages': [
-                {'role': 'system', 'content': '你是资深独立开发者的信号分析师，擅长从海量信息里筛出能落地赚钱的产品机会。只输出 JSON。'},
-                {'role': 'user', 'content': prompt},
-            ],
-            'response_format': {'type': 'json_object'},
-            'temperature': 0.7,
-        },
-        timeout=300,
-    )
-    if resp.status_code != 200:
-        print(f'❌ API 调用失败 HTTP {resp.status_code}: {resp.text[:300]}')
-        sys.exit(1)
-
-    body = resp.json()
-    content = body['choices'][0]['message']['content']
-    usage = body.get('usage', {})
-
-    try:
-        report = json.loads(content)
-    except json.JSONDecodeError:
-        bad = REPORTS_DIR / f'{args.date}.raw.txt'
-        REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-        bad.write_text(content)
-        print(f'❌ 模型返回的不是合法 JSON，原文已存到 {bad}')
-        sys.exit(1)
+    if report is None:
+        report = build_fallback_report(raw, args.date, args.focus)
 
     report['date'] = args.date
     report.setdefault('sources', {k: len(v) for k, v in (raw.get('sources') or {}).items()})

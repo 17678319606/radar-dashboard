@@ -89,6 +89,8 @@ body {
   background: var(--bg);
   color: var(--text);
   line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   display: flex;
   justify-content: center;
   min-height: 100vh;
@@ -308,6 +310,13 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   background: var(--surface); border: 1px dashed var(--border);
   font-size: .78rem; color: var(--text-secondary); line-height: 1.6;
 }
+.global-stale {
+  position: sticky; top: 0; z-index: 9;
+  padding: 8px 14px; text-align: center; font-size: .78rem; line-height: 1.6;
+  background: var(--warn-bg); color: var(--warn-text);
+  border-bottom: 1px solid var(--warn-text);
+}
+.global-stale[hidden] { display: none; }
 /* 本期模块目录 */
 .module-toc {
   display: flex; flex-wrap: wrap; gap: 8px;
@@ -810,8 +819,8 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   /* 移动端阅读优化：正文更大更松，卡片内边距收窄把宽度让给文字 */
   .module-item { padding: 14px 14px; }
-  .module-item h4 { font-size: .96rem; line-height: 1.55; }
-  .module-item .field { font-size: .88rem; line-height: 1.8; max-width: none; }
+  .module-item h4 { font-size: 1rem; line-height: 1.55; }
+  .module-item .field { font-size: .94rem; line-height: 1.85; max-width: none; }
   /* 模块目录横向滑动，避免在小屏堆成一大坨占满首屏 */
   .module-toc {
     flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 18px; padding: 0 16px 6px;
@@ -965,6 +974,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 <!-- ═══ Main ═══ -->
 <main class="main">
+  <div id="globalStale" class="global-stale" hidden></div>
   <div class="topbar">
     <div class="topbar-inner">
       <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="打开菜单" title="菜单">
@@ -1115,7 +1125,10 @@ function renderDonation() {
   const qrEl = document.getElementById('donateQr');
   if (titleEl) titleEl.textContent = d.title || '支持雷达日报';
   if (descEl) descEl.textContent = d.desc || '如果这份日报对你有启发，欢迎赞赏支持。';
-  if (qrEl) qrEl.src = d.qrUrl || '';
+  if (qrEl) {
+    qrEl.onerror = () => { qrEl.style.display = 'none'; };
+    qrEl.src = d.qrUrl || '';
+  }
 }
 
 function toggleDonate(show) {
@@ -2752,9 +2765,29 @@ initTocJump();
 initReadProgress();
 initKeyboardNav();
 window.addEventListener('popstate', render);
+async function checkGlobalStale() {
+  try {
+    const reports = await staticGet('reports');
+    const list = (reports && reports.reports) || [];
+    const date = (list[0] && list[0].date) || (reports && reports.date);
+    if (!date) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const banner = document.getElementById('globalStale');
+    if (!banner) return;
+    if (date < today) {
+      const days = Math.max(1, Math.round((new Date(today) - new Date(date)) / 86400000));
+      banner.textContent = `⏳ 最新一期为 ${date}（${days} 天前）。数据每日 06:00 / 19:00 自动更新；若长期未更新，可能是采集链路异常。`;
+      banner.hidden = false;
+    } else {
+      banner.hidden = true;
+    }
+  } catch (e) { /* 忽略：不影响主流程 */ }
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   render();
   document.getElementById('footerYear').textContent = new Date().getFullYear();
+  checkGlobalStale();
 });
 </script>
 </body>

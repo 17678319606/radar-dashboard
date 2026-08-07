@@ -49,11 +49,24 @@ jobs:
           echo "已同步文件数：$(find radar-api -type f -name '*.json' | wc -l)"
           test -f radar-api/reports.json || { echo "::error::radar-api/reports.json 缺失"; exit 1; }
 
+      - name: 校验数据新鲜度
+        run: |
+          set -e
+          TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
+          GEN=$(python3 -c "import json;print(json.load(open('radar-api/reports.json'))['date'])")
+          if [ "$GEN" != "$TODAY" ]; then
+            echo "::error::日报日期 $GEN ≠ 今天 $TODAY，自动更新可能失败"
+            exit 1
+          fi
+          echo "✅ 日报日期与今天一致: $TODAY"
+
       - name: 提交更新的数据
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A data/ radar-api/ 2>/dev/null || true
+          # 仅提交必要产物：日报正文 / 独立开发者列表 / 去重状态 / 构建数据；
+          # 排除 data/raw_signals（每日约 332KB，已由 radar-api/raw 承载，避免仓库无限膨胀）
+          git add data/reports data/indie_dev.json data/daily_signals_state.json radar-api/ 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "无数据变更，跳过提交"
           else
