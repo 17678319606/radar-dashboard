@@ -53,7 +53,9 @@ jobs:
         run: |
           set -e
           TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
-          GEN=$(python3 -c "import json;print(json.load(open('radar-api/reports.json'))['date'])")
+          # reports.json 是报告摘要列表（按日期倒序），每个元素含 date 字段；
+          # 取列表首元素（最新一期）的 date。兼容 dict 结构兜底，避免 TypeError。
+          GEN=$(python3 -c "import json;d=json.load(open('radar-api/reports.json'));print(d[0]['date'] if isinstance(d,list) and d else (d.get('date','') if isinstance(d,dict) else ''))")
           if [ "$GEN" != "$TODAY" ]; then
             echo "::error::日报日期 $GEN ≠ 今天 $TODAY，自动更新可能失败"
             exit 1
