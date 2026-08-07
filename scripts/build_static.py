@@ -44,6 +44,11 @@ INJECT_SNIPPET = (
 
 SITE_URL = 'https://radar-dashboard-7zsuaod4.edgeone.cool'
 
+# 静态 SEO 页（每日日报 HTML / sitemap / rss / og 封面）通过 jsDelivr 自动发布。
+# 原因：CI 自动跑批不会重部署 EdgeOne，若把收录页指向 EdgeOne 则新日期页不会自动上线，
+# 与「全自动化」诉求冲突。jsDelivr 随 git 提交即生效，无需人工重部署。
+PUBLIC_BASE = 'https://cdn.jsdelivr.net/gh/17678319606/radar-dashboard@main'
+
 
 def _generate_seo_assets(out_dir: Path):
     """生成 robots.txt 与 sitemap.xml（含每日日报 URL），便于搜索引擎收录"""
@@ -53,12 +58,12 @@ def _generate_seo_assets(out_dir: Path):
         shutil.copy(robots, out_dir / 'robots.txt')
     else:
         (out_dir / 'robots.txt').write_text(
-            f"User-agent: *\nAllow: /\nSitemap: {SITE_URL}/sitemap.xml\n", encoding='utf-8')
+            f"User-agent: *\nAllow: /\nSitemap: {PUBLIC_BASE}/sitemap.xml\n", encoding='utf-8')
 
     # sitemap.xml：首页 + 每一期日报（真实静态 HTML 页，可被搜索引擎收录）
     urls = [f"{SITE_URL}/"]
     for f in sorted(REPORTS_DIR.glob('*.json'), reverse=True):
-        urls.append(f"{SITE_URL}/daily/{f.stem}.html")
+        urls.append(f"{PUBLIC_BASE}/daily/{f.stem}.html")
     xml = ['<?xml version="1.0" encoding="UTF-8"?>',
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
     for u in urls:
@@ -87,8 +92,8 @@ def _generate_rss(out_dir: Path, site_url: str):
         items.append(
             '    <item>\n'
         f'      <title>进步分子雷达日报 {date}</title>\n'
-        f'      <link>{site_url}/daily/{date}.html</link>\n'
-        f'      <guid isPermaLink="true">{site_url}/daily/{date}.html</guid>\n'
+        f'      <link>{PUBLIC_BASE}/daily/{date}.html</link>\n'
+        f'      <guid isPermaLink="true">{PUBLIC_BASE}/daily/{date}.html</guid>\n'
             f'      <pubDate>{pub}</pubDate>\n'
             f'      <description>{desc}</description>\n'
             '    </item>'
@@ -158,11 +163,11 @@ DAILY_HTML_TMPL = """<!DOCTYPE html>
 <meta property="og:type" content="article">
 <meta property="og:title" content="进步分子雷达日报 {date}">
 <meta property="og:description" content="{desc}">
-<meta property="og:url" content="{site_url}/daily/{date}.html">
-<meta property="og:image" content="{site_url}/og-cover.svg">
+<meta property="og:url" content="{public_base}/daily/{date}.html">
+<meta property="og:image" content="{public_base}/og-cover.svg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="{site_url}/og-cover.svg">
-<link rel="canonical" href="{site_url}/daily/{date}.html">
+<meta name="twitter:image" content="{public_base}/og-cover.svg">
+<link rel="canonical" href="{public_base}/daily/{date}.html">
 <script type="application/ld+json">{article_ld}</script>
 <style>
 :root{{--bg:#0b0d12;--surface:#13161e;--card:#1a1e2a;--border:#2a2f45;--text:#e6e8ee;--sub:#9aa3b2}}
@@ -209,11 +214,13 @@ OG_COVER_SVG = """<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="6
 
 
 def _generate_og_cover(out_dir, site_url):
-    """生成 OG 分享封面（SVG，零依赖），供 og:image / twitter:image 引用"""
+    """生成 OG 分享封面（SVG，零依赖），供 og:image / twitter:image 引用。
+    同时写入仓库根，使 jsDelivr（PUBLIC_BASE）也能取到，避免依赖 EdgeOne 重部署。"""
     (out_dir / 'og-cover.svg').write_text(OG_COVER_SVG, encoding='utf-8')
+    (BASE_DIR / 'og-cover.svg').write_text(OG_COVER_SVG, encoding='utf-8')
 
 
-def _generate_daily_html(out_dir, report_path, site_url):
+def _generate_daily_html(out_dir, report_path, site_url, public_base):
     """把每期日报预渲染为真实静态 HTML 页，便于搜索引擎收录正文（SEO 关键）"""
     try:
         data = json.loads(report_path.read_text(encoding='utf-8'))
@@ -265,15 +272,20 @@ def _generate_daily_html(out_dir, report_path, site_url):
         'author': {'@type': 'Organization', 'name': '进步分子雷达日报'},
         'publisher': {'@type': 'Organization', 'name': '进步分子雷达日报'},
         'description': desc,
-        'mainEntityOfPage': f'{site_url}/daily/{date}.html',
+        'mainEntityOfPage': f'{public_base}/daily/{date}.html',
     }
     html = DAILY_HTML_TMPL.format(
-        site_url=site_url, date=date, desc=desc,
+        site_url=site_url, public_base=public_base, date=date, desc=desc,
         sections=sections_html, article_ld=json.dumps(article_ld, ensure_ascii=False),
     )
+    # 1) 写入 dist/daily（EdgeOne 部署用，人工重部署后生效）
     daily_dir = out_dir / 'daily'
     daily_dir.mkdir(parents=True, exist_ok=True)
     (daily_dir / f'{date}.html').write_text(html, encoding='utf-8')
+    # 2) 同时写入仓库根 daily/，随 CI 提交经 jsDelivr 自动发布（无需重部署 EdgeOne，满足全自动化）
+    repo_daily = BASE_DIR / 'daily'
+    repo_daily.mkdir(parents=True, exist_ok=True)
+    (repo_daily / f'{date}.html').write_text(html, encoding='utf-8')
 
 
 def collect_routes():
@@ -341,10 +353,16 @@ def build(out_dir: Path):
     # SEO：根目录静态文件（robots / sitemap / rss / public）
     _generate_seo_assets(out_dir)
     _generate_rss(out_dir, SITE_URL)
+    # 同步 SEO 索引文件到仓库根：sitemap/rss 经 jsDelivr 自动发布，
+    # 使搜索引擎无需依赖 EdgeOne 重部署即可持续发现新日期日报（全自动化关键）。
+    for _seo in ('sitemap.xml', 'rss.xml'):
+        _src = out_dir / _seo
+        if _src.exists():
+            (BASE_DIR / _seo).write_text(_src.read_text(encoding='utf-8'), encoding='utf-8')
     # 预渲染每期日报为真实静态 HTML（SEO 收录关键）+ OG 分享封面
     _generate_og_cover(out_dir, SITE_URL)
     for f in sorted(REPORTS_DIR.glob('*.json'), reverse=True):
-        _generate_daily_html(out_dir, f, SITE_URL)
+        _generate_daily_html(out_dir, f, SITE_URL, PUBLIC_BASE)
 
     size = sum(f.stat().st_size for f in out_dir.rglob('*') if f.is_file())
     print(f'✅ 静态站点已生成: {out_dir}')

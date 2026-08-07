@@ -69,7 +69,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # 仅提交必要产物：日报正文 / 独立开发者列表 / 去重状态 / 构建数据；
           # 排除 data/raw_signals（每日约 332KB，已由 radar-api/raw 承载，避免仓库无限膨胀）
-          git add data/reports data/indie_dev.json data/daily_signals_state.json radar-api/ 2>/dev/null || true
+          git add data/reports data/indie_dev.json data/daily_signals_state.json radar-api/ daily/ og-cover.svg sitemap.xml rss.xml 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "无数据变更，跳过提交"
           else
