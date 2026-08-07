@@ -925,6 +925,11 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
         <span>赚钱案例库</span>
         <span class="badge" data-badge="money-cases">0</span>
       </a>
+      <a class="nav-item" href="#/module/side-hustles" data-route="module-side-hustles">
+        <span class="dot" style="background:var(--orange)"></span>
+        <span>副业赚钱库</span>
+        <span class="badge" data-badge="side-hustles">0</span>
+      </a>
       <a class="nav-item" href="#/module/inspirations" data-route="module-inspirations">
         <span class="dot" style="background:var(--purple)"></span>
         <span>产品灵感库</span>
@@ -1880,6 +1885,7 @@ async function render() {
         'signals': '📊 数据信号库',
         'mini-program': '📱 小程序机会库',
         'wisdom': '🧠 心法库',
+        'side-hustles': '🚀 副业赚钱库',
       };
       title.textContent = labels[parts[1]] || '模块视图';
       await renderModule(content, parts[1]);

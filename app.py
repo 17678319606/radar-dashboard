@@ -81,6 +81,7 @@ def get_module(module_name):
         'mini-program': 'miniProgram',
         'wisdom': 'dailyWisdom',
         'indie-dev': 'indieDev',
+        'side-hustles': 'sideHustles',
     }
     key = module_map.get(module_name)
     if not key:

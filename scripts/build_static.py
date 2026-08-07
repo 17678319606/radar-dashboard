@@ -31,6 +31,7 @@ RAW_DIR = REPORTS_DIR.parent / 'raw_signals'
 MODULE_NAMES = [
     'opportunities', 'money-cases', 'inspirations', 'growth',
     'tools', 'pitfalls', 'signals', 'mini-program', 'wisdom', 'indie-dev',
+    'side-hustles',
 ]
 
 INJECT_SNIPPET = (
