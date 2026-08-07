@@ -1,231 +1,241 @@
 {
   "date": "2026-08-08",
   "tags": [
-    "#AI代理",
-    "#短剧",
-    "#屏幕时间",
+    "#微信小程序",
+    "#AI技能",
     "#拼豆",
-    "#副业"
+    "#短剧",
+    "#屏幕时间"
   ],
   "modules": {
     "opportunities": [
       {
-        "title": "AI代理技能市场正在爆发",
-        "why": "GitHub上agent-skills类项目大量涌现（PrimeIntellect、addyosmani、microsoft等），开发者对开箱即用的AI代理技能需求激增，但技能分发和商业化仍处早期。",
-        "how": "可以做一个面向国内开发者的AI代理技能市场/目录站，聚合+评测+付费下载，或者直接做垂直技能包（如微信生态运营技能），通过小程序/网站售卖。",
+        "title": "AI 技能包市场：从 agent-skills 到垂直行业技能",
+        "why": "GitHub 上出现大量面向 AI 编码智能体的技能包（agent-skills、marketing-skills、taste-skill 等），开发者生态正在围绕 AI 智能体构建可复用的技能集。早期入局者可以像插件市场一样，为特定行业（如营销、设计）提供中文技能包并收费。",
+        "how": "选择一个垂直领域（如小红书文案、电商客服），结合 Claude Code 或 Codex 编写一套标准化的技能定义（SKILL.md + 脚本），打包成付费模板或订阅服务。先开源免费版积累口碑，再靠 Pro 版收费。",
         "keywords": [
-          "AI技能",
-          "代理市场"
+          "AI智能体",
+          "技能包",
+          "插件市场"
         ],
         "source": "github"
       },
       {
-        "title": "短剧应用全球走红，工具链有空间",
-        "why": "App Store多地区出现GoodDrama等短剧应用，短剧内容消费在全球范围内快速增长，但国内开发者做内容合规风险高。",
-        "how": "避开内容本身，做短剧的工具/服务：短剧素材库、字幕翻译、剪辑辅助、短剧数据榜单，用小程序或网站服务创作者和推广者。",
+        "title": "拼豆色卡开放数据集：衍生工具与增值服务",
+        "why": "有人整理了 5 个品牌 1406 个色号并开放数据集（含 CIEDE2000 跨品牌对照表），这是垂直领域的稀缺数据资产，可复用到设计、电商、教育等多个场景。",
+        "how": "基于该数据集开发小程序（图纸生成）、Web 工具（色号转换 API）、或 B 端服务（给拼豆厂商做供应链管理系统）。数据是开放免费的，但增值服务可以收费。",
         "keywords": [
-          "短剧",
-          "工具链"
+          "拼豆",
+          "色卡数据",
+          "开放数据集"
         ],
-        "source": "appstore-kr"
+        "source": "v2ex"
       },
       {
-        "title": "屏幕时间管理需求持续升温",
-        "why": "Screen Time Lock、ScreenSafe等屏幕锁定/时间管理App在多地区新上架，Meta因损害青少年心理健康被重罚，公众对数字健康的关注度上升。",
-        "how": "国内微信小程序可做「屏幕使用时间打卡+社交监督」工具，通过群排名、勋章激励、好友监督帮助用户减少手机依赖。",
+        "title": "短剧出海本地化服务",
+        "why": "App Store 多区（美/韩/中）同步出现短剧应用 GoodDrama，短剧出海已成趋势，但多语言翻译、本地化运营是痛点。",
+        "how": "做一款短剧字幕翻译或本地化分发的小工具/服务。起步可以是一个小程序，为国内短剧团队提供「一键生成多语言字幕」的 SaaS，按月收费。",
         "keywords": [
-          "屏幕时间",
-          "数字健康"
+          "短剧出海",
+          "字幕翻译",
+          "SaaS"
         ],
         "source": "appstore-us"
       }
     ],
-    "moneyCases": [],
+    "moneyCases": [
+      {
+        "title": "vPlayer HiFi App：高保真音乐播放器的付费模式",
+        "what": "一款支持 DSD、SACD-R、Samba 接入等专业功能的 HiFi 音乐播放器，已上架 App Store。",
+        "revenue": "（未披露收入）",
+        "how": "定位小众发烧友，靠专业功能（内存加载、重采样算法、外置 DAC）做差异化，采用付费下载或内购解锁。启发：小而美的专业工具可以避开大众市场竞争。",
+        "source": "indie-dev"
+      },
+      {
+        "title": "沉浸式翻译：开源扩展的护城河",
+        "what": "开源的双语网页翻译扩展，支持 PDF、Epub、字幕等，用户量大且口碑好。",
+        "revenue": "（未披露）",
+        "how": "通过免费开源积累用户，靠付费进阶功能（如 DeepL API 额度、AI 翻译）变现。护城河在于对「双语对照」体验的极致打磨。",
+        "source": "github-zh"
+      }
+    ],
     "sideHustles": [
       {
-        "title": "数字产品副业",
-        "why": "Reddit用户一致看好数字产品，零库存、可自动化交付，适合普通人上手。",
-        "how": "从模板、电子书、素材包开始，用微信小程序做展示+分销，通过小红书引流。",
-        "revenue": "",
+        "title": "数字产品副业：卖模板和电子书",
+        "why": "Reddit 上有人在数字产品领域交流，门槛低、可自动化交付，适合独立开发者顺手做。",
+        "how": "利用你的编程技能，制作 Notion 模板、简历模板、微信小程序源码、设计资源包等，在 Gumroad、面包多等平台售卖。每天花 1 小时打磨一个产品。",
+        "revenue": "（未披露）",
         "source": "reddit-sidehustle"
       },
       {
-        "title": "每日固定副业流程",
-        "why": "有用户分享不花大量时间的每日副业routine，说明细水长流的模式更能持续。",
-        "how": "每天花1小时专注做副业，例如更新一条小红书/抖音、回答一个专业问题、写50行代码，坚持90天。",
-        "revenue": "",
-        "source": "reddit-sidehustle"
-      },
-      {
-        "title": "软件销售背景做SaaS代理",
-        "why": "软件销售人员的销售技能可迁移到B2B SaaS代理或销售AI工具，副业潜力大。",
-        "how": "找到一款适合国内市场的SaaS（如海外AI工具），做本地化代理或销售培训，赚取佣金。",
-        "revenue": "",
+        "title": "YouTube 内容创作（男性弃电视转向 YouTube）",
+        "why": "Ofcom 报告显示男性正在从电视转向 YouTube，这背后是内容消费习惯的转移，创作者有机会抓住细分领域。",
+        "how": "针对科技、游戏（如红警怀旧）、AI 工具测评等方向，制作长视频或直播。YouTube 的广告分成和会员稳定，前期靠剪辑效率工具（如 OpusClip）降低成本。",
+        "revenue": "（未披露）",
         "source": "reddit-sidehustle"
       }
     ],
     "productInspirations": [
       {
-        "title": "拼豆图纸生成器",
-        "idea": "V2EX用户已整理5个品牌1406个色号并开放数据集，可以做一个照片转拼豆图纸的网页/小程序，顺便用跨品牌色卡数据做推荐。",
-        "source": "v2ex"
+        "title": "从约束模型生成益智游戏",
+        "idea": "用约束求解自动生成关卡，像《马里奥》和益智游戏结合，可以做一个「每天一个数学谜题」的微信小程序，由算法生成无限关卡。",
+        "source": "lobsters"
       },
       {
-        "title": "十字绣解压应用",
-        "idea": "App Store新上的Cross Stitch: Antistress把十字绣搬到手机，国内可做「小程序版十字绣图纸生成器」或「数字填色」小游戏。",
-        "source": "appstore-us"
+        "title": "表情符号 DOS 可执行文件",
+        "idea": "极端 geek 的实验，但启发了「用表情符号编码数据」的脑洞，可以做成一个表情符号加密/解密小工具，面向情侣趣味互动。",
+        "source": "lobsters"
       },
       {
-        "title": "语音日志App",
-        "idea": "VoiceLogue主打语音日志，国内可做「语音日记」小程序，支持录音+转文字+情绪标签，适合不愿打字的用户。",
-        "source": "appstore-cn"
-      },
-      {
-        "title": "秒表挑战小游戏",
-        "idea": "Stop the Timer要求玩家在精确时间停止秒表，规则简单、有排名，适合做成微信小游戏，配合排行榜和分享裂变。",
-        "source": "appstore-cn"
-      },
-      {
-        "title": "双语翻译工具",
-        "idea": "V2EX用户用deepseek做了双语翻译，发现体验做好需要很深积累。可以做一个专注「公众号/网页双语对照阅读」的小程序，切入细分场景。",
-        "source": "v2ex"
+        "title": "Herdr 加入 YC，运行时保持开源",
+        "idea": "开源 + 商业化服务的方式，国内微信小程序可以复制：核心逻辑开源（或免费），把部署和托管做成付费服务。",
+        "source": "hackernews"
       }
     ],
     "growthTips": [
       {
-        "title": "品味是最后壁垒",
-        "tip": "在AI生成内容泛滥的时代，审美和品味是稀缺品。多逛优秀设计，建立自己的品味库，用在你的产品里。",
+        "title": "警惕机器人流量，用真实行为分析",
+        "tip": "有人发现网站 99% 流量是机器人。做增长分析时，优先看「完成关键行为的用户」而不是 PV/UV，用自定义事件（如点击、停留时间）筛选真人。",
         "source": "hackernews"
       },
       {
-        "title": "每日小步快跑",
-        "tip": "每天固定时间做一点副业，比周末突击更可持续。Reddit用户分享的「每日流程」重点在于低压力和稳定产出。",
-        "source": "reddit-sidehustle"
+        "title": "开源社区是增长引擎",
+        "tip": "沉浸式翻译通过开源积累口碑，Reddit/V2EX 分享创造帖成为早期流量。新项目可以主动在 V2EX、Product Hunt 发帖，把反馈循环做短。",
+        "source": "v2ex"
       }
     ],
     "tools": [
       {
-        "title": "DataZen",
-        "what": "不到10MB的开源数据库客户端，集成AI、图表、工作流，支持PostgreSQL/MySQL/Redis。",
-        "url": "https://www.v2ex.com/t/1232825",
-        "source": "v2ex"
+        "title": "drawdb",
+        "what": "免费、简单的在线数据库图表编辑器和 SQL 生成器，适合快速设计表结构。",
+        "url": "https://github.com/drawdb-io/drawdb",
+        "source": "github-js"
       },
       {
-        "title": "Flintmark",
-        "what": "VS Code里实时渲染Markdown的插件，像Obsidian一样，适合AI生成的文档阅读。",
-        "url": "https://www.v2ex.com/t/1232824",
-        "source": "v2ex"
-      },
-      {
-        "title": "Cairn",
-        "what": "macOS小工具，让Coding Agent的任务成果一键寻迹返回，解决多任务管理混乱。",
-        "url": "https://www.v2ex.com/t/1232809",
-        "source": "v2ex"
-      },
-      {
-        "title": "沉浸式翻译",
-        "what": "开源双语网页翻译扩展，支持输入框、PDF、Epub等，国内可用。",
+        "title": "immersive-translate",
+        "what": "沉浸式双语网页翻译扩展，支持 PDF、Epub、字幕文件，做翻译类产品可参考其交互方式。",
         "url": "https://github.com/immersive-translate/immersive-translate",
         "source": "github-zh"
+      },
+      {
+        "title": "authentik",
+        "what": "开源身份认证解决方案，可以用它快速给小程序/网站加上登录系统，节省自建成本。",
+        "url": "https://github.com/goauthentik/authentik",
+        "source": "github"
+      },
+      {
+        "title": "mise",
+        "what": "集开发工具、环境变量和任务运行器于一体，提升本地开发效率。",
+        "url": "https://github.com/jdx/mise",
+        "source": "github"
       }
     ],
     "pitfalls": [
       {
-        "title": "tl;dv 会议记录工具被黑",
-        "pitfall": "tl;dv被爆181,874场会议数据暴露，安全设计不到位。",
-        "lesson": "任何存储用户数据的工具必须做权限校验，最小化收集数据，别把用户内容变成地毯。",
-        "source": "lobsters"
-      },
-      {
-        "title": "99%网站流量是机器人",
-        "pitfall": "一名开发者发现其网站99%流量来自机器人，真实访问少得可怜。",
-        "lesson": "不要被PV数据骗了，要关注真实用户在做什么，用深度指标衡量。",
+        "title": "GitHub Actions 和 Pages 服务降级",
+        "pitfall": "依赖 GitHub 的 CI/CD 和静态托管，遇到故障会让发布停摆。",
+        "lesson": "关键项目要准备自建备份方案（如 Gitee Pages、Vercel），并设置自动切换。",
         "source": "hackernews"
       },
       {
-        "title": "被动收入理想化陷阱",
-        "pitfall": "一位作者反思整个职业生涯构建被动收入，最后发现最初的方向就错了。",
-        "lesson": "被动收入通常需要前期大量主动投入，别被「躺赚」故事迷惑，老老实实做产品。",
+        "title": "客户不按时付款",
+        "pitfall": "自由职业常见问题，容易影响现金流。",
+        "lesson": "接单前收 50% 定金，项目里程碑结款，或者在合同中约定逾期利息。",
         "source": "reddit-sidehustle"
       }
     ],
     "dataSignals": [
       {
-        "title": "网上真实流量可能远低于想象",
-        "signal": "一位站长发现99%的网站流量是机器人，意味着多数网站的真实访客可能极少。",
+        "title": "99% 网站流量是机器人",
+        "signal": "大量网站的真实访问远低于统计数字，机器人流量污染数据，影响广告收入。",
         "source": "hackernews"
       },
       {
-        "title": "美国经济7月失业2.3万人",
-        "signal": "美国7月非农就业减少2.3万人，经济突然走弱，海外消费者付费意愿可能受影响。",
-        "source": "hackernews"
+        "title": "男性弃电视转向 YouTube",
+        "signal": "Ofcom 报告显示男性正在从电视转向 YouTube，且与 AI 使用和社交媒体疲劳相关。",
+        "source": "reddit-sidehustle"
       },
       {
-        "title": "Meta因青少年心理健康被重罚",
-        "signal": "新墨西哥州法院判Meta赔偿5.67亿美元，社交媒体对青少年心理的影响受到法律制裁。",
-        "source": "hackernews"
+        "title": "屏幕时间管理工具在各区 App Store 密集上架",
+        "signal": "Screen Time Lock 在美、韩、台等多区新上架，反映出数字健康和自律管理需求上升。",
+        "source": "appstore-us"
       }
     ],
     "miniProgram": [
       {
-        "title": "拼豆图纸生成器",
-        "insight": "拼豆厂商不公开色卡数据，玩家手动设计图纸麻烦，V2EX已有人整理开放数据。",
-        "suggestion": "做一个微信小程序，上传照片自动生成拼豆图纸，并匹配品牌色号，支持导出PDF/推荐购买。",
+        "title": "拼豆图纸生成器小程序",
+        "insight": "拼豆厂商不公开色卡数据，已有开源数据集覆盖 5 品牌 1406 色号，并附跨品牌对照表。这是工具类小程序的绝佳切入点。",
+        "suggestion": "做一个「照片转拼豆图纸」的微信小程序，用户上传图片，自动识别像素并匹配最近色号，输出图纸和色号清单。支持品牌切换和跨品牌替换。",
         "keywords": [
           "拼豆",
           "图纸生成",
-          "手工"
+          "DIY"
         ],
-        "userNeed": "拼豆爱好者想要快速把任意图片变成可操作的拼豆图纸。",
-        "painPoint": "手动逐色拍照、对色号非常耗时，且跨品牌色号难以匹配。",
-        "howToBuild": "用Canvas处理图片像素化，内置1406色号JSON数据，识别后用最近色算法替换，输出图纸+色号清单。",
-        "relatedSignal": "V2EX开发者发布了拼豆图纸生成器及开放数据集",
+        "userNeed": "拼豆爱好者想把照片、头像做成实物，但手动换算色号太繁琐。",
+        "painPoint": "现有工具要么收费，要么色号不全，不同品牌颜色差异大。",
+        "howToBuild": "用开放数据集（JSON+CSV）做离线色号库，小程序 Canvas 处理图片像素，用 CIEDE2000 算法匹配色号。可接 AI 增强（自动识别图案区域）。变现：高级滤镜、去广告、导出高清 PDF。",
+        "relatedSignal": "拼豆图纸生成器 + 开放数据集",
         "source": "v2ex"
       },
       {
-        "title": "十字绣图案生成小程序",
-        "insight": "App Store全球新上多款十字绣解压应用（Cross Stitch: Antistress），说明数字十字绣需求真实，国内小程序尚未饱和。",
-        "suggestion": "做一个十字绣图案生成+教程小程序，用户上传照片生成十字绣图纸，或提供在线填色游戏。",
+        "title": "十字绣模拟解压小程序",
+        "insight": "App Store 美区/韩区新上架 Cross Stitch: Antistress（十字绣解压应用），说明这种轻量解压玩法有市场。国内微信小程序还少有同类。",
+        "suggestion": "做「像素十字绣」小程序，提供图案库和自由创作模式，点击网格填充色块，配合针线音效和进度条，达到解压效果。",
         "keywords": [
           "十字绣",
-          "生成器",
-          "解压"
+          "解压",
+          "像素画"
         ],
-        "userNeed": "十字绣爱好者想要简单快速的图案设计工具。",
-        "painPoint": "纸质图纸容易丢失，且设计图案门槛高。",
-        "howToBuild": "复用拼豆同款像素化技术，把色号换成十字绣线号，提供基础图案库和社交分享。",
-        "relatedSignal": "App Store新上Cross Stitch: Antistress交叉绣解压应用",
+        "userNeed": "用户想通过简单重复的动手操作放松减压，但又懒得买实体材料。",
+        "painPoint": "实体十字绣费时费钱，手机 App 下载麻烦，广告多。",
+        "howToBuild": "Canvas 绘制网格，内置几十个模板（表情包、动物、文字），支持自定义图片转像素。用微信小程序的震动接口模拟针感。变现：激励视频解锁新图案、去广告。",
+        "relatedSignal": "Cross Stitch: Antistress",
+        "source": "appstore-cn"
+      },
+      {
+        "title": "红警怀旧资源站小程序",
+        "insight": "V2EX 上有人做了红警资源站，发现老玩家在 Win10/11 上安装红警 2 需要兼容补丁、版本资料，资源零散且存在安全风险。",
+        "suggestion": "做一个「红色警戒怀旧助手」小程序，聚合安装教程、兼容补丁、MOD 导航、联机服务器状态，并提供社区问答。",
+        "keywords": [
+          "红警",
+          "怀旧",
+          "游戏攻略"
+        ],
+        "userNeed": "80/90 后想快速重温红警，但新系统上手门槛高。",
+        "painPoint": "网上资源混乱，容易下到捆绑软件，老教程失效多。",
+        "howToBuild": "小程序以内容聚合为主，人工整理教程和链接（只做跳转，不直接提供游戏文件）。内置联机状态查询（需后端抓取），可做打赏和广告。",
+        "relatedSignal": "红警资源站",
+        "source": "v2ex"
+      },
+      {
+        "title": "短剧追剧日历小程序",
+        "insight": "App Store 中区/韩区新上架短剧应用 GoodDrama，短剧热度持续。国内短剧分散在多个平台，用户常常忘记追更新。",
+        "suggestion": "做「短剧追踪」小程序，收录各大平台的短剧信息，提供每日更新提醒、追剧日历、演员/梗概检索。不直接播放视频，规避资质风险。",
+        "keywords": [
+          "短剧",
+          "追剧",
+          "提醒"
+        ],
+        "userNeed": "短剧受众覆盖广，但剧集更新不固定，很难记。",
+        "painPoint": "平台分散、没有统一的时间表，剧情讨论也散。",
+        "howToBuild": "通过爬虫或人工录入短剧数据，小程序端做订阅和提醒（利用订阅消息）。变现：接短剧平台的分销 CPS，按用户点击下载分成。",
+        "relatedSignal": "GoodDrama",
+        "source": "appstore-cn"
+      },
+      {
+        "title": "屏幕时间自律打卡小程序",
+        "insight": "Screen Time Lock: Disconnect 在美/韩/台多区 App Store 新上架，说明「数字断连」是普遍需求。微信小程序虽不能读取系统屏幕时间，但可以做「打卡+监督」。",
+        "suggestion": "做「放下手机」小程序：用户设定每日目标时长，使用番茄钟/专注倒计时，超时在本群里打卡失败，失败要发红包或做公益。",
+        "keywords": [
+          "屏幕时间",
+          "自律",
+          "打卡"
+        ],
+        "userNeed": "手机重度用户想减少使用，但意志力不足。",
+        "painPoint": "系统工具太干，缺乏社交激励。",
+        "howToBuild": "用微信小程序的番茄钟 + 群打卡机制，结合「微信运动」或小程序内的时长统计。核心是社交监督，可以创建「戒手机小组」。变现：会员解锁更多统计功能。",
+        "relatedSignal": "Screen Time Lock: Disconnect",
         "source": "appstore-us"
-      },
-      {
-        "title": "语音日记小程序",
-        "insight": "VoiceLogue语音日志App在多地区上架，语音输入比打字自然，适合通勤、睡前等碎片场景。",
-        "suggestion": "做一款「语音日记」小程序，支持录音→转文字→情绪分析→生成年度报告，可设置私密或分享到好友圈。",
-        "keywords": [
-          "语音日记",
-          "情绪记录",
-          "转文字"
-        ],
-        "userNeed": "想记录生活但懒得打字的人，需要一种更快的记录方式。",
-        "painPoint": "打字日记门槛高，传统录音无法检索和回顾。",
-        "howToBuild": "使用微信录音接口+第三方转文字API，存储到云开发，用情绪分析JS库做简单标签。",
-        "relatedSignal": "VoiceLogue语音日志App在App Store上线",
-        "source": "appstore-cn"
-      },
-      {
-        "title": "精准停表挑战小游戏",
-        "insight": "Stop the Timer是App Store新上架的极简游戏，规则简单，适合做成微信小游戏分享裂变。",
-        "suggestion": "做一款「停表挑战」小游戏，玩家点击开始后要在3秒/5秒/10秒的整数时刻停止，误差越小得分越高，支持好友对战。",
-        "keywords": [
-          "小游戏",
-          "秒表",
-          "对战"
-        ],
-        "userNeed": "人们在休闲时间想玩不需要思考、又能竞争的小游戏。",
-        "painPoint": "常规游戏太复杂，这个一秒就能上手，且天然有社交传播点。",
-        "howToBuild": "用微信小游戏Canvas渲染秒表，记录误差数据，接入开放数据域做好友排行。",
-        "relatedSignal": "Stop the Timer秒表游戏App在多地区上架",
-        "source": "appstore-cn"
       }
     ],
     "indieDev": [
@@ -241,16 +251,16 @@
       }
     ],
     "dailyWisdom": {
-      "method": "今天把你做过的任何一个成品（哪怕只有10个用户）整理成帖子发布到V2EX的「分享创造」板块，详细写清背景和亮点。",
-      "why": "V2EX是聚集国内独立开发者、早期用户和潜在合伙人的地方，一条认真的分享帖经常能带来第一批种子用户和有效反馈。"
+      "method": "为自己写一套「agent-skills」：把日常重复的超高频操作（如打包发布小程序、生成周报、整理发票）整理成标准化的 SKILL.md 和脚本，让 Claude Code 或 Codex 帮你自动执行，今天就能省下 1 小时。",
+      "why": "GitHub 上 agent-skills 趋势说明 AI 智能体可将重复劳动产品化，你花一小时写的技能，以后每次都能复用。"
     }
   },
   "sources": {
-    "lobsters": 25,
-    "indie-dev": 1,
     "ruanyifeng": 3,
+    "indie-dev": 1,
     "v2ex": 30,
-    "hackernews": 50,
+    "lobsters": 25,
+    "hackernews": 49,
     "appstore-cn": 20,
     "appstore-tw": 20,
     "appstore-us": 20,
