@@ -66,7 +66,7 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 STATE_FILE = DATA_DIR / 'daily_signals_state.json'
 LOOKBACK_HOURS = 48
 MAX_ITEMS_PER_SOURCE = 50
-MAX_PARALLEL = 14
+MAX_PARALLEL = 16
 
 TRUSTMRR_API_KEY = os.environ.get("TRUSTMRR_API_KEY", "")
 PH_TOKEN = os.environ.get("PH_TOKEN", "")
@@ -74,7 +74,7 @@ PH_TOKEN = os.environ.get("PH_TOKEN", "")
 # 中文翻译增强（GitHub / trustmrr / Product Hunt 等英文源 → 中文主标题）
 # key 从环境变量 DEEPSEEK_API_KEY 或 ~/.hermes/.env 读取
 ENHANCE_ZH = os.environ.get("ENHANCE_ZH", "1") == "1"
-ZH_SOURCES = ["github", "trustmrr", "producthunt", "appstore-cn", "appstore-tw", "appstore-us", "appstore-jp", "appstore-kr", "hackernews", "lobsters"]  # 需要翻译的英文源
+ZH_SOURCES = ["github", "trustmrr", "producthunt", "appstore-cn", "appstore-tw", "appstore-us", "appstore-jp", "appstore-kr", "hackernews", "lobsters", "reddit-sidehustle"]  # 需要翻译的英文源
 
 # Reddit OAuth（推荐，绕开 IP 封锁）— 在 https://www.reddit.com/prefs/apps 注册 script app 获取
 # 未设置时自动 fallback 到 pullpush.io 镜像
@@ -1504,6 +1504,85 @@ def fetch_lobsters():
 
 
 # ============================================================
+# SOURCE: 副业 / 赚钱（Reddit r/sidehustle + r/EntrepreneurRideAlong）
+# 这些源偏「普通人能上手的低门槛赚钱项目」，与主开发者信号互补
+# ============================================================
+def _fetch_reddit_rss(sub, limit=15):
+    """Reddit 官方 RSS（hot.rss）。数据中心 IP 易被 403/429，仅作尽力补充。"""
+    try:
+        url = f"https://www.reddit.com/r/{sub}/hot.rss?limit={limit}"
+        return _parse_rss_feed(url, "reddit-sidehustle", "副业")
+    except Exception as e:
+        print(f"[WARN] reddit-rss/{sub}: {e}")
+        return []
+
+
+def _fetch_hn_money(queries, per_query=8):
+    """Hacker News（Algolia API）侧：稳定可获取的「副业 / 赚钱」信号。
+
+    Reddit 在本环境常被 403/429 封禁，HN Algolia 是可靠兜底，且内容天然偏
+    独立开发者 / 赚钱 / 小本经营，契合副业主题。
+    """
+    items = []
+    seen = set()
+    for q in queries:
+        try:
+            r = requests.get(
+                "http://hn.algolia.com/api/v1/search_by_date",
+                params={"query": q, "tags": "story",
+                        "numericFilters": "points>10", "hitsPerPage": per_query},
+                headers={"User-Agent": UA_BROWSER}, timeout=15)
+            r.raise_for_status()
+            for h in r.json().get("hits", []):
+                oid = h.get("objectID")
+                if not oid or oid in seen:
+                    continue
+                seen.add(oid)
+                title = (h.get("title") or "").strip()
+                if not title:
+                    continue
+                url_ = h.get("url") or f"https://news.ycombinator.com/item?id={oid}"
+                ts = int(time.time())
+                try:
+                    ts = int(datetime.fromisoformat(
+                        h["created_at"].replace("Z", "+00:00")).timestamp())
+                except Exception:
+                    pass
+                items.append(make_item(
+                    source="reddit-sidehustle", item_id=f"hn:{oid}",
+                    title=title, url=url_, points=h.get("points") or 0,
+                    timestamp=ts, description="", extra_tags=["副业"],
+                    extra_fields={}))
+        except Exception as e:
+            print(f"[WARN] hn-money '{q}': {e}")
+    return items
+
+
+def fetch_reddit_sidehustle():
+    """副业 / 赚钱项目信号聚合：Reddit RSS（尽力）+ Hacker News Algolia（可靠兜底）
+
+    数据中心 IP 对 Reddit 原生 JSON / RSS 常被 403/429，故以 HN Algolia 作为
+    稳定主源、Reddit 作补充；统一归入 reddit-sidehustle 源标签，供 gen_report
+    提炼 sideHustles（副业赚钱项目）模块。
+    """
+    items = []
+    for sub in ("sidehustle", "EntrepreneurRideAlong"):
+        items += _fetch_reddit_rss(sub)
+    items += _fetch_hn_money([
+        "side hustle", "passive income", "make money online",
+        "freelance", "small business ideas"
+    ])
+    seen = set()
+    deduped = []
+    for it in items:
+        if it["id"] in seen:
+            continue
+        seen.add(it["id"])
+        deduped.append(it)
+    return deduped[:MAX_ITEMS_PER_SOURCE]
+
+
+# ============================================================
 # MAIN
 # ============================================================
 
@@ -1528,6 +1607,7 @@ def main():
         "appstore": fetch_appstore,
         "indie-dev": fetch_indie_dev,
         "hackernews": fetch_hackernews,
+        "reddit-sidehustle": fetch_reddit_sidehustle,
         "lobsters": fetch_lobsters,
     }
 
@@ -1665,8 +1745,9 @@ def main():
         "oschina": "开源中国", "jike-ai-explore": "即刻·AI探索站",
         "jike-ai-discuss": "即刻·AI讨论", "jike-engineer": "即刻·工程师",
         "appstore-cn": "App Store 中国", "appstore-tw": "App Store 台湾",
-        "appstore-us": "App Store 美国", "appstore-jp": "App Store 日本",
+        "appstore-us": "App Store 美国",         "appstore-jp": "App Store 日本",
         "appstore-kr": "App Store 韩国",
+        "reddit-sidehustle": "副业赚钱（Reddit + HN）",
     }
     parts = []
     for name, items in per_source.items():

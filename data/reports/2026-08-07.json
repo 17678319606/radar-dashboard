@@ -54,7 +54,7 @@
           "内容消费",
           "出海"
         ],
-        "source": "jike-ai-discuss"
+        "source": "indie-dev"
       },
       {
         "title": "Easy 简历开源，验证简历制作 SaaS 付费可行",
@@ -165,6 +165,18 @@
         "what": "支持任务规划、工具调用、记忆和自我进化，多模型多平台接入，可快速搭建个性化 AI 助手。",
         "url": "https://github.com/zhayujie/CowAgent",
         "source": "github-zh"
+      },
+      {
+        "title": "HowToCook",
+        "what": "程序员做饭指南，开源菜谱。",
+        "url": "https://github.com/Anduin2017/HowToCook",
+        "source": "github-zh"
+      },
+      {
+        "title": "MiroFish",
+        "what": "简洁通用的群体智能引擎，预测万物。",
+        "url": "https://github.com/666ghj/MiroFish",
+        "source": "github"
       }
     ],
     "pitfalls": [
@@ -324,12 +336,7 @@
     "v2ex": 30,
     "sspai": 10,
     "oschina": 30,
-    "lobsters": 25,
-    "hackernews": 50,
-    "v2ex": 30,
-    "jike-ai-explore": 9,
-    "jike-ai-discuss": 3,
-    "jike-engineer": 7,
+    "indie-dev": 2,
     "appstore-cn": 20,
     "appstore-tw": 20,
     "appstore-us": 20,

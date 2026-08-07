@@ -1,17 +1,19 @@
 {
   "site": {
-    "name": "独立开发者雷达日报",
-    "description": "为独立开发者/小程序创业者聚合每日产品机会、赚钱案例与数据信号。",
-    "keywords": "独立开发者, 微信小程序, 创业机会, 雷达日报, 产品灵感",
-    "author": "独立开发者雷达日报"
+    "name": "进步分子日报",
+    "description": "为独立开发者与副业玩家聚合每日产品机会、赚钱案例、独立开发者新品与数据信号。",
+    "keywords": "进步分子, 副业, 独立开发者, 赚钱, 产品灵感, 雷达日报, 小程序创业",
+    "author": "进步分子日报"
   },
   "footer": {
-    "copyright": "独立开发者雷达日报",
+    "copyright": "进步分子日报",
     "basedOn": {
       "text": "本项目基于 susumr/radar-dashboard",
       "url": "https://github.com/susumr/radar-dashboard"
     },
-    "extraLinks": []
+    "extraLinks": [
+      { "text": "主站 jinbufenzi.com", "url": "https://jinbufenzi.com" }
+    ]
   },
   "compliance": {
     "icp": "豫ICP备2024069686号",
@@ -22,6 +24,13 @@
   "ads": {
     "enabled": true,
     "adsenseClient": "",
+    "jd": {
+      "enabled": false,
+      "unionId": "",
+      "positionId": "",
+      "scriptUrl": "",
+      "html": ""
+    },
     "slots": [
       {
         "id": "top-banner",
@@ -48,7 +57,7 @@
   },
   "donation": {
     "enabled": true,
-    "title": "支持雷达日报持续运转",
+    "title": "支持进步分子日报持续运转",
     "desc": "如果这份日报对你有启发，欢迎赞赏支持，让我能持续采集更多信号、迭代功能。",
     "qrUrl": "https://raw.githubusercontent.com/17678319606/radar-dashboard/main/docs/donate-qrcode.jpg",
     "buttonText": "☕ 赞赏支持"

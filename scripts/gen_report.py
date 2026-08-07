@@ -77,6 +77,7 @@ JSON_SCHEMA_HINT = """严格输出如下结构的 JSON（不要 markdown 代码�
   "modules": {
     "opportunities":      [{"title":"", "why":"", "how":"", "keywords":["",""], "source":""}],
     "moneyCases":         [{"title":"", "what":"", "revenue":"", "how":"", "source":""}],
+    "sideHustles":       [{"title":"", "why":"", "how":"", "revenue":"", "source":""}],  // 副业赚钱项目：来自 reddit-sidehustle 等通用副业信号，挑低门槛、普通人能上手、能变现的方向
     "productInspirations":[{"title":"", "idea":"", "source":""}],
     "growthTips":         [{"title":"", "tip":"", "source":""}],
     "tools":              [{"title":"", "what":"", "url":"", "source":""}],
@@ -92,7 +93,8 @@ JSON_SCHEMA_HINT = """严格输出如下结构的 JSON（不要 markdown 代码�
 要求：
 - 每个数组模块 1-5 条，宁缺毋滥，只挑当天最有价值的；实在没有就给空数组 []
 - 所有内容用中文；英文标题请翻译，专有名词可保留原文
-- `source` 填信号来源平台（如 github / appstore-us / v2ex / sspai）
+- `source` 填信号来源平台（如 github / appstore-us / v2ex / sspai / reddit-sidehustle）
+- `sideHustles`（副业赚钱项目）：低门槛、普通人能上手、能变现的副业方向，可从 reddit-sidehustle 等副业信号里提炼；与 `moneyCases` 不同，它更偏「个人可做的副业」而非「已验证的赚钱案例」
 - 不要编造信号里没有的数据（收入、用户数等），没有就不写
 - `dailyWisdom.method` 是一条今天就能执行的具体做法，不要鸡汤
 """

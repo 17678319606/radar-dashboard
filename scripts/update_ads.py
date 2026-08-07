@@ -70,6 +70,12 @@ def main():
     p.add_argument("--content", default=None, help="自定义广告位 HTML 内容")
     p.add_argument("--off", action="store_true", help="关闭全部广告（含 AdSense）")
     p.add_argument("--on", action="store_true", help="开启广告总开关")
+    p.add_argument("--jd-enable", action="store_true", help="启用京东联盟橱窗广告")
+    p.add_argument("--jd-disable", action="store_true", help="关闭京东联盟橱窗广告")
+    p.add_argument("--jd-script-url", default=None, help="京东联盟提供的广告位脚本地址（粘贴官方代码里的 <script src=...>）")
+    p.add_argument("--jd-html", default=None, help="京东联盟自定义橱窗 HTML 片段（可选，填入侧边栏）")
+    p.add_argument("--jd-union-id", default=None, help="京东联盟 unionId（备用，优先用 --jd-script-url）")
+    p.add_argument("--jd-position-id", default=None, help="京东联盟 positionId（备用，优先用 --jd-script-url）")
     args = p.parse_args()
 
     cfg = load_site()
@@ -96,6 +102,36 @@ def main():
             print(f"🔗 已设置 AdSense 发布商：{ads['adsenseClient']}（自动广告将在下次部署后生效）")
         else:
             print("🔗 已清空 AdSense 发布商（自动广告关闭）")
+
+    # 京东联盟橱窗广告
+    if args.jd_enable or args.jd_disable or args.jd_script_url is not None \
+            or args.jd_html is not None or args.jd_union_id is not None or args.jd_position_id is not None:
+        jd = ads.setdefault("jd", {})
+        if args.jd_enable:
+            jd["enabled"] = True
+            changed = True
+            print("🛒 已启用京东联盟橱窗广告")
+        if args.jd_disable:
+            jd["enabled"] = False
+            changed = True
+            print("🛒 已关闭京东联盟橱窗广告")
+        if args.jd_script_url is not None:
+            jd["scriptUrl"] = args.jd_script_url.strip()
+            jd["enabled"] = True
+            ads["enabled"] = True
+            changed = True
+            print(f"🛒 已设置京东联盟脚本地址（下次部署后生效）")
+        if args.jd_html is not None:
+            jd["html"] = args.jd_html
+            changed = True
+        if args.jd_union_id is not None:
+            jd["unionId"] = args.jd_union_id.strip()
+            changed = True
+        if args.jd_position_id is not None:
+            jd["positionId"] = args.jd_position_id.strip()
+            changed = True
+        if not jd.get("scriptUrl") and not jd.get("html") and not (jd.get("unionId") and jd.get("positionId")):
+            print("⚠️ 京东联盟已启用但未填脚本地址/橱窗片段，广告不会展示；请补充 --jd-script-url")
 
     if args.slot:
         slot = next((s for s in ads.get("slots", []) if s.get("id") == args.slot), None)
