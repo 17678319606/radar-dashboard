@@ -1391,8 +1391,9 @@ function navigate(path) {
 
 // 缓存击穿：reports 列表每 10 分钟刷新一次，避免 CDN/浏览器长期缓存导致「内容不更新」
 function cacheBust(rel) {
-  // 每次构建注入 __BUILD_TS__；用版本戳做缓存击穿，保证重新部署后浏览器/CDN 拉到新数据，杜绝「内容不刷新」
-  return '?t=' + (window.__BUILD_TS__ || Math.floor(Date.now() / 60000));
+  // 每 10 分钟一档：保证每日两次自动更新后用户能在 10 分钟内拉到新数据；
+  // 不依赖「重新部署」即可击穿缓存（BUILD_TS 仅在重新部署时变化，不足以驱动每日自动更新）。
+  return '?t=' + Math.floor(Date.now() / 600000);
 }
 
 // ─── 静态模式适配层（无后端时使用）───
@@ -1428,20 +1429,19 @@ async function staticGet(path) {
       if (lr.ok) return await lr.json();
     } catch (e) { /* 本地缺失则走远程 */ }
   }
-  // 数据优先用「本地部署副本」（随自动化部署实时刷新，无 CDN 缓存延迟），
-  // jsDelivr 镜像仅作兜底（CI 缓存延迟/不可达时回退）。
-  // 背景：原先 jsDelivr 优先，但其 CDN 缓存常滞后于 GitHub 提交，
-  // 导致线上日报停在旧日期；改为本地优先后，自动化每次部署即所见最新。
-  try {
-    const lr = await fetch(STATIC_BASE + rel + q);
-    if (lr.ok) return await lr.json();
-  } catch (e) { /* 本地缺失则走远程兜底 */ }
+  // 数据优先用「远程源」（GitHub Actions 每次提交即生效，jsDelivr 镜像随提交刷新，
+  // 无需重新部署 EdgeOne 即可自动更新；cacheBust 用时间窗击穿 CDN/浏览器缓存）。
+  // 本地部署副本（radar-api/）仅作兜底：远程不可达时仍可看到最近一次部署的快照。
   if (REMOTE_ENABLED) {
     try {
       const rr = await fetch(REMOTE_DATA_BASE + rel + q);
       if (rr.ok) return await rr.json();
-    } catch (e) { /* 远程不可达 */ }
+    } catch (e) { /* 远程不可达则走本地兜底 */ }
   }
+  try {
+    const lr = await fetch(STATIC_BASE + rel + q);
+    if (lr.ok) return await lr.json();
+  } catch (e) { /* 本地缺失 */ }
   throw new Error('not found: ' + path);
 }
 
