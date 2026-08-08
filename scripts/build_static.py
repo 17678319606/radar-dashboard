@@ -42,12 +42,13 @@ INJECT_SNIPPET = (
 )
 
 
-SITE_URL = 'https://radar-dashboard-7zsuaod4.edgeone.cool'
+SITE_URL = 'https://zb.jinbufenzi.com'
 
-# 静态 SEO 页（每日日报 HTML / sitemap / rss / og 封面）通过 jsDelivr 自动发布。
-# 原因：CI 自动跑批不会重部署 EdgeOne，若把收录页指向 EdgeOne 则新日期页不会自动上线，
-# 与「全自动化」诉求冲突。jsDelivr 随 git 提交即生效，无需人工重部署。
-PUBLIC_BASE = 'https://cdn.jsdelivr.net/gh/17678319606/radar-dashboard@main'
+# 静态 SEO 页（每日日报 HTML / sitemap / rss / og 封面）统一指向自定义域名。
+# CI 现在每次跑批都会重新部署 EdgeOne（见 .github/workflows/daily.yml 的部署步骤），
+# 因此 EdgeOne 上的新日期页与数据都会自动上线，无需依赖 jsDelivr 作为收录源。
+# jsDelivr 仅作为前端运行时的数据兜底（SPA staticGet 的 REMOTE_DATA_BASE）。
+PUBLIC_BASE = 'https://zb.jinbufenzi.com'
 
 
 def _generate_seo_assets(out_dir: Path):
@@ -172,7 +173,7 @@ DAILY_HTML_TMPL = """<!DOCTYPE html>
 <style>
 :root{{--bg:#0b0d12;--surface:#13161e;--card:#1a1e2a;--border:#2a2f45;--text:#e6e8ee;--sub:#9aa3b2}}
 *{{box-sizing:border-box;margin:0;padding:0}}
-body{{background:var(--bg);color:var(--text);font:15px/1.7 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;padding:0 16px}}
+body{{background:var(--bg);color:var(--text);font:16px/1.85 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'PingFang SC','Microsoft YaHei',sans-serif;padding:0 16px}}
 .wrap{{max-width:760px;margin:0 auto;padding:32px 0 64px}}
 header a{{color:var(--sub);text-decoration:none;font-size:.85rem}}
 h1{{font-size:1.6rem;margin:14px 0 4px}}

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://cdn.jsdelivr.net/gh/17678319606/radar-dashboard@main/sitemap.xml
+Sitemap: https://zb.jinbufenzi.com/sitemap.xml

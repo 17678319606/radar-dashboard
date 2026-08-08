@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <title>进步分子雷达日报</title>
 <meta name="description" content="为独立开发者与副业玩家聚合每日产品机会、赚钱案例、独立开发者新品与数据信号。每日 06:00/19:00 自动更新。">
 <meta name="keywords" content="进步分子雷达日报, 进步分子, 副业, 独立开发者, 赚钱, 产品灵感, 雷达日报, 小程序创业">
@@ -12,15 +12,15 @@
 <meta property="og:title" content="进步分子雷达日报">
 <meta property="og:description" content="每日自动采集 20+ 信息源，生成独立开发者/副业赚钱机会雷达。">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://radar-dashboard-7zsuaod4.edgeone.cool/">
+<meta property="og:url" content="https://zb.jinbufenzi.com/">
 <meta name="twitter:card" content="summary_large_image">
-<meta property="og:image" content="https://radar-dashboard-7zsuaod4.edgeone.cool/og-cover.svg">
+<meta property="og:image" content="https://zb.jinbufenzi.com/og-cover.svg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta name="twitter:image" content="https://radar-dashboard-7zsuaod4.edgeone.cool/og-cover.svg">
-<link rel="canonical" href="https://radar-dashboard-7zsuaod4.edgeone.cool/">
+<meta name="twitter:image" content="https://zb.jinbufenzi.com/og-cover.svg">
+<link rel="canonical" href="https://zb.jinbufenzi.com/">
 <script type="application/ld+json" id="jsonld-website">
-{"@context":"https://schema.org","@type":"WebSite","name":"进步分子雷达日报","url":"https://radar-dashboard-7zsuaod4.edgeone.cool/","description":"每日自动采集 20+ 信息源，生成独立开发者/副业赚钱机会雷达。","inLanguage":"zh-CN"}
+{"@context":"https://schema.org","@type":"WebSite","name":"进步分子雷达日报","url":"https://zb.jinbufenzi.com/","description":"每日自动采集 20+ 信息源，生成独立开发者/副业赚钱机会雷达。","inLanguage":"zh-CN"}
 </script>
 <style>
 /* ─── Reset & Base ─── */
@@ -57,7 +57,7 @@
   /* 顶栏底色（与背景融为一体） */
   --topbar-bg: var(--bg);
   color-scheme: dark;
-  font-size: 15px;
+  font-size: 16px;
 }
 /* ═══ 亮色主题（PostHog 式暖色杂志） ═══ */
 [data-theme="light"] {
@@ -309,6 +309,19 @@ body {
 }
 a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 .pager-btn.disabled { opacity: .35; cursor: default; }
+
+/* 日报底部翻页（R15 增强）：长文读到底也能一键切换，无需回顶 */
+.daily-footer-nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin: 28px 0 8px; }
+.daily-footer-nav .pager-btn { padding: 9px 16px; font-size: .85rem; }
+
+/* 时间线「已读」标记（R17，纯前端 localStorage 记忆，无后端成本） */
+.timeline-card { position: relative; }
+.timeline-card.read { opacity: .82; }
+.read-badge {
+  position: absolute; top: 10px; right: 12px;
+  font-size: .68rem; color: var(--green);
+  background: var(--ok-bg); padding: 2px 8px; border-radius: 999px;
+}
 .stale-tip {
   margin-top: 10px; padding: 8px 12px; border-radius: 8px;
   background: var(--surface); border: 1px dashed var(--border);
@@ -391,7 +404,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   transition: border-color .15s;
 }
 .module-item:hover { border-color: rgba(108,140,255,.25); }
-.module-item h4 { font-size: .95rem; font-weight: 600; margin-bottom: 8px; line-height: 1.5; }
+.module-item h4 { font-size: 1.05rem; font-weight: 600; margin-bottom: 8px; line-height: 1.5; }
 .module-item .label-row {
   display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
 }
@@ -401,8 +414,8 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 }
 /* 正文可读性：行距拉开、限制单行字数（过长的行最伤阅读） */
 .module-item .field {
-  font-size: .86rem; color: var(--text-secondary);
-  margin-top: 7px; line-height: 1.75; max-width: 78ch;
+  font-size: 1rem; color: var(--text-secondary);
+  margin-top: 7px; line-height: 1.85; max-width: 70ch;
   overflow-wrap: anywhere;
 }
 .module-item .field strong { color: var(--text); }
@@ -735,7 +748,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ─── Donation ─── */
 .donate-float {
-  position: fixed; right: 18px; bottom: 18px;
+  position: fixed; right: calc(18px + env(safe-area-inset-right)); bottom: calc(18px + env(safe-area-inset-bottom));
   z-index: 90; display: flex; align-items: center; gap: 6px;
   background: linear-gradient(135deg, var(--accent), #4f46e5);
   color: #fff; border: none; border-radius: 50px;
@@ -762,7 +775,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 /* ─── Scroll to Top ─── */
 .scroll-top {
-  position: fixed; right: 18px; bottom: 74px;
+  position: fixed; right: calc(18px + env(safe-area-inset-right)); bottom: calc(74px + env(safe-area-inset-bottom));
   z-index: 89; display: none;
   background: var(--card); border: 1px solid var(--border); color: var(--text);
   width: 40px; height: 40px; border-radius: 50%;
@@ -812,7 +825,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
 @media (max-width: 768px) {
   .layout { position: relative; }
   .sidebar {
-    position: fixed; left: 0; top: 0; bottom: 0;
+    position: fixed; left: 0; top: 0; bottom: 0; padding-left: env(safe-area-inset-left); padding-top: env(safe-area-inset-top);
     width: 260px; min-width: 260px;
     transform: translateX(-100%); transition: transform .25s ease;
     z-index: 60; border-right: none; box-shadow: 4px 0 24px rgba(0,0,0,.35);
@@ -830,7 +843,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   .topbar h2 { font-size: .9rem; }
   .topbar .stats { display: none; }
   .global-search { width: 130px; padding: 7px 10px; font-size: .8rem; }
-  .content { padding: 16px; }
+  .content { padding: 16px; padding-left: calc(16px + env(safe-area-inset-left)); padding-right: calc(16px + env(safe-area-inset-right)); }
   .timeline-grid { grid-template-columns: 1fr; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .raw-layout { flex-direction: column; }
@@ -840,14 +853,14 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   .daily-header .date-large { font-size: 1.4rem; }
   .mp-grid, .source-grid { grid-template-columns: 1fr; }
   .mp-filter, .global-search { width: 100%; }
-  .donate-float { right: 12px; bottom: 12px; padding: 9px 13px; font-size: .8rem; }
-  .scroll-top { right: 12px; bottom: 64px; }
+  .donate-float { right: calc(12px + env(safe-area-inset-right)); bottom: calc(12px + env(safe-area-inset-bottom)); padding: 9px 13px; font-size: .8rem; }
+  .scroll-top { right: calc(12px + env(safe-area-inset-right)); bottom: calc(64px + env(safe-area-inset-bottom)); }
   .donate-modal-content img { width: 180px; }
 
   /* 移动端阅读优化：正文更大更松，卡片内边距收窄把宽度让给文字 */
   .module-item { padding: 14px 14px; }
   .module-item h4 { font-size: 1rem; line-height: 1.55; }
-  .module-item .field { font-size: .94rem; line-height: 1.85; max-width: none; }
+  .module-item .field { font-size: 1rem; line-height: 1.9; max-width: none; }
   /* 模块目录横向滑动，避免在小屏堆成一大坨占满首屏 */
   .module-toc {
     flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 18px; padding: 0 16px 6px;
@@ -860,7 +873,7 @@ a.pager-btn:hover { border-color: var(--accent); color: var(--accent); }
   .pager-btn { padding: 8px 14px; font-size: .78rem; }
   .daily-header .source-stats { gap: 8px; }
   .daily-header .source-stat { font-size: .74rem; padding: 3px 8px; }
-  .site-footer { padding: 18px 0 76px; }
+  .site-footer { padding: 18px 0 calc(76px + env(safe-area-inset-bottom)); }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -1415,17 +1428,20 @@ async function staticGet(path) {
       if (lr.ok) return await lr.json();
     } catch (e) { /* 本地缺失则走远程 */ }
   }
-  // 数据优先「远程每日更新源」（jsDelivr 镜像的 root radar-api/，由 CI 每日刷新），
-  // 本地部署副本 dist/radar-api 仅作兜底；保证「一次部署」后用户始终看到最新日报，
-  // 无需每次自动更新都重新部署站点外壳。config 已在上方优先用本地副本。
+  // 数据优先用「本地部署副本」（随自动化部署实时刷新，无 CDN 缓存延迟），
+  // jsDelivr 镜像仅作兜底（CI 缓存延迟/不可达时回退）。
+  // 背景：原先 jsDelivr 优先，但其 CDN 缓存常滞后于 GitHub 提交，
+  // 导致线上日报停在旧日期；改为本地优先后，自动化每次部署即所见最新。
+  try {
+    const lr = await fetch(STATIC_BASE + rel + q);
+    if (lr.ok) return await lr.json();
+  } catch (e) { /* 本地缺失则走远程兜底 */ }
   if (REMOTE_ENABLED) {
     try {
       const rr = await fetch(REMOTE_DATA_BASE + rel + q);
       if (rr.ok) return await rr.json();
-    } catch (e) { /* 远程不可达则走本地兜底 */ }
+    } catch (e) { /* 远程不可达 */ }
   }
-  const r = await fetch(STATIC_BASE + rel + q);
-  if (r.ok) return await r.json();
   throw new Error('not found: ' + path);
 }
 
@@ -2020,10 +2036,13 @@ async function renderTimeline(container) {
   }
 
   let html = '<div class="timeline-grid">';
+  const readDates = _readSet();
   for (const r of list) {
     const moduleList = Object.keys(r.modules || {});
+    const isRead = readDates.has(r.date);
     html += `
-      <a class="timeline-card card" href="#/daily/${r.date}">
+      <a class="timeline-card card${isRead ? ' read' : ''}" href="#/daily/${r.date}">
+        ${isRead ? '<span class="read-badge">✓ 已读</span>' : ''}
         <div class="date-badge">${r.date}</div>
         <div class="card-title">${r.date} 进步分子雷达日报</div>
         <div class="card-meta">${r.moduleCount} 个模块 · ${r.signalCount || '-'} 条精选</div>
@@ -2037,6 +2056,34 @@ async function renderTimeline(container) {
 }
 
 // ─── 日报详情视图 ───
+// 本地续读记忆（R17，纯前端、无后端成本）：按日期保存/恢复滚动位置 + 已读标记
+function _readSet() {
+  try { return new Set(JSON.parse(localStorage.getItem('radar_read_dates') || '[]')); }
+  catch (e) { return new Set(); }
+}
+function markDailyRead(date) {
+  try { const s = _readSet(); s.add(date); localStorage.setItem('radar_read_dates', JSON.stringify([...s])); } catch (e) {}
+}
+function saveDailyScroll(date) {
+  try { localStorage.setItem('radar_scroll_' + date, String(Math.round(window.scrollY))); } catch (e) {}
+}
+function restoreDailyScroll(date) {
+  try {
+    const y = parseInt(localStorage.getItem('radar_scroll_' + date) || '0', 10);
+    if (y > 0) requestAnimationFrame(() => window.scrollTo(0, y));
+  } catch (e) {}
+}
+let _scrollSaveHandler = null;
+function bindDailyScrollSave(date) {
+  if (_scrollSaveHandler) { window.removeEventListener('scroll', _scrollSaveHandler); _scrollSaveHandler = null; }
+  let ticking = false;
+  _scrollSaveHandler = () => {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(() => { saveDailyScroll(date); ticking = false; });
+  };
+  window.addEventListener('scroll', _scrollSaveHandler, { passive: true });
+}
+
 async function renderDaily(container, dateStr, opts) {
   opts = opts || {};
   const report = await api(`/reports/${dateStr}`);
@@ -2072,7 +2119,7 @@ async function renderDaily(container, dateStr, opts) {
     'dateModified': (report.date || dateStr),
     'author': { '@type': 'Organization', 'name': (siteConfig && siteConfig.footer && siteConfig.footer.copyright) || '进步分子雷达日报' },
     'publisher': { '@type': 'Organization', 'name': '进步分子雷达日报' },
-    'mainEntityOfPage': { '@type': 'WebPage', '@url': 'https://radar-dashboard-7zsuaod4.edgeone.cool/#/daily/' + (report.date || dateStr) }
+    'mainEntityOfPage': { '@type': 'WebPage', '@url': 'https://zb.jinbufenzi.com/daily/' + (report.date || dateStr) + '.html' }
   });
 
   let html = `
@@ -2166,12 +2213,23 @@ async function renderDaily(container, dateStr, opts) {
     html += `</div>`;
   }
 
+  // 底部翻页（R15 增强）：长文阅读到底也能一键切换，无需回顶
+  html += `<nav class="daily-footer-nav" aria-label="日报翻页">
+      ${newer ? `<a class="pager-btn" href="#/daily/${newer}">← 更新一期</a>` : `<span class="pager-btn disabled">← 更新一期</span>`}
+      <a class="pager-btn" href="#/timeline">🗂 时间线</a>
+      ${older ? `<a class="pager-btn" href="#/daily/${older}">更早一期 →</a>` : `<span class="pager-btn disabled">更早一期 →</span>`}
+    </nav>`;
+
   if (!Object.keys(mods).length) {
     html += `<div class="empty-state"><div class="icon">📭</div><h3>暂无内容</h3></div>`;
   }
 
   container.innerHTML = html;
   markFavorites(container);
+  // R17 本地续读：恢复上次滚动位置 + 标记已读 + 绑定滚动保存
+  restoreDailyScroll(report.date || dateStr);
+  markDailyRead(report.date || dateStr);
+  bindDailyScrollSave(report.date || dateStr);
 }
 
 function renderModuleItem(modKey, item) {
@@ -2814,7 +2872,7 @@ async function checkGlobalStale() {
     const list = Array.isArray(reports) ? reports : ((reports && reports.reports) || []);
     const date = (list[0] && list[0].date) || '';
     if (!date) return;
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Shanghai' });
     const banner = document.getElementById('globalStale');
     if (!banner) return;
     if (date < today) {

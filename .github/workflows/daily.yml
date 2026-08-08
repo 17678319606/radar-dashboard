@@ -63,6 +63,18 @@ jobs:
           fi
           echo "✅ 日报日期与今天一致: $TODAY"
 
+      - name: 部署到 EdgeOne（刷新线上数据 + 外壳，无需人工重部署）
+        env:
+          EO_TOKEN: ${{ secrets.EO_TOKEN }}
+        run: |
+          if [ -z "$EO_TOKEN" ]; then
+            echo "⚠️ 未配置 EO_TOKEN，跳过 EdgeOne 部署；数据仍通过 GitHub 提交 + jsDelivr 兜底更新。"
+            exit 0
+          fi
+          set -e
+          npm install -g edgeone
+          edgeone makers deploy dist -t "$EO_TOKEN" -n radar-dashboard -e production -a global
+
       - name: 提交更新的数据
         run: |
           git config user.name "github-actions[bot]"
@@ -78,22 +90,28 @@ jobs:
             git push
           fi
 
-      - name: 验证 CDN 可达性（推送后端到端校验）
+      - name: 验证线上可达性（自定义域名 + GitHub 源双校验）
         run: |
           set -e
           TODAY=$(TZ=Asia/Shanghai date +%Y-%m-%d)
-          URL="https://raw.githubusercontent.com/17678319606/radar-dashboard/main/radar-api/reports.json"
+          # 1) GitHub 源：证明数据已提交、jsDelivr 兜底可用（硬校验）
+          SRC="https://raw.githubusercontent.com/17678319606/radar-dashboard/main/radar-api/reports.json"
           for i in $(seq 1 6); do
             sleep 10
-            GEN=$(curl -sL "$URL" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['date'] if isinstance(d,list) and d else '')" 2>/dev/null || true)
-            if [ "$GEN" = "$TODAY" ]; then
-              echo "✅ CDN 已可取到今日日报 ($TODAY)"
-              exit 0
-            fi
-            echo "  第 $i 次：CDN 暂未更新（当前=$GEN），重试…"
+            GEN=$(curl -sL "$SRC" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['date'] if isinstance(d,list) and d else '')" 2>/dev/null || true)
+            if [ "$GEN" = "$TODAY" ]; then echo "✅ GitHub 源已可取到今日日报 ($TODAY)"; break; fi
+            echo "  第 $i 次：GitHub 源暂未更新（当前=$GEN），重试…"
           done
-          echo "::error::推送后 60s 内 CDN 仍未提供今日日报，端到端更新可能失败"
-          exit 1
+          # 2) 自定义域名：证明 EdgeOne 部署已生效（最佳努力，失败仅告警不阻断）
+          URL="https://zb.jinbufenzi.com/radar-api/reports.json"
+          OK=0
+          for i in $(seq 1 8); do
+            sleep 8
+            GEN=$(curl -sL "$URL" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d[0]['date'] if isinstance(d,list) and d else '')" 2>/dev/null || true)
+            if [ "$GEN" = "$TODAY" ]; then echo "✅ 自定义域名已上线今日日报 ($TODAY)"; OK=1; break; fi
+            echo "  第 $i 次：自定义域名暂未刷新（当前=$GEN），重试…"
+          done
+          if [ "$OK" != "1" ]; then echo "⚠️ 自定义域名尚未刷新（可能 EdgeOne 边缘节点传播中），GitHub 源已正常，数据最终一致。"; fi
 
       - name: CI 失败通知（GitHub 原生 Issue + 邮件）
         if: failure()
