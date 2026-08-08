@@ -45,14 +45,14 @@ GitHub Actions (cron)
 ## 7. 如何验证健康（无需登服务器）
 - **CI 状态**：GitHub → Actions → `daily.yml` 应每日 2 次 success；失败会自动开 Issue。
 - **内容新鲜**：访问站点，或 `curl https://raw.githubusercontent.com/17678319606/radar-dashboard/main/radar-api/reports.json` 看最新 `date` 是否为今天。
-- **SEO 收录**：`robots.txt` 的 `Sitemap` 指向 `https://cdn.jsdelivr.net/gh/17678319606/radar-dashboard@main/sitemap.xml`，该 sitemap 列出真实 `daily/{date}.html`（jsDelivr 上，非 `#/` 哈希）。收录页随 CI 提交自动更新，无需重部署 EdgeOne。
+- **SEO 收录**：`robots.txt` 的 `Sitemap` 指向 `https://zb.jinbufenzi.com/sitemap.xml`，该 sitemap 列出真实 `daily/{date}.html`（EdgeOne 与 jsDelivr 双源同内容，`canonical` 统一收敛到品牌域名 `zb.jinbufenzi.com`）。收录页随 CI 提交自动更新，无需重部署 EdgeOne。
 
 ## 8. 已知限制 / 风险（留给未来团队）
-- **预览域名**：当前部署在 EdgeOne 预览子域 `radar-dashboard-7zsuaod4.edgeone.cool`，非品牌稳定域名。如需品牌域名，可将 `jinbufenzi.com` 子域 CNAME 到 EdgeOne 并修改 `build_static.py` 的 `SITE_URL`（影响 sitemap/canonical/og）。
+- **品牌域名（已生效）**：已绑定 `zb.jinbufenzi.com`（CNAME 到 EdgeOne），`build_static.py` 的 `SITE_URL` / `PUBLIC_BASE` 均已收敛为 `https://zb.jinbufenzi.com`，sitemap / canonical / og 全部指向品牌域名，不再依赖 EdgeOne 预览子域。
 - **jsDelivr 缓存**：远程源有短缓存，CI 已做「推送后 60s 可达性」校验降低风险。
 - **本地构建需 venv**：`pip install flask requests` 到 `venv/`。
 - **单期日报静态页**已生成，但 Google/Bing 收录需时间，非即时。
-- **双源托管**：SPA 在 EdgeOne（`radar-dashboard-7zsuaod4.edgeone.cool`），SEO 静态页 / sitemap / rss / og 封面在 jsDelivr（仓库根 `daily/` `sitemap.xml` `rss.xml` `og-cover.svg`）。两者 `canonical` 以 jsDelivr 为准，避免重复内容。
+- **双源托管**：SPA 与 SEO 静态页（含 `daily/{date}.html`、sitemap、rss、og 封面）均部署在 EdgeOne 品牌域名 `zb.jinbufenzi.com`（canonical 唯一收敛到该域名）；jsDelivr 仅作为 SPA 的「远程数据兜底源」（CI 提交即刷新，无需重部署 EdgeOne），并镜像发布仓库根 SEO 文件。两者 `canonical` 统一为 `zb.jinbufenzi.com`，无重复内容风险。
 - **仓库根 `daily/` 会随时间增长**（每日 1 个 HTML，约 3–5KB）。如需控制体积，可在 `build_static.py` 里只保留最近 N 期，或在 `.gitignore` 排除旧日期（需同步改 `daily.yml` 提交逻辑）。
 
 ## 9. 备份基线
