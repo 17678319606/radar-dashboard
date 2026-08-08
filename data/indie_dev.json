@@ -1,10 +1,55 @@
 {
   "date": "2026-08-08",
-  "fetched_at": "2026-08-08 06:31:04",
+  "fetched_at": "2026-08-08 19:27:56",
   "source": "github.com/1c7/chinese-independent-developer",
-  "newCount": 1,
-  "totalProducts": 1,
+  "newCount": 4,
+  "totalProducts": 4,
   "items": [
+    {
+      "date": "2026-08-08",
+      "developer": "Miracle",
+      "city": "杭州",
+      "github": "https://github.com/zhoulianbo",
+      "homepage": null,
+      "products": [
+        {
+          "name": "ClassroomTimers",
+          "url": "https://classroomtimers.app/",
+          "desc": "面向教师和课堂场景的免费在线计时工具，主打大屏投影、全屏显示、无需注册",
+          "status": "已上线"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-08",
+      "developer": "vivililio",
+      "city": "广州",
+      "github": "https://github.com/silankfakentend",
+      "homepage": null,
+      "products": [
+        {
+          "name": "CCNavX AI 中转站精选导航",
+          "url": "https://ccnavx.com/zh",
+          "desc": "AI 中转站导航，收录可接入的开发者向 AI API 中转服务，方便切换对比 - [更多介绍](https://github.com/silankfakentend/ai-api-providers)",
+          "status": "已上线"
+        }
+      ]
+    },
+    {
+      "date": "2026-08-08",
+      "developer": "cabbagehao",
+      "city": "北京",
+      "github": "https://github.com/cabbagehao",
+      "homepage": null,
+      "products": [
+        {
+          "name": "LiveFaceSwap AI",
+          "url": "https://livefaceswap.ai/zh",
+          "desc": "在线实时 AI 换脸工具，可在浏览器中体验换脸、换装和风格重绘；Windows 11 桌面版可通过虚拟摄像头接入直播、会议和视频通话软件",
+          "status": "已上线"
+        }
+      ]
+    },
     {
       "date": "2026-08-08",
       "developer": "ShanLeiGuang",
